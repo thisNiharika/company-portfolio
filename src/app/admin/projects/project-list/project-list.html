@@ -1,0 +1,37 @@
+<h1>Manage Projects</h1>
+
+<a routerLink="/admin/projects/new">
+  + Add Project
+</a>
+
+<hr>
+
+@for (project of projects; track project.id) {
+
+  <div>
+
+    <strong>
+      {{ project.serialNo }}
+    </strong>
+
+    {{ project.title }}
+
+    <span>
+      — {{ project.year }}
+    </span>
+
+    <span>
+      — {{ project.status }}
+    </span>
+
+    <a [routerLink]="['/admin/projects', project.id, 'edit']">
+  Edit
+</a>
+
+<a [routerLink]="['/admin/projects', project.id, 'builder']">
+  Add Details
+</a>
+
+  </div>
+
+}

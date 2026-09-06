@@ -1,0 +1,67 @@
+<h1>Projects</h1>
+
+<div class="projects-page">
+
+  <div class="projects-content">
+
+    @for (year of years; track year) {
+
+      <section
+        class="project-year"
+        [id]="'year-' + year">
+
+        <h2>{{ year }}</h2>
+
+        <div class="projects">
+
+          @for (
+            project of getProjectsByYear(year);
+            track project.id
+          ) {
+
+            <div class="project">
+
+              <strong>
+                {{ project.serialNo }}.
+              </strong>
+
+              <span>
+                {{ project.title }}
+              </span>
+
+              <p>
+                {{ project.description }}
+              </p>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+  </div>
+
+
+  <!-- YEAR NAVIGATION -->
+
+  <nav class="year-navigation">
+
+    @for (year of years; track year) {
+
+      <button
+        type="button"
+        (click)="scrollToYear(year)">
+
+        {{ year }}
+
+      </button>
+
+    }
+
+  </nav>
+
+</div>
