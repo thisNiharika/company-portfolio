@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+
 import { Project } from '../../core/models/project';
-import { PROJECTS } from '../../core/data/project-data';
+import { ProjectService } from '../../core/services/project';
 
 @Component({
   selector: 'app-projects',
@@ -8,23 +9,39 @@ import { PROJECTS } from '../../core/data/project-data';
   templateUrl: './projects.html',
   styleUrl: './projects.css'
 })
-export class Projects {
+export class Projects implements OnInit {
 
-  projects: Project[] = PROJECTS;
+  private projectService = inject(ProjectService);
 
-  get years(): number[] {
-    return [...new Set(this.projects.map(project => project.year))]
-      .sort((a, b) => b - a);
+  projects: Project[] = [];
+
+  ngOnInit(): void {
+    this.loadProjects();
   }
 
-getProjects(): Project[] {
-  return [...this.projects].sort(
-    (a, b) => a.serialNo - b.serialNo
-  );
-}
+  loadProjects(): void {
+    this.projects = this.projectService
+      .getProjects()
+      .filter(project => project.status === 'published');
+  }
+
+  get years(): number[] {
+    return [
+      ...new Set(
+        this.projects.map(project => project.year)
+      )
+    ].sort((a, b) => b - a);
+  }
+
+  getProjectsByYear(year: number): Project[] {
+    return this.projects
+      .filter(project => project.year === year)
+      .sort((a, b) => a.serialNo - b.serialNo);
+  }
 
   scrollToYear(year: number): void {
-    const element = document.getElementById(`year-${year}`);
+    const element =
+      document.getElementById(`year-${year}`);
 
     if (element) {
       element.scrollIntoView({

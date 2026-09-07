@@ -58,53 +58,52 @@ export class ProjectForm implements OnInit {
   // INITIALIZE
   // =========================
 
-  ngOnInit(): void {
+ngOnInit(): void {
 
-    this.projectId =
-      this.route.snapshot.paramMap.get('id') || '';
+  this.projectId =
+    this.route.snapshot.paramMap.get('id') || '';
 
-    // =========================
-    // EDIT PROJECT
-    // =========================
+  // =========================
+  // EDIT
+  // =========================
 
-    if (this.projectId) {
+  if (this.projectId) {
 
-      this.isEditMode = true;
+    this.isEditMode = true;
 
-      const project =
-        this.projectService.getProjectById(this.projectId);
-
-      if (!project) {
-        this.router.navigate(['/admin/projects']);
-        return;
-      }
-
-      this.projectForm.patchValue({
-        year: project.year,
-         serialNo: this.projectService.getNextSerialNo(),
-        title: project.title,
-        description: project.description,
-        coverImage: project.coverImage,
-        slug: project.slug,
-        status: project.status
-      });
-
-      this.imagePreview = project.coverImage;
-
-      // Existing slug should not be regenerated
-      this.slugManuallyEdited = true;
-
+    const project =
+      this.projectService.getProjectById(this.projectId);
+console.log('EDIT PROJECT:', project);
+    if (!project) {
+      this.router.navigate(['/admin/projects']);
       return;
     }
 
-    // =========================
-    // ADD PROJECT
-    // =========================
-
     this.projectForm.patchValue({
-      serialNo: this.projectService.getNextSerialNo()
+      year: project.year,
+      serialNo: project.serialNo,
+      title: project.title,
+      description: project.description,
+      coverImage: project.coverImage,
+      slug: project.slug,
+      status: project.status
     });
+
+    this.imagePreview = project.coverImage;
+
+    this.slugManuallyEdited = true;
+
+    return;
   }
+
+  // =========================
+  // ADD
+  // =========================
+
+  this.projectForm.patchValue({
+    serialNo: this.projectService.getNextSerialNo()
+  });
+}
 
 
   // =========================
