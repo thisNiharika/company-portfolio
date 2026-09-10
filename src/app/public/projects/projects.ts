@@ -38,6 +38,11 @@ export class Projects implements OnInit {
       .filter(project => project.year === year)
       .sort((a, b) => a.serialNo - b.serialNo);
   }
+getProjects(): Project[] {
+  return [...this.projects].sort(
+    (a, b) => a.serialNo - b.serialNo
+  );
+}
 
   scrollToYear(year: number): void {
     const element =
