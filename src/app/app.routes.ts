@@ -21,6 +21,12 @@ export const routes: Routes = [
       import('./public/projects/projects').then(m => m.Projects)
   },
 
+  {
+    path: 'portfolio',
+    loadComponent: () =>
+      import('./public/p-design/p-design').then(m => m.PDesign)
+  },
+
   // ADMIN
   {
     path: 'admin/login',

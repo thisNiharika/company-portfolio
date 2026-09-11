@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
+import { RouteTransitionService } from './core/services/route-transition.service';
+import { Header } from './public/layout/header/header';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, Header],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('company-portfolio');
+    readonly routeTransition = inject(RouteTransitionService);
 }

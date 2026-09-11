@@ -1,1 +1,38 @@
-<router-outlet></router-outlet>
+<div
+  class="route-transition-panel"
+  [class.active]="
+    routeTransition.phase() === 'cover' ||
+    routeTransition.phase() === 'switching'
+  "
+  [class.reset]="routeTransition.phase() === 'show'">
+</div>
+
+<div
+  class="route-transition-panel-after-time"
+  [class.active]="
+    routeTransition.phase() === 'cover' ||
+    routeTransition.phase() === 'switching'
+  "
+  [class.reset]="routeTransition.phase() === 'show'">
+</div>
+
+<main
+  class="route-page-content"
+  [class.route-page-content-hidden]="
+    routeTransition.phase() === 'switching'
+  "
+  [class.route-animation-active]="
+    routeTransition.phase() === 'show'
+  ">
+
+  <app-header
+    class="route-animate animate-fade-down"
+    style="
+      --route-delay: 200ms;
+      --route-duration: 500ms;
+    ">
+  </app-header>
+
+  <router-outlet></router-outlet>
+
+</main>

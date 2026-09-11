@@ -86,66 +86,58 @@ export class ProjectService {
   // CHANGE S.NO.
   // =========================
 
-  changeSerialNo(
-    projectId: string,
-    newSerialNo: number
-  ): void {
+changeSerialNo(
+  projectId: string,
+  newSerialNo: number
+): void {
 
-    const project =
-      this.projects.find(
-        p => p.id === projectId
-      );
+  const project = this.projects.find(
+    p => p.id === projectId
+  );
 
-    if (!project) {
-      return;
-    }
-
-
-    const oldSerialNo =
-      project.serialNo;
-
-
-    if (oldSerialNo === newSerialNo) {
-      return;
-    }
-
-
-    // Moving UP
-    if (newSerialNo < oldSerialNo) {
-
-      for (const existingProject of this.projects) {
-
-        if (
-          existingProject.id !== projectId &&
-          existingProject.serialNo >= newSerialNo &&
-          existingProject.serialNo < oldSerialNo
-        ) {
-          existingProject.serialNo++;
-        }
-      }
-    }
-
-
-    // Moving DOWN
-    else {
-
-      for (const existingProject of this.projects) {
-
-        if (
-          existingProject.id !== projectId &&
-          existingProject.serialNo > oldSerialNo &&
-          existingProject.serialNo <= newSerialNo
-        ) {
-          existingProject.serialNo--;
-        }
-      }
-    }
-
-
-    project.serialNo = newSerialNo;
-
-    this.normalizeSerialNumbers();
+  if (!project || newSerialNo < 1) {
+    return;
   }
+
+  const oldSerialNo = project.serialNo;
+
+  if (oldSerialNo === newSerialNo) {
+    return;
+  }
+
+  // Moving to a lower number
+  if (newSerialNo < oldSerialNo) {
+
+    for (const existingProject of this.projects) {
+
+      if (
+        existingProject.id !== projectId &&
+        existingProject.serialNo >= newSerialNo &&
+        existingProject.serialNo < oldSerialNo
+      ) {
+        existingProject.serialNo++;
+      }
+    }
+  }
+
+  // Moving to a higher number
+  else {
+
+    for (const existingProject of this.projects) {
+
+      if (
+        existingProject.id !== projectId &&
+        existingProject.serialNo > oldSerialNo &&
+        existingProject.serialNo <= newSerialNo
+      ) {
+        existingProject.serialNo--;
+      }
+    }
+  }
+
+  // Keep the exact number requested
+  project.serialNo = newSerialNo;
+}
 
 
   // =========================

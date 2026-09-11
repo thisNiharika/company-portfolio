@@ -1,0 +1,62 @@
+<div class="portfolioPage">
+  <div class="phead d-flex align-items-start justify-content-between">
+    <h2 class="route-animate animate-fade-up" style="--route-delay: 360ms; --route-duration: 800ms;">Discover our <br><strong>work</strong></h2>
+    <h4 class="route-animate animate-fade-up" style="--route-delay: 400ms; --route-duration: 800ms;">2026</h4>
+  </div>
+  <div class="cardList" [routeStagger]="100" [routeStaggerStart]="600" style="--route-duration: 700ms;">
+    @for (card of cards; track card.title; let index = $index) {
+
+      <div class="card_items route-animate animate-fade-up">
+        <div class="ci_content">
+          <div class="cic_top">
+            <span>{{ card.category }}</span>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.description }}</p>
+          </div>
+          <div class="cic_bottom d-flex justify-content-end">
+            <a class="arrow_card" [attr.href]="card.link"
+            (click)="goTo(card.link, $event)" [attr.aria-label]="'View ' + card.title">
+              <img src="assets/images/arrow_line.svg" alt="Arrow" />
+            </a>
+          </div>          
+        </div>
+        @if (card.image) {
+            <div class="ci_img">
+              <img
+                [src]="card.image"
+                [alt]="card.title"
+                loading="lazy" />
+            </div>
+          }
+      </div>
+    }
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>

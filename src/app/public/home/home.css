@@ -1,0 +1,97 @@
+/* =========================================
+ Loader Start
+========================================= */
+.itm_loader{
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #fff;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.itm_loader svg{
+    width: 400px;
+    overflow: visible;
+    opacity: 1;
+}
+.logo-above-line,
+.logo-below-line,
+.logo-text-below-line {
+    transform: translateY(0);
+    transform-box: view-box;
+    transform-origin: center;
+    will-change: transform;
+}
+
+.line {
+    clip-path: inset(0 100% 0 0);
+    opacity: 1;
+    transform: translate(0, -1px);
+    will-change: clip-path, opacity;
+}
+.zoom-dot {
+    opacity: 0;
+    transform: scale(0.5);
+    transform-box: fill-box;
+    transform-origin: center;
+    pointer-events: none;
+    will-change: transform, opacity, fill;
+}
+
+.i_icon path,
+path.t_icon,
+path.m_icon {
+    fill: transparent;
+    opacity: 1;
+    stroke: #58595b;
+    stroke-dasharray: 0 9999;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0;
+    stroke-width: 2;
+    will-change: fill, stroke-dashoffset, stroke-opacity;
+}
+.text {
+    opacity: 0;
+    transform: translateY(5px);
+    will-change: transform, opacity;
+}
+@media (max-width: 576px) {
+    .itm_loader svg {
+        width: min(82vw, 400px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .itm_loader,
+    .itm_loader svg {
+        transition-duration: 0.01ms;
+    }
+}
+/* =========================================
+ Loader End
+========================================= */
+.home-page-entering {
+  animation: home-enter 500ms ease-out both;
+}
+
+@keyframes home-enter {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

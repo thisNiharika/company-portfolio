@@ -4,7 +4,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'project-1',
     year: 2026,
-    serialNo: 4,
+    serialNo: 1,
     title: 'Project A',
     description: 'Description for Project A',
     coverImage: 'assets/images/project-a.jpg',
@@ -15,7 +15,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'project-2',
     year: 2025,
-    serialNo: 3,
+    serialNo: 2,
     title: 'Project B',
     description: 'Description for Project B',
     coverImage: 'assets/images/project-b.jpg',
@@ -26,7 +26,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'project-3',
     year: 2026,
-    serialNo: 5,
+    serialNo: 3,
     title: 'Project C',
     description: 'Description for Project C',
     coverImage: 'assets/images/project-c.jpg',
@@ -37,7 +37,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'project-4',
     year: 2025,
-    serialNo: 1,
+    serialNo: 4,
     title: 'Project D',
     description: 'Description for Project D',
     coverImage: 'assets/images/project-d.jpg',
@@ -48,7 +48,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'project-5',
     year: 2025,
-    serialNo: 2,
+    serialNo: 5,
     title: 'Project E',
     description: 'Description for Project E',
     coverImage: 'assets/images/project-e.jpg',

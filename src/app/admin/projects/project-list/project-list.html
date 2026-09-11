@@ -1,37 +1,88 @@
-<h1>Manage Projects</h1>
+<div class="project-list-page">
 
-<a routerLink="/admin/projects/new">
-  + Add Project
-</a>
+  <div class="page-header">
 
-<hr>
+    <div>
+      <h1>Manage Projects</h1>
+      <p>Manage your portfolio projects.</p>
+    </div>
 
-@for (project of projects; track project.id) {
-
-  <div>
-
-    <strong>
-      {{ project.serialNo }}
-    </strong>
-
-    {{ project.title }}
-
-    <span>
-      — {{ project.year }}
-    </span>
-
-    <span>
-      — {{ project.status }}
-    </span>
-
-    <a [routerLink]="['/admin/projects', project.id, 'edit']">
-  Edit
-</a>
-
-<a [routerLink]="['/admin/projects', project.id, 'builder']">
-  Add Details
-</a>
+    <a
+      routerLink="/admin/projects/new"
+      class="add-project-btn"
+    >
+      + Add Project
+    </a>
 
   </div>
 
-}
+
+  <div class="project-list">
+
+    @for (project of projects; track project.id) {
+
+      <div class="project-row">
+
+        <div class="project-info">
+
+          <div class="project-serial">
+            {{ project.serialNo }}
+          </div>
+
+          <div class="project-details">
+
+            <h3>{{ project.title }}</h3>
+
+            <div class="project-meta">
+              <span>{{ project.year }}</span>
+              <span>—</span>
+              <span>{{ project.status }}</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="project-actions">
+
+          <a
+            [routerLink]="['/admin/projects', project.id, 'edit']"
+          >
+            Edit
+          </a>
+
+          <a
+            [routerLink]="['/admin/projects', project.id, 'builder']"
+          >
+            Add Details
+          </a>
+
+          @if (project.status !== 'archived') {
+
+            <button
+              type="button"
+              (click)="archiveProject(project)"
+            >
+              Archive
+            </button>
+
+          }
+
+          <button
+            type="button"
+            (click)="deleteProject(project)"
+            class="delete-btn"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>
