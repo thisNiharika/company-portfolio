@@ -45,38 +45,20 @@
 
 
         <div class="project-actions">
-
-          <a
-            [routerLink]="['/admin/projects', project.id, 'edit']"
-          >
+          <a [routerLink]="['/admin/projects', project.id, 'edit']">
             Edit
           </a>
 
-          <a
-            [routerLink]="['/admin/projects', project.id, 'builder']"
-          >
+          <a [routerLink]="['/admin/projects', project.id, 'builder']">
             Add Details
           </a>
-
-          @if (project.status !== 'archived') {
-
-            <button
-              type="button"
-              (click)="archiveProject(project)"
-            >
-              Archive
-            </button>
-
-          }
 
           <button
             type="button"
             (click)="deleteProject(project)"
-            class="delete-btn"
-          >
+            class="delete-btn">
             Delete
           </button>
-
         </div>
 
       </div>

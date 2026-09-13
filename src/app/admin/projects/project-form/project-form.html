@@ -1,378 +1,290 @@
-<div class="page-header">
-  <div>
-    <p class="eyebrow">PROJECT MANAGEMENT</p>
+<div class="project-form-page">
 
-    <h1>{{ isEditMode ? 'Edit Project' : 'Add New Project' }}</h1>
+  <!-- Header -->
+  <div class="page-header">
 
-    <p class="page-description">
-  {{ isEditMode
-    ? 'Update your project information.'
-    : 'Create a project and add it to your portfolio.' }}
-</p>
+    <div>
+      <h1>
+        {{ isEditMode ? 'Edit Project' : 'Add Project' }}
+      </h1>
+
+      <p>
+        {{
+          isEditMode
+            ? 'Update your project details.'
+            : 'Add a new project to your portfolio.'
+        }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="cancel-btn"
+      (click)="router.navigate(['/admin/projects'])">
+      Cancel
+    </button>
+
   </div>
 
-  <button
-    type="button"
-    class="back-button"
-    (click)="router.navigate(['/admin/projects'])">
-    ← Back to Projects
-  </button>
-</div>
+
+  <!-- Form -->
+  <form
+    [formGroup]="projectForm"
+    (ngSubmit)="saveProject()"
+    class="project-form">
 
 
-<form
-  [formGroup]="projectForm"
-  (ngSubmit)="saveProject()"
-  class="project-form">
+    <!-- Basic Information -->
+    <div class="form-section">
 
-  <!-- =========================
-       BASIC INFORMATION
-  ========================== -->
+      <h2>Project Information</h2>
 
-  <section class="form-card">
+      <div class="form-grid">
 
-    <div class="card-header">
-      <div>
-        <h2>Basic Information</h2>
 
-        <p>
-          Enter the basic details of your project.
-        </p>
+        <!-- Project Title -->
+        <div class="form-group full-width">
+
+          <label for="title">
+            Project Title
+          </label>
+
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="Enter project title"
+            (input)="generateSlug()" />
+
+          @if (
+            projectForm.controls.title.touched &&
+            projectForm.controls.title.invalid
+          ) {
+            <small class="error">
+              Project title is required.
+            </small>
+          }
+
+        </div>
+
+
+        <!-- Slug -->
+        <div class="form-group full-width">
+
+          <label for="slug">
+            Slug
+          </label>
+
+          <input
+            id="slug"
+            type="text"
+            formControlName="slug"
+            placeholder="project-name"
+            (input)="onSlugEdit()" />
+
+          <small class="form-help">
+            This is used in the project URL.
+            It is automatically generated from the project title,
+            but you can edit it.
+          </small>
+
+          @if (
+            projectForm.controls.slug.touched &&
+            projectForm.controls.slug.invalid
+          ) {
+            <small class="error">
+              Slug is required.
+            </small>
+          }
+
+        </div>
+
+
+        <!-- Year -->
+        <div class="form-group">
+
+          <label for="year">
+            Year
+          </label>
+
+          <input
+            id="year"
+            type="number"
+            formControlName="year"
+            min="1" />
+
+          @if (
+            projectForm.controls.year.touched &&
+            projectForm.controls.year.invalid
+          ) {
+            <small class="error">
+              Year is required.
+            </small>
+          }
+
+        </div>
+
+
+        <!-- Serial Number -->
+        <div class="form-group">
+
+          <label for="serialNo">
+            S.No.
+          </label>
+
+          <input
+            id="serialNo"
+            type="number"
+            formControlName="serialNo"
+            min="1" />
+
+          <small class="form-help">
+            Controls the global project order.
+          </small>
+
+          @if (
+            projectForm.controls.serialNo.touched &&
+            projectForm.controls.serialNo.invalid
+          ) {
+            <small class="error">
+              S.No. must be at least 1.
+            </small>
+          }
+
+        </div>
+
+
+        <!-- Status -->
+        <div class="form-group">
+
+          <label for="status">
+            Status
+          </label>
+
+          <select
+            id="status"
+            formControlName="status">
+
+            <option value="draft">
+              Draft
+            </option>
+
+            <option value="published">
+              Published
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- Description -->
+        <div class="form-group full-width">
+
+          <label for="description">
+            Description
+          </label>
+
+          <textarea
+            id="description"
+            rows="6"
+            formControlName="description"
+            placeholder="Enter project description">
+          </textarea>
+
+          @if (
+            projectForm.controls.description.touched &&
+            projectForm.controls.description.invalid
+          ) {
+            <small class="error">
+              Description is required.
+            </small>
+          }
+
+        </div>
+
       </div>
+
     </div>
 
 
-    <div class="form-grid">
+    <!-- Cover Image -->
+    <div class="form-section">
 
-      <!-- YEAR -->
+      <h2>Cover Image</h2>
 
       <div class="form-group">
 
-        <label for="year">
-          Year
+        <label for="coverImage">
+          Project Cover
         </label>
 
         <input
-          id="year"
-          type="number"
-          formControlName="year"
-          placeholder="2026">
+          id="coverImage"
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event)" />
 
-        @if (
-          projectForm.controls.year.touched &&
-          projectForm.controls.year.invalid
-        ) {
-          <small class="error">
-            Year is required.
-          </small>
-        }
+        <small class="form-help">
+          Select an image for the project cover.
+        </small>
 
       </div>
 
 
-      <!-- SERIAL NUMBER -->
-
-<div class="form-group">
-
-  <label for="serialNo">
-    S.No.
-  </label>
-
-  <input
-    id="serialNo"
-    type="number"
-    formControlName="serialNo"
-   >
-
-  <small class="hint">
-    @if (isEditMode) {
-      Change the serial number to change the project's position.
-    } @else {
-      Serial number is automatically assigned.
-    }
-  </small>
-
-</div>
-
-
-      <!-- PROJECT TITLE -->
-
-      <div class="form-group full-width">
-
-        <label for="title">
-          Project Title
-        </label>
-
-        <input
-          id="title"
-          type="text"
-          formControlName="title"
-          placeholder="Enter project title"
-          (input)="generateSlug()">
-
-        @if (
-          projectForm.controls.title.touched &&
-          projectForm.controls.title.invalid
-        ) {
-          <small class="error">
-            Project title is required.
-          </small>
-        }
-
-      </div>
-
-
-      <!-- DESCRIPTION -->
-
-      <div class="form-group full-width">
-
-        <label for="description">
-          Short Description
-        </label>
-
-        <textarea
-          id="description"
-          formControlName="description"
-          rows="5"
-          placeholder="Write a short description about the project...">
-        </textarea>
-
-        @if (
-          projectForm.controls.description.touched &&
-          projectForm.controls.description.invalid
-        ) {
-          <small class="error">
-            Description is required.
-          </small>
-        }
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       COVER IMAGE
-  ========================== -->
-
-  <section class="form-card">
-
-    <div class="card-header">
-
-      <div>
-
-        <h2>
-          Cover Image
-        </h2>
-
-        <p>
-          This image will appear on the project listing page.
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <div class="upload-area">
-
+      <!-- Image Preview -->
       @if (imagePreview) {
-
-        <!-- IMAGE PREVIEW -->
 
         <div class="image-preview">
 
           <img
             [src]="imagePreview"
-            alt="Project cover preview">
-
-          <div class="preview-overlay">
-
-            <label for="coverImage">
-              Change Image
-            </label>
-
-          </div>
+            [alt]="
+              projectForm.controls.title.value ||
+              'Project cover preview'
+            " />
 
         </div>
-
-      } @else {
-
-        <!-- UPLOAD AREA -->
-
-        <label
-          class="upload-box"
-          for="coverImage">
-
-          <div class="upload-icon">
-            ↑
-          </div>
-
-          <strong>
-            Upload project cover
-          </strong>
-
-          <span>
-            Click to browse your files
-          </span>
-
-          <small>
-            JPG, PNG or WEBP
-          </small>
-
-        </label>
 
       }
 
 
-      <!-- HIDDEN FILE INPUT -->
-
-      <input
-        id="coverImage"
-        type="file"
-        accept="image/*"
-        hidden
-        (change)="onFileSelected($event)">
-
-    </div>
-
-
-    @if (
-      projectForm.controls.coverImage.touched &&
-      projectForm.controls.coverImage.invalid
-    ) {
-
-      <small class="error image-error">
-        Please upload a cover image.
-      </small>
-
-    }
-
-  </section>
-
-
-  <!-- =========================
-       PROJECT SETTINGS
-  ========================== -->
-
-  <section class="form-card">
-
-    <div class="card-header">
-
-      <div>
-
-        <h2>
-          Project Settings
-        </h2>
-
-        <p>
-          Configure how the project is identified and displayed.
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <div class="form-grid">
-
-      <!-- SLUG -->
-
-      <div class="form-group">
-
-        <label for="slug">
-          URL Slug
-        </label>
-
-        <input
-          id="slug"
-          type="text"
-          formControlName="slug"
-          placeholder="my-project"
-          (input)="onSlugEdit()">
-
-        <small class="hint">
-          Automatically generated from the project title.
-          You can edit it.
+      @if (
+        projectForm.controls.coverImage.touched &&
+        projectForm.controls.coverImage.invalid
+      ) {
+        <small class="error">
+          Cover image is required.
         </small>
-
-        @if (
-          projectForm.controls.slug.touched &&
-          projectForm.controls.slug.invalid
-        ) {
-
-          <small class="error">
-            Slug is required.
-          </small>
-
-        }
-
-      </div>
-
-
-      <!-- STATUS -->
-
-      <div class="form-group">
-
-        <label for="status">
-          Status
-        </label>
-
-        <select
-          id="status"
-          formControlName="status">
-
-          <option value="draft">
-            Draft
-          </option>
-
-          <option value="published">
-            Published
-          </option>
-
-          <option value="archived">
-            Archived
-          </option>
-
-        </select>
-
-        <small class="hint">
-          Draft projects won't appear on the public website.
-        </small>
-
-      </div>
+      }
 
     </div>
 
-  </section>
 
+    <!-- Actions -->
+    <div class="form-actions">
 
-  <!-- =========================
-       ACTIONS
-  ========================== -->
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="router.navigate(['/admin/projects'])">
+        Cancel
+      </button>
 
-  <div class="form-actions">
+      <button
+        type="submit"
+        class="save-btn">
 
-    <button
-      type="button"
-      class="cancel-button"
-      (click)="router.navigate(['/admin/projects'])">
+        {{
+          isEditMode
+            ? 'Update Project'
+            : 'Save Project'
+        }}
 
-      Cancel
+      </button>
 
-    </button>
+    </div>
 
+  </form>
 
-    <button
-      type="submit"
-      class="save-button">
-
-     {{ isEditMode ? 'Update Project' : 'Save Project' }}
-
-    </button>
-
-  </div>
-
-</form>
+</div>
