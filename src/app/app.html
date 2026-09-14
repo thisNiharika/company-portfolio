@@ -24,14 +24,15 @@
   [class.route-animation-active]="
     routeTransition.phase() === 'show'
   ">
-
-  <app-header
-    class="route-animate animate-fade-down"
-    style="
-      --route-delay: 200ms;
-      --route-duration: 500ms;
-    ">
-  </app-header>
+  @if (!isHeaderHidden()) {
+    <app-header
+      class="route-animate animate-fade-down"
+      style="
+        --route-delay: 200ms;
+        --route-duration: 500ms;
+      ">
+    </app-header>
+  }
 
   <router-outlet></router-outlet>
 

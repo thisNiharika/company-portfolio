@@ -1,85 +1,101 @@
-/* =========================================
- Loader Start
-========================================= */
-.itm_loader{
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    overscroll-behavior: none;
-    background: #fff;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.35s ease, visibility 0.35s ease;
+.itm_loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  background: #fff;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 350ms ease,
+    visibility 0s linear 350ms;
 }
-.itm_loader svg{
-    width: 400px;
-    overflow: visible;
-    opacity: 1;
+
+.itm_loader.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
+
+.itm_loader svg {
+  position: relative;
+  z-index: 1;
+  width: min(400px, 82vw);
+  overflow: visible;
+}
+
+/*
+ * HTML dot:
+ * TypeScript इसकी actual width और height बदलेगा।
+ */
+.itm_loader .zoom-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #db414c;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change:
+    left,
+    top,
+    width,
+    height,
+    opacity,
+    border-radius,
+    background-color;
+}
+
 .logo-above-line,
 .logo-below-line,
 .logo-text-below-line {
-    transform: translateY(0);
-    transform-box: view-box;
-    transform-origin: center;
-    will-change: transform;
+  transform: translateY(0);
+  transform-box: view-box;
+  transform-origin: center;
+  will-change: transform;
 }
 
-.line {
-    clip-path: inset(0 100% 0 0);
-    opacity: 1;
-    transform: translate(0, -1px);
-    will-change: clip-path, opacity;
-}
-.zoom-dot {
-    opacity: 0;
-    transform: scale(0.5);
-    transform-box: fill-box;
-    transform-origin: center;
-    pointer-events: none;
-    will-change: transform, opacity, fill;
+/* .line को global रखने की बजाय loader के अंदर scope करें */
+.itm_loader .line {
+  clip-path: inset(0 100% 0 0);
+  opacity: 1;
+  transform: translate(0, -1px);
+  will-change: clip-path, opacity;
 }
 
-.i_icon path,
-path.t_icon,
-path.m_icon {
-    fill: transparent;
-    opacity: 1;
-    stroke: #58595b;
-    stroke-dasharray: 0 9999;
-    stroke-dashoffset: 0;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-opacity: 0;
-    stroke-width: 2;
-    will-change: fill, stroke-dashoffset, stroke-opacity;
-}
-.text {
-    opacity: 0;
-    transform: translateY(5px);
-    will-change: transform, opacity;
-}
-@media (max-width: 576px) {
-    .itm_loader svg {
-        width: min(82vw, 400px);
-    }
+.itm_loader .i_icon path,
+.itm_loader path.t_icon,
+.itm_loader path.m_icon {
+  fill: transparent;
+  opacity: 1;
+  stroke: #58595b;
+  stroke-dasharray: 0 9999;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-opacity: 0;
+  stroke-width: 2;
+  will-change: fill, stroke-dashoffset, stroke-opacity;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .itm_loader,
-    .itm_loader svg {
-        transition-duration: 0.01ms;
-    }
+.itm_loader .text {
+  opacity: 0;
+  transform: translateY(5px);
+  will-change: transform, opacity;
 }
-/* =========================================
- Loader End
-========================================= */
+
 .home-page-entering {
   animation: home-enter 500ms ease-out both;
 }
@@ -93,5 +109,15 @@ path.m_icon {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itm_loader {
+    transition-duration: 0.01ms;
+  }
+
+  .home-page-entering {
+    animation-duration: 0.01ms;
   }
 }

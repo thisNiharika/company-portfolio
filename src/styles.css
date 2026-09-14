@@ -15,6 +15,10 @@ body {
     --color747C8C: #747C8C;
     --colorC5C8CD: #C5C8CD;
     --color4C4646: #4C4646;
+    --colorD8D8D9: #D8D8D9;
+    --colorHover: #DB414C;
+    --filterHover: brightness(0) saturate(100%) invert(32%) sepia(88%) saturate(2209%) hue-rotate(334deg) brightness(91%) contrast(87%);
+    --colorfff: #fff;
     --fontFamilyPoppins: "Poppins", sans-serif;
     --fontFamilyRoboto: "Roboto Serif", serif;
     --fontFamilyAgbalumo: "Agbalumo", system-ui;
@@ -77,7 +81,13 @@ div {
   cursor: pointer;
 }
 /* =================================== */
-
+.banner{
+    background: url('../public/assets/images/banner.jpg') 0 0 no-repeat;
+    background-size: cover;
+}
+body.itm-loader-open {
+  overflow: hidden;
+}
 /* ==================================
   Route Change Animation
 ================================== */
