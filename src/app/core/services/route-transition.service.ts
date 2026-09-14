@@ -1,4 +1,10 @@
-import { inject, Injectable, signal } from '@angular/core';
+import {
+  inject,
+  Injectable,
+  signal
+} from '@angular/core';
+
+import { ViewportScroller } from '@angular/common';
 import { Router } from '@angular/router';
 
 type TransitionPhase =
@@ -8,14 +14,7 @@ type TransitionPhase =
   | 'show';
 
 interface NavigationAnimationOptions {
-  /*
-   Panels cover होने के बाद content show होने से पहले wait.
-  */
   contentShowDelay?: number;
-
-  /*
-   Animation के दौरान दोबारा navigation रोकने का time.
-  */
   navigationLockDuration?: number;
 }
 
@@ -27,12 +26,9 @@ export class RouteTransitionService {
 
   private readonly router = inject(Router);
 
-  /*
-   Red panel: 1s
-   White panel delay: 1.5s
-   White panel duration: 1s
-   Total: 2.5s
-  */
+  private readonly viewportScroller =
+    inject(ViewportScroller);
+
   private readonly panelSequenceDuration = 2500;
 
   private isAnimating = false;
@@ -45,7 +41,12 @@ export class RouteTransitionService {
     event?.preventDefault();
     event?.stopPropagation();
 
-    if (this.isAnimating || this.router.url === url) {
+    if (this.isAnimating) {
+      return;
+    }
+
+    if (this.router.url === url) {
+      this.scrollPageToTop();
       return;
     }
 
@@ -60,41 +61,82 @@ export class RouteTransitionService {
       // Panel animation start
       this.phase.set('cover');
 
-      await this.wait(this.panelSequenceDuration);
+      await this.wait(
+        this.panelSequenceDuration
+      );
 
-      // Content hide और panels को screen पर रोकें
+      // Route content hidden रहेगा
       this.phase.set('switching');
 
       await this.nextFrame();
 
-      // Panels के पीछे route change
-      await this.router.navigateByUrl(url);
+      // Hidden panels के पीछे route change
+      const navigationSuccessful =
+        await this.router.navigateByUrl(url);
 
-      // New component render होने दें
+      if (!navigationSuccessful) {
+        this.phase.set('idle');
+        return;
+      }
+
+      // New component render
       await this.nextFrame();
       await this.nextFrame();
 
-      // Manual content show delay
+      // पहले scroll top
+      this.scrollPageToTop();
+
+      await this.nextFrame();
+
+      // Scroll position confirm
+      this.scrollPageToTop();
+
+      await this.nextFrame();
+
+      // Optional content delay
       if (contentShowDelay > 0) {
         await this.wait(contentShowDelay);
       }
 
-      // Panels hide और content animations start
+      // Scroll top के बाद content show
       this.phase.set('show');
 
-      // User interaction को कुछ समय lock रखें
-      await this.wait(navigationLockDuration);
-
-      /*
-       यहां phase को idle नहीं करना है।
-       show class next navigation तक रहेगी।
-      */
+      await this.wait(
+        navigationLockDuration
+      );
     } catch (error) {
       this.phase.set('idle');
       throw error;
     } finally {
       this.isAnimating = false;
     }
+  }
+
+  private scrollPageToTop(): void {
+    this.viewportScroller.scrollToPosition([0, 0]);
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+
+    document.scrollingElement?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    document
+      .querySelector<HTMLElement>('.route-page-content')
+      ?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto'
+      });
   }
 
   private wait(duration: number): Promise<void> {
@@ -105,7 +147,9 @@ export class RouteTransitionService {
 
   private nextFrame(): Promise<void> {
     return new Promise((resolve) => {
-      window.requestAnimationFrame(() => resolve());
+      window.requestAnimationFrame(() => {
+        resolve();
+      });
     });
   }
 }

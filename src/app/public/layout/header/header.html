@@ -1,16 +1,61 @@
 <header class="header">
     <div class="logo route-animate animate-fade-up" style="--route-delay: 200ms; --route-duration: 800ms;">
-        <a href="javascript:void(0)" class="d-block w-100">
+        <a href="javascript:void(0)" class="d-block w-100" (click)="goTo('/', $event)">
             <img class="img-fluid" src="assets/images/itm_logo.svg" alt="ITech Mission" />
         </a>
     </div>
     <div class="headerFilter">
-        <div class="h_filter route-animate animate-fade-up" style="--route-delay: 240ms; --route-duration: 800ms;">
-            <img src="assets/images/filter.svg" alt="Filter Icon" /> Filter
-        </div>
-        <div class="h_search route-animate animate-fade-up" style="--route-delay: 280ms; --route-duration: 800ms;">
-            <input type="search" placeholder="Search" />
-            <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+        <div class="h_filter_box position-relative d-flex w-100 align-items-center">
+            <div class="h_filter route-animate animate-fade-up" style="--route-delay: 240ms; --route-duration: 800ms;">
+                <img src="assets/images/filter.svg" alt="Filter Icon" /> Filter
+            </div>
+            <div class="h_filter_dropdown">
+                <div class="hfd_left">
+                    <h4>Filter by</h4>
+                    <ul>
+                        <li class="active">
+                            <a href="javascript:void(0)">
+                                <span>Year</span> <span class="filter_count">3</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <span>Domain</span> <span class="filter_count">0</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <span>Client</span> <span class="filter_count">0</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <span>Geo Scope</span> <span class="filter_count">0</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <span>Technology</span> <span class="filter_count">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="hfd_right">
+                    <div class="hdfr_top">
+                        <div class="hdfrt_top">
+                            <p>Select one or more year</p>
+                            <button class="btn_reset">
+                                <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                Reset Year
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+            <div class="h_search route-animate animate-fade-up" style="--route-delay: 280ms; --route-duration: 800ms;">
+                <input type="search" placeholder="Search" />
+                <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+            </div>
         </div>
     </div>
     <div class="humburger route-animate animate-fade-up" style="--route-delay: 320ms; --route-duration: 800ms;">

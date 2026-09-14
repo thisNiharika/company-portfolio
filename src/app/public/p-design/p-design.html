@@ -1,62 +1,100 @@
-<div class="portfolioPage">
-  <div class="phead d-flex align-items-start justify-content-between">
-    <h2 class="route-animate animate-fade-up" style="--route-delay: 360ms; --route-duration: 800ms;">Discover our <br><strong>work</strong></h2>
-    <h4 class="route-animate animate-fade-up" style="--route-delay: 400ms; --route-duration: 800ms;">2027</h4>
-  </div>
-  <div class="cardList" [routeStagger]="100" [routeStaggerStart]="600" style="--route-duration: 700ms;">
-    @for (card of cards; track card.title; let index = $index) {
+<div class="portfolioPage" #portfolioPage>
 
-      <div class="card_items route-animate animate-fade-up">
-        <div class="ci_content">
-          <div class="cic_top">
-            <span>{{ card.category }}</span>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.description }}</p>
-          </div>
-          <div class="cic_bottom d-flex justify-content-end">
-            <a class="arrow_card" [attr.href]="card.link"
-            (click)="goTo(card.link, $event)" [attr.aria-label]="'View ' + card.title">
-              <img src="assets/images/arrow_line.svg" alt="Arrow" />
-            </a>
-          </div>          
-        </div>
-        @if (card.image) {
-            <div class="ci_img">
-              <img
-                [src]="card.image"
-                [alt]="card.title"
-                loading="lazy" />
-            </div>
-          }
+  @for (
+    group of portfolioYears;
+    track group.year;
+    let yearIndex = $index
+  ) {
+    <section
+      class="yearColumn"
+      [class.firstColumn]="yearIndex === 0"
+      [attr.id]="'portfolio-year-' + group.year"
+      [attr.data-year]="group.year">
+
+      <div
+        class="phead d-flex align-items-start"
+        [class.justify-content-between]="yearIndex === 0"
+        [class.justify-content-end]="yearIndex !== 0">
+
+        @if (yearIndex === 0) {
+          <h2
+            class="route-animate animate-fade-up"
+            style="--route-delay: 360ms; --route-duration: 800ms;">
+            Discover our <br>
+            <strong>work</strong>
+          </h2>
+        }
+
+        <h4
+          class="route-animate animate-fade-up"
+          style="--route-delay: 400ms; --route-duration: 800ms;">
+          {{ group.year }}
+        </h4>
       </div>
-    }
-  </div>
 
+      <div class="cardList">
+        @for ( card of group.cards; track $index; let cardIndex = $index ) {
+          <article class="card_items">
 
+            <!-- Route animation wrapper -->
+            <div class="card_route_entry animate-fade-up" [class.route-animate]="yearIndex === 0" [class.animate-portfolio-card]="yearIndex === 0" [style.--route-delay]="(520 + cardIndex * 120) + 'ms'" [style.--route-duration]="'800ms'">
+              <div class="ci_content">
+                <div class="cic_top">
+                  <span>{{ card.category }}</span>
+                  <h2>{{ card.title }}</h2>
+                  <p>{{ card.description }}</p>
+                </div>
 
+                <div class="cic_bottom d-flex justify-content-end">
+                  <a
+                    class="arrow_card"
+                    [attr.href]="card.link"
+                    (click)="goTo(card.link, $event)"
+                    [attr.aria-label]="'View ' + card.title">
 
+                    <img
+                      src="assets/images/arrow_line.svg"
+                      alt="Arrow">
+                  </a>
+                </div>
+              </div>
+            </div>
 
+            <!-- Image wrapper ke bahar hi rahegi -->
+            @if (card.image) {
+              <div class="ci_img animate-fade-up" [class.route-animate]="yearIndex === 0" [class.animate-portfolio-image]="yearIndex === 0" [style.--route-delay]="(620 + cardIndex * 120) + 'ms'" [style.--route-duration]="'900ms'">
+                <img
+                  [src]="card.image"
+                  [alt]="card.title"
+                  [attr.loading]="yearIndex === 0 ? 'eager' : 'lazy'"
+                  [attr.fetchpriority]="yearIndex === 0 ? 'high' : 'auto'">
+              </div>
+            }
 
+          </article>
+        }
+      </div>
+    </section>
+  }
 
+  <!-- Fixed year navigation -->
+  <nav class="yearList" aria-label="Portfolio years">
+    <ul>
+      @for (group of portfolioYears; track group.year) {
+        <li [class.active]="activeYear() === group.year">
+          <button
+            type="button"
+            (click)="scrollToYear(group.year)"
+            [attr.aria-current]="
+              activeYear() === group.year ? 'true' : null
+            ">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            <h4>{{ group.year }}</h4>
+            <span class="line"></span>
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
 
 </div>

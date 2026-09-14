@@ -9,19 +9,16 @@ import {
   withInMemoryScrolling
 } from '@angular/router';
 
-import { provideHttpClient } from '@angular/common/http';
-
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-
-    provideRouter(
-      routes,
-      withViewTransitions()
-    ),
-
-    provideHttpClient()
+    provideRouter(routes, withViewTransitions(),
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top',
+        anchorScrolling: 'enabled'
+      })
+    )
   ]
 };
