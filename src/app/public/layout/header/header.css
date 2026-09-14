@@ -45,7 +45,7 @@
     border-radius: 50px;
     display: flex;
     align-items: center;
-    padding: clamp(12px, 0.86vw, 16.5px) clamp(16px, 1.04vw, 20px);
+    padding: clamp(9px, 0.7vw, 13.5px) clamp(16px, 1.04vw, 20px);
     padding-left: clamp(35px, 2.53vw, 48.5px);
     font-size: clamp(14px, 0.83vw, 16px);
     color: #666;

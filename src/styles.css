@@ -14,6 +14,7 @@ body {
     --color313842:#313842 ;
     --color747C8C: #747C8C;
     --colorC5C8CD: #C5C8CD;
+    --color4C4646: #4C4646;
     --fontFamilyPoppins: "Poppins", sans-serif;
     --fontFamilyRoboto: "Roboto Serif", serif;
     --fontFamilyAgbalumo: "Agbalumo", system-ui;
@@ -344,28 +345,22 @@ Portfolio Page
   font-family: var(--fontFamilyAgbalumo);
   line-height: 0.5;
 }
-/* .cardList {
-    margin-top: clamp(40px, 3.13vw, 60px);
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: clamp(40px, 4.43vw, 85px);
-    row-gap: clamp(40px, 4.43vw, 85px);
-    align-items: start;
-} */
-
+.yearColumn {
+  margin-bottom: clamp(50px, 4.43vw, 85px);
+  scroll-margin-top: clamp(20px, 3vw, 60px);
+}
 .cardList {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-
   column-gap: clamp(40px, 4.43vw, 85px);
   row-gap: clamp(40px, 4.43vw, 85px);
-
-  margin-top: clamp(70px, 6.88vw, 132px);
-
+  margin-top: clamp(120px, 8.39vw, 161px);
   align-items: start;
 }
-
+.firstColumn .cardList{
+  margin-top: clamp(70px, 6.88vw, 132px);
+}
 .card_items {
   position: relative;
   display: inline-block;
@@ -436,4 +431,111 @@ Portfolio Page
 }
 .card_items:hover .ci_img img {
     transform: rotate(10deg) translateX(clamp(30px, 2.5vw, 48px));
+}
+/* Year navigation */
+.yearList {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+}
+
+.yearList ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.yearList li button {
+  width: 100%;
+  padding: 0 0 2px 10px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.yearList li h4 {
+  margin: 0;
+  color: var(--color4C4646);
+  font-family: var(--fontFamilyAgbalumo);
+  font-size: clamp(12px, 0.83vw, 16px);
+  opacity: 0;
+  transform: translateX(10px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.yearList li .line {
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: #BFB8B8;
+  transition:
+    width 0.4s ease,
+    height 0.4s ease,
+    background-color 0.4s ease;
+}
+
+.yearList li.active h4,
+.yearList li:hover h4,
+.yearList li button:focus-visible h4 {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.yearList li.active .line {
+  width: 48px;
+  height: 2px;
+  background: var(--color4C4646);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .cardList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card_items:nth-child(3n + 2) {
+    top: 0;
+  }
+}
+
+@media (max-width: 575px) {
+  .cardList {
+    grid-template-columns: 1fr;
+  }
+
+  .yearList {
+    display: none;
+  }
+}
+
+.card_items {
+  transform-style: flat;
+}
+
+.card_items .ci_img,
+.card_items .ci_img img {
+  backface-visibility: hidden;
+}
+
+.card_items .ci_img img {
+  will-change: opacity, clip-path;
+}
+
+.card_items .ci_content {
+  will-change: transform, opacity, filter;
+}
+
+.card_items .cic_top > span,
+.card_items .cic_top > h2,
+.card_items .cic_top > p,
+.card_items .arrow_card {
+  will-change: transform, opacity;
 }
