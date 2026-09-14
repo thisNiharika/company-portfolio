@@ -1,52 +1,48 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+
 import { Project } from '../models/project';
-import { PROJECTS } from '../data/project-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
 
-  private projects: Project[] = [...PROJECTS];
+  private http = inject(HttpClient);
+
+  private readonly apiUrl =
+    'http://localhost:3000/projects';
 
 
   // =========================
   // GET ALL PROJECTS
   // =========================
 
-  getProjects(): Project[] {
-    return [...this.projects].sort(
-      (a, b) => a.serialNo - b.serialNo
+getProjects(): Observable<Project[]> {
+  return this.http
+    .get<any[]>(this.apiUrl)
+    .pipe(
+      map(projects =>
+        projects.map(project => ({
+          ...project,
+          id: project._id
+        }))
+      )
     );
-  }
+}
 
 
   // =========================
   // GET PROJECT
   // =========================
 
-  getProjectById(id: string): Project | undefined {
-    return this.projects.find(
-      project => project.id === id
+  getProjectById(
+    id: string
+  ): Observable<Project> {
+    return this.http.get<Project>(
+      `${this.apiUrl}/${id}`
     );
-  }
-
-
-  // =========================
-  // NEXT S.NO.
-  // =========================
-
-  getNextSerialNo(): number {
-
-    if (this.projects.length === 0) {
-      return 1;
-    }
-
-    return Math.max(
-      ...this.projects.map(
-        project => project.serialNo
-      )
-    ) + 1;
   }
 
 
@@ -54,106 +50,37 @@ export class ProjectService {
   // ADD PROJECT
   // =========================
 
-  addProject(project: Project): void {
+  addProject(
+    project: Omit<Project, 'id'>
+  ): Observable<Project> {
 
-    const serialNo = Math.max(
-      1,
-      Math.min(
-        project.serialNo,
-        this.projects.length + 1
-      )
+    return this.http.post<Project>(
+      this.apiUrl,
+      project
     );
-
-
-    // Move existing projects forward
-    for (const existingProject of this.projects) {
-
-      if (existingProject.serialNo >= serialNo) {
-        existingProject.serialNo++;
-      }
-    }
-
-
-    project.serialNo = serialNo;
-
-    this.projects.push(project);
-
-    this.normalizeSerialNumbers();
   }
-
-
-  // =========================
-  // CHANGE S.NO.
-  // =========================
-
-changeSerialNo(
-  projectId: string,
-  newSerialNo: number
-): void {
-
-  const project = this.projects.find(
-    p => p.id === projectId
-  );
-
-  if (!project || newSerialNo < 1) {
-    return;
-  }
-
-  const oldSerialNo = project.serialNo;
-
-  if (oldSerialNo === newSerialNo) {
-    return;
-  }
-
-  // Moving to a lower number
-  if (newSerialNo < oldSerialNo) {
-
-    for (const existingProject of this.projects) {
-
-      if (
-        existingProject.id !== projectId &&
-        existingProject.serialNo >= newSerialNo &&
-        existingProject.serialNo < oldSerialNo
-      ) {
-        existingProject.serialNo++;
-      }
-    }
-  }
-
-  // Moving to a higher number
-  else {
-
-    for (const existingProject of this.projects) {
-
-      if (
-        existingProject.id !== projectId &&
-        existingProject.serialNo > oldSerialNo &&
-        existingProject.serialNo <= newSerialNo
-      ) {
-        existingProject.serialNo--;
-      }
-    }
-  }
-
-  // Keep the exact number requested
-  project.serialNo = newSerialNo;
-}
 
 
   // =========================
   // UPDATE PROJECT
   // =========================
 
-  updateProject(project: Project): void {
+  updateProject(
+    project: Project
+  ): Observable<Project> {
 
-    const index =
-      this.projects.findIndex(
-        p => p.id === project.id
-      );
-
-    if (index !== -1) {
-      this.projects[index] = project;
-    }
+    return this.http.patch<Project>(
+      `${this.apiUrl}/${project.id}`,
+      {
+        year: project.year,
+        serialNo: project.serialNo,
+        title: project.title,
+        description: project.description,
+        coverImage: project.coverImage,
+        slug: project.slug,
+        status: project.status
+      }
+    );
   }
 
 
@@ -161,31 +88,12 @@ changeSerialNo(
   // DELETE PROJECT
   // =========================
 
-  deleteProject(id: string): void {
+  deleteProject(
+    id: string
+  ): Observable<void> {
 
-    this.projects =
-      this.projects.filter(
-        project => project.id !== id
-      );
-
-    this.normalizeSerialNumbers();
-  }
-
-
-  // =========================
-  // NORMALIZE
-  // =========================
-
-  private normalizeSerialNumbers(): void {
-
-    this.projects.sort(
-      (a, b) => a.serialNo - b.serialNo
-    );
-
-    this.projects.forEach(
-      (project, index) => {
-        project.serialNo = index + 1;
-      }
+    return this.http.delete<void>(
+      `${this.apiUrl}/${id}`
     );
   }
 }

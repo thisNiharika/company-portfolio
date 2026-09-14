@@ -16,44 +16,24 @@ export class ProjectList implements OnInit {
 
   projects: Project[] = [];
 
-
   ngOnInit(): void {
     this.loadProjects();
   }
-
 
   // =========================
   // LOAD PROJECTS
   // =========================
 
   loadProjects(): void {
-    this.projects = this.projectService.getProjects();
-  }
-
-
-  // =========================
-  // ARCHIVE PROJECT
-  // =========================
-
-  archiveProject(project: Project): void {
-
-    const confirmed = confirm(
-      `Archive "${project.title}"?\n\n` +
-      `The project will remain in Admin but will no longer appear on the public website.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.projectService.updateProject({
-      ...project,
-      status: 'archived'
+    this.projectService.getProjects().subscribe({
+      next: (projects) => {
+        this.projects = projects;
+      },
+      error: (error) => {
+        console.error('Failed to load projects:', error);
+      }
     });
-
-    this.loadProjects();
   }
-
 
   // =========================
   // DELETE PROJECT
@@ -70,8 +50,16 @@ export class ProjectList implements OnInit {
       return;
     }
 
-    this.projectService.deleteProject(project.id);
-
-    this.loadProjects();
+    this.projectService
+      .deleteProject(project.id)
+      .subscribe({
+        next: () => {
+          this.loadProjects();
+        },
+        error: (error) => {
+          console.error('Failed to delete project:', error);
+          alert('Failed to delete project.');
+        }
+      });
   }
 }

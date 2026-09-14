@@ -7,6 +7,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { ProjectService } from '../../../core/services/project';
+import { Project } from '../../../core/models/project';
 
 @Component({
   selector: 'app-project-form',
@@ -29,7 +30,10 @@ export class ProjectForm implements OnInit {
   projectId = '';
 
   projectForm = this.fb.group({
-    year: [new Date().getFullYear(), Validators.required],
+    year: [
+      new Date().getFullYear(),
+      Validators.required
+    ],
 
     serialNo: [
       1,
@@ -39,75 +43,117 @@ export class ProjectForm implements OnInit {
       ]
     ],
 
-    title: ['', Validators.required],
+    title: [
+      '',
+      Validators.required
+    ],
 
-    description: ['', Validators.required],
+    description: [
+      '',
+      Validators.required
+    ],
 
-    coverImage: ['', Validators.required],
+    coverImage: [
+      '',
+      Validators.required
+    ],
 
-    slug: ['', Validators.required],
+    slug: [
+      '',
+      Validators.required
+    ],
 
     status: [
-      'draft' as 'draft' | 'published' | 'archived',
+      'draft' as 'draft' | 'published',
       Validators.required
     ]
   });
 
 
   // =========================
-  // INITIALIZE
+  // INIT
   // =========================
 
-ngOnInit(): void {
+  ngOnInit(): void {
 
-  this.projectId =
-    this.route.snapshot.paramMap.get('id') || '';
+    this.projectId =
+      this.route.snapshot.paramMap.get('id') || '';
 
-  // =========================
-  // EDIT
-  // =========================
+    // EDIT MODE
+    if (this.projectId) {
 
-  if (this.projectId) {
+      this.isEditMode = true;
 
-    this.isEditMode = true;
+      this.projectService
+        .getProjectById(this.projectId)
+        .subscribe({
+          next: (project) => {
 
-    const project =
-      this.projectService.getProjectById(this.projectId);
-console.log('EDIT PROJECT:', project);
-    if (!project) {
-      this.router.navigate(['/admin/projects']);
+            this.projectForm.patchValue({
+              year: project.year,
+              serialNo: project.serialNo,
+              title: project.title,
+              description: project.description,
+              coverImage: project.coverImage,
+              slug: project.slug,
+              status: project.status
+            });
+
+            this.imagePreview =
+              project.coverImage;
+
+            this.slugManuallyEdited = true;
+          },
+
+          error: (error) => {
+
+            console.error(
+              'Failed to load project:',
+              error
+            );
+
+            this.router.navigate([
+              '/admin/projects'
+            ]);
+          }
+        });
+
       return;
     }
 
-    this.projectForm.patchValue({
-      year: project.year,
-      serialNo: project.serialNo,
-      title: project.title,
-      description: project.description,
-      coverImage: project.coverImage,
-      slug: project.slug,
-      status: project.status
-    });
+    // ADD MODE
+    this.projectService
+      .getProjects()
+      .subscribe({
+        next: (projects) => {
 
-    this.imagePreview = project.coverImage;
+          const nextSerialNo =
+            projects.length === 0
+              ? 1
+              : Math.max(
+                  ...projects.map(
+                    project => project.serialNo
+                  )
+                ) + 1;
 
-    this.slugManuallyEdited = true;
+          this.projectForm.patchValue({
+            serialNo: nextSerialNo
+          });
+        },
 
-    return;
+        error: (error) => {
+
+          console.error(
+            'Failed to load projects:',
+            error
+          );
+        }
+      });
   }
 
-  // =========================
-  // ADD
-  // =========================
-
-  this.projectForm.patchValue({
-    serialNo: this.projectService.getNextSerialNo()
-  });
-}
-
 
   // =========================
-  // IMAGE
+  // FILE UPLOAD
   // =========================
 
   onFileSelected(event: Event): void {
@@ -115,14 +161,21 @@ console.log('EDIT PROJECT:', project);
     const input =
       event.target as HTMLInputElement;
 
-    if (!input.files || input.files.length === 0) {
+    if (
+      !input.files ||
+      input.files.length === 0
+    ) {
       return;
     }
 
     const file = input.files[0];
 
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.');
+
+      alert(
+        'Please select an image file.'
+      );
+
       return;
     }
 
@@ -138,7 +191,6 @@ console.log('EDIT PROJECT:', project);
       this.projectForm.patchValue({
         coverImage: imageData
       });
-
     };
 
     reader.readAsDataURL(file);
@@ -149,31 +201,25 @@ console.log('EDIT PROJECT:', project);
   // SLUG
   // =========================
 
-  generateSlug(): void {
+generateSlug(): void {
+  if (this.slugManuallyEdited) return;
 
-    if (this.slugManuallyEdited) {
-      return;
-    }
+  const title = this.projectForm.controls.title.value;
+  if (!title) return;
 
-    const title =
-      this.projectForm.controls.title.value;
+  const slug = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 
-    if (!title) {
-      return;
-    }
-
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-
-    this.projectForm.controls.slug.setValue(slug);
-  }
+  this.projectForm.controls.slug.setValue(slug);
+}
 
 
   onSlugEdit(): void {
+
     this.slugManuallyEdited = true;
   }
 
@@ -185,7 +231,9 @@ console.log('EDIT PROJECT:', project);
   saveProject(): void {
 
     if (this.projectForm.invalid) {
+
       this.projectForm.markAllAsTouched();
+
       return;
     }
 
@@ -193,195 +241,265 @@ console.log('EDIT PROJECT:', project);
       this.projectForm.getRawValue();
 
 
-    // ==================================================
-    // ADD PROJECT
-    // ==================================================
+    // =========================
+    // ADD
+    // =========================
 
     if (!this.isEditMode) {
 
       const newSerialNo =
         formValue.serialNo!;
 
-      const newYear =
-        formValue.year!;
+      const newProject: Omit<Project, 'id'> = {
 
-
-      // Check for globally duplicate S.No.
-      const conflictingProject =
-        this.projectService
-          .getProjects()
-          .find(
-            project =>
-              project.serialNo === newSerialNo
-          );
-
-
-      // ==================================================
-      // S.NO. CONFLICT
-      // ==================================================
-
-      if (conflictingProject) {
-
-        const confirmed = confirm(
-          `S.No. ${newSerialNo} already belongs to "${conflictingProject.title}".\n\nDo you want to change the order?`
-        );
-
-
-        // User selected NO
-        if (!confirmed) {
-          return;
-        }
-      }
-
-
-      // ==================================================
-      // ADD PROJECT
-      // ==================================================
-
-      this.projectService.addProject({
-
-        id: 'project-' + Date.now(),
-
-        year: newYear,
+        year: formValue.year!,
 
         serialNo: newSerialNo,
 
         title: formValue.title!,
 
-        description: formValue.description!,
+        description:
+          formValue.description!,
 
-        coverImage: formValue.coverImage!,
+        coverImage:
+          formValue.coverImage!,
 
         slug: formValue.slug!,
 
-        status: formValue.status!
+        status:
+          formValue.status!
+      };
 
-      });
+
+      // Check global S.No. conflict
+      this.projectService
+        .getProjects()
+        .subscribe({
+
+          next: (projects) => {
+
+            const conflictingProject =
+              projects.find(
+                project =>
+                  project.serialNo ===
+                  newSerialNo
+              );
 
 
-      this.router.navigate([
-        '/admin/projects'
-      ]);
+            if (conflictingProject) {
+
+              const confirmed = confirm(
+                `S.No. ${newSerialNo} already belongs to "${conflictingProject.title}".\n\n` +
+                `Do you want to change the order?`
+              );
+
+              if (!confirmed) {
+                return;
+              }
+            }
+
+
+            this.projectService
+              .addProject(newProject)
+              .subscribe({
+
+                next: () => {
+
+                  this.router.navigate([
+                    '/admin/projects'
+                  ]);
+                },
+
+                error: (error) => {
+
+                  console.error(
+                    'Failed to create project:',
+                    error
+                  );
+
+                  alert(
+                    'Failed to create project.'
+                  );
+                }
+              });
+          },
+
+          error: (error) => {
+
+            console.error(
+              'Failed to check S.No.:',
+              error
+            );
+
+            alert(
+              'Failed to check project order.'
+            );
+          }
+        });
 
       return;
     }
 
 
-    // ==================================================
-    // EDIT PROJECT
-    // ==================================================
+    // =========================
+    // EDIT
+    // =========================
 
-    const existingProject =
-      this.projectService.getProjectById(
-        this.projectId
-      );
+    this.projectService
+      .getProjectById(this.projectId)
+      .subscribe({
 
+        next: (existingProject) => {
 
-    if (!existingProject) {
-      return;
-    }
-
-
-    const newSerialNo =
-      formValue.serialNo!;
+          const newSerialNo =
+            formValue.serialNo!;
 
 
-    // ==================================================
-    // S.NO. CHANGED
-    // ==================================================
+          // S.No. changed
+          if (
+            existingProject.serialNo !==
+            newSerialNo
+          ) {
 
-    if (
-      existingProject.serialNo !== newSerialNo
-    ) {
+            this.projectService
+              .getProjects()
+              .subscribe({
 
-      const conflictingProject =
-        this.projectService
-          .getProjects()
-          .find(
-            project =>
-              project.id !== this.projectId &&
-              project.serialNo === newSerialNo
+                next: (projects) => {
+
+                  const conflictingProject =
+                    projects.find(
+                      project =>
+                        project.id !==
+                          this.projectId &&
+                        project.serialNo ===
+                          newSerialNo
+                    );
+
+
+                  if (conflictingProject) {
+
+                    const confirmed =
+                      confirm(
+                        `S.No. ${newSerialNo} already belongs to "${conflictingProject.title}".\n\n` +
+                        `Do you want to change the order?`
+                      );
+
+                    if (!confirmed) {
+
+                      this.projectForm.patchValue({
+                        serialNo:
+                          existingProject.serialNo
+                      });
+
+                      return;
+                    }
+                  }
+
+
+                  this.sendUpdate(
+                    existingProject
+                  );
+                },
+
+                error: (error) => {
+
+                  console.error(
+                    'Failed to check S.No.:',
+                    error
+                  );
+
+                  alert(
+                    'Failed to check project order.'
+                  );
+                }
+              });
+
+            return;
+          }
+
+
+          // S.No. unchanged
+          this.sendUpdate(
+            existingProject
+          );
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to load project:',
+            error
           );
 
-
-      // ==================================================
-      // S.NO. CONFLICT
-      // ==================================================
-
-      if (conflictingProject) {
-
-        const confirmed = confirm(
-          `S.No. ${newSerialNo} already belongs to "${conflictingProject.title}".\n\nDo you want to change the order?`
-        );
-
-
-        // User selected NO
-        if (!confirmed) {
-
-          this.projectForm.patchValue({
-            serialNo: existingProject.serialNo
-          });
-
-          return;
+          alert(
+            'Failed to load project.'
+          );
         }
-      }
-
-
-      // ==================================================
-      // CHANGE SERIAL NUMBER
-      // ==================================================
-
-      this.projectService.changeSerialNo(
-        this.projectId,
-        newSerialNo
-      );
-    }
-
-
-    // ==================================================
-    // GET UPDATED PROJECT
-    // ==================================================
-
-    const currentProject =
-      this.projectService.getProjectById(
-        this.projectId
-      );
-
-
-    if (!currentProject) {
-      return;
-    }
-
-
-    // ==================================================
-    // UPDATE PROJECT DETAILS
-    // ==================================================
-
-    this.projectService.updateProject({
-
-      ...currentProject,
-
-      year: formValue.year!,
-
-      title: formValue.title!,
-
-      description: formValue.description!,
-
-      coverImage: formValue.coverImage!,
-
-      slug: formValue.slug!,
-
-      status: formValue.status!
-
-    });
-
-
-    // ==================================================
-    // BACK TO PROJECT LIST
-    // ==================================================
-
-    this.router.navigate([
-      '/admin/projects'
-    ]);
+      });
   }
-}
+
+
+  // =========================
+  // SEND UPDATE
+  // =========================
+
+  private sendUpdate(
+    existingProject: Project
+  ): void {
+
+    const formValue =
+      this.projectForm.getRawValue();
+
+    const updatedProject: Project = {
+
+      ...existingProject,
+
+      year:
+        formValue.year!,
+
+      serialNo:
+        formValue.serialNo!,
+
+      title:
+        formValue.title!,
+
+      description:
+        formValue.description!,
+
+      coverImage:
+        formValue.coverImage!,
+
+      slug:
+        formValue.slug!,
+
+      status:
+        formValue.status!
+    };
+
+
+    this.projectService
+      .updateProject(updatedProject)
+      .subscribe({
+
+        next: () => {
+
+          this.router.navigate([
+            '/admin/projects'
+          ]);
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to update project:',
+            error
+          );
+
+          alert(
+            'Failed to update project.'
+          );
+        }
+      });
+  }
+} 

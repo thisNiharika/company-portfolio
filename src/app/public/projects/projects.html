@@ -1,67 +1,99 @@
-<h1>Projects</h1>
+<div class="portfolioPage">
 
-<div class="projects-page">
+  <div class="phead d-flex align-items-start justify-content-between">
 
-  <div class="projects-content">
+    <h2
+      class="route-animate animate-fade-up"
+      style="--route-delay: 360ms; --route-duration: 800ms;"
+    >
+      Discover our <br>
+      <strong>work</strong>
+    </h2>
 
-    @for (year of years; track year) {
-
-      <section
-        class="project-year"
-        [id]="'year-' + year">
-
-        <h2>{{ year }}</h2>
-
-        <div class="projects">
-
-          @for (
-            project of getProjectsByYear(year);
-            track project.id
-          ) {
-
-            <div class="project">
-
-              <strong>
-                {{ project.serialNo }}.
-              </strong>
-
-              <span>
-                {{ project.title }}
-              </span>
-
-              <p>
-                {{ project.description }}
-              </p>
-
-            </div>
-
-          }
-
-        </div>
-
-      </section>
-
+    @if (years.length > 0) {
+      <h4
+        class="route-animate animate-fade-up"
+        style="--route-delay: 400ms; --route-duration: 800ms;"
+      >
+        {{ years[0] }}
+      </h4>
     }
 
   </div>
 
 
-  <!-- YEAR NAVIGATION -->
+  <div
+    class="cardList"
+    [routeStagger]="100"
+    [routeStaggerStart]="600"
+    style="--route-duration: 700ms;"
+  >
 
-  <nav class="year-navigation">
+    @for (
+      project of projects;
+      track project.id;
+      let index = $index
+    ) {
 
-    @for (year of years; track year) {
+      <div class="card_items route-animate animate-fade-up">
 
-      <button
-        type="button"
-        (click)="scrollToYear(year)">
+        <div class="ci_content">
 
-        {{ year }}
+          <div class="cic_top">
 
-      </button>
+            <span>
+              {{ project.year }}
+            </span>
+
+            <h2>
+              {{ project.title }}
+            </h2>
+
+            <p>
+              {{ project.description }}
+            </p>
+
+          </div>
+
+
+          <div class="cic_bottom d-flex justify-content-end">
+
+            <a
+              class="arrow_card"
+              [attr.href]="'/projects/' + project.slug"
+              [attr.aria-label]="'View ' + project.title"
+            >
+
+              <img
+                src="assets/images/arrow_line.svg"
+                alt="Arrow"
+              />
+
+            </a>
+
+          </div>
+
+        </div>
+
+
+        @if (project.coverImage) {
+
+          <div class="ci_img">
+
+            <img
+              [src]="project.coverImage"
+              [alt]="project.title"
+              loading="lazy"
+            />
+
+          </div>
+
+        }
+
+      </div>
 
     }
 
-  </nav>
+  </div>
 
 </div>

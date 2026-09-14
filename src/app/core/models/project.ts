@@ -6,5 +6,5 @@ export interface Project {
   description: string;
   coverImage: string;
   slug: string;
-  status: 'draft' | 'published' | 'archived';
+  status: 'draft' | 'published';
 }
