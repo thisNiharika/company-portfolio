@@ -27,7 +27,7 @@
 .itm_loader svg {
   position: relative;
   z-index: 1;
-  width: min(400px, 82vw);
+  width: min(35%, 82vw);
   overflow: visible;
 }
 
@@ -96,9 +96,9 @@
   will-change: transform, opacity;
 }
 
-.home-page-entering {
+/* .home-page-entering {
   animation: home-enter 500ms ease-out both;
-}
+} */
 
 @keyframes home-enter {
   from {

@@ -8,9 +8,10 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
+import { Summary } from '../summary/summary';
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [Summary],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
@@ -35,12 +36,6 @@ export class Home implements AfterViewInit, OnDestroy {
   private loaderRef?: ElementRef<HTMLDivElement>;
 
   // =============================================
-  // private readonly loaderStorageKey =
-  //   'itm-home-loader-played-v1';
-
-  // readonly showHomeLoader = signal<boolean>(
-  //   this.shouldShowHomeLoader()
-  // );
   readonly showHomeLoader =
   signal<boolean>(true);
   // =============================================
