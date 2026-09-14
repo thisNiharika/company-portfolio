@@ -11,8 +11,7 @@ import {
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import { RouteTransitionService } from
-  '../../core/services/route-transition.service';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 
 interface PortfolioCard {
   category: string;
@@ -36,7 +35,6 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './p-design.css'
 })
 export class PDesign implements AfterViewInit, OnDestroy {
-
   @ViewChild('portfolioPage', { static: true })
   private portfolioPage!: ElementRef<HTMLElement>;
 
@@ -435,9 +433,20 @@ export class PDesign implements AfterViewInit, OnDestroy {
     });
   }
 
-  goTo(url: string, event: MouseEvent): void {
-    void this.routeTransition.navigate(url, event);
-  }
+  goTo(
+  url: string,
+  event: MouseEvent,
+  contentShowDelay = 0
+): void {
+  void this.routeTransition.navigate(
+    url,
+    event,
+    {
+      contentShowDelay,
+      navigationLockDuration: 2000
+    }
+  );
+}
 
   ngOnDestroy(): void {
     if (this.refreshFrame !== null) {

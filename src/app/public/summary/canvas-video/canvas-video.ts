@@ -25,20 +25,20 @@ import { RouteTransitionService } from '../../../core/services/route-transition.
 export class CanvasVideo implements AfterViewInit, OnDestroy {
   readonly routeTransition = inject(RouteTransitionService);
   goTo(
-    url: string,
-    event: MouseEvent,
-    contentShowDelay = 0
-  ): void {
-    void this.routeTransition.navigate(
-      url,
-      event,
-      {
-        contentShowDelay,
-        navigationLockDuration: 2000
-      }
-    );
-  }
-  @Input() frameCount = 240;
+  url: string,
+  event: MouseEvent,
+  contentShowDelay = 0
+): void {
+  void this.routeTransition.navigate(
+    url,
+    event,
+    {
+      contentShowDelay,
+      navigationLockDuration: 2000
+    }
+  );
+}
+  @Input() frameCount = 300;
   @Input() frameFolder = 'assets/frames';
   @Input() frameExtension = 'webp';
   @Input() smoothness = 0.18;
