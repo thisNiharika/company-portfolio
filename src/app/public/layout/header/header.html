@@ -301,22 +301,14 @@
                         <!-- =======================================
                         Technology List End
                         ======================================== -->
-
-
-
-
-
-
-
-
-
-
-
                         <div class="hdfr_footer">
-                            <div class="hf_filter_applied">
-                                <p>1 Filter applied</p>
+                            <div class="hf_filter_applied" [class.d-none]="appliedFilterCount === 0" >
+                            <p>
+                               {{ appliedFilterCount }}
+    Filter{{                    appliedFilterCount === 1 ? '' : 's' }} applied
+                            </p>
                             </div>
-                            <button class="clearFilterAll">
+                            <button class="clearFilterAll" (click)="clearFilterAll()" [disabled]="appliedFilterCount === 0">
                                 <img src="assets/images/reset.svg" alt="Reset Icon" /> 
                                 Clear All Filters
                             </button>

@@ -310,5 +310,22 @@ resetLocations(): void {
   }
 
   // =====================================
+  get appliedFilterCount(): number {
+    return [
+      this.selectedYears.length > 0,
+      this.selectedDomains.length > 0,
+      this.selectedAgencies.length > 0,
+      this.selectedLocation.length > 0,
+      this.selectedTech.length > 0
+    ].filter(Boolean).length;
+  }
+
+  clearFilterAll(): void {
+    this.resetYears();
+    this.resetDomains();
+    this.resetClients();
+    this.resetLocations();
+    this.resetTech();
+  }
   
 }

@@ -389,9 +389,14 @@
     max-height: clamp(17px, 1.2vw, 23px);
     max-width: clamp(17px, 1.2vw, 23px);
 }
-
-
-
+.clearFilterAll:disabled {
+    opacity: 0.8;
+    pointer-events: none;
+    color: #999;
+}
+.clearFilterAll:disabled img{
+    filter: brightness(0) saturate(100%) invert(63%) sepia(0%) saturate(0%) hue-rotate(347deg) brightness(98%) contrast(87%);
+}
 .h_search {
     width: 100%;
     position: relative;
