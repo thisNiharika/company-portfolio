@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouteTransitionService } from '../../../core/services/route-transition.service';
+import { Router } from '@angular/router';
+
 interface Technology {
   name: string;
   image: string;
@@ -35,7 +37,7 @@ export class Header {
     );
   }
 
-
+  constructor(public router: Router) {}
   isFilterOpen = false;
 
   toggleFilter(): void {

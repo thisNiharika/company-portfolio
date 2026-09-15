@@ -4,6 +4,7 @@
     align-items: center;
     z-index: 2;
     position: relative;
+    justify-content: space-between;
 }
 .logo {
     width: clamp(160px, 11.77vw, 226px);

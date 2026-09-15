@@ -4,327 +4,329 @@
             <img class="img-fluid" src="assets/images/itm_logo.svg" alt="ITech Mission" />
         </a>
     </div>
-    <div class="headerFilter">
-        <div class="h_filter_box position-relative d-flex w-100 align-items-center">
-            <div>
-                <div class="h_filter route-animate animate-fade-up" style="--route-delay: 240ms; --route-duration: 800ms;" (click)="toggleFilter()" [class.active]="isFilterOpen">
-                    <img src="assets/images/filter.svg" alt="Filter Icon" /> Filter
-                </div>
-                <div class="h_filter_dropdown" [class.show]="isFilterOpen">
-                    <div class="hfd_left">
-                        <h4>Filter by</h4>
-                        <ul>
-                            <li [class.active]="activeFilter === 'year'" (click)="selectFilter('year')">
-                                <a href="javascript:void(0)">
-                                    <span>Year</span> 
-                                    @if (selectedYears.length > 0) {
-                                        <span class="filter_count">{{ selectedYears.length }}</span>
-                                    }
-                                </a>
-                            </li>
-                            <li [class.active]="activeFilter === 'domain'" (click)="selectFilter('domain')">
-                                <a href="javascript:void(0)">
-                                    <span>Domain</span>
-                                    @if (selectedDomains.length > 0) {
-                                        <span class="filter_count">{{ selectedDomains.length }}</span>
-                                    }
-                                </a>
-                            </li>
-                            <li [class.active]="activeFilter === 'client'" (click)="selectFilter('client')">
-                                <a href="javascript:void(0)">
-                                    <span>Client</span>
-                                    @if (selectedAgencies.length > 0) {
-                                        <span class="filter_count">{{ selectedAgencies.length }}</span>
-                                    }
-                                </a>
-                            </li>
-                            <li [class.active]="activeFilter === 'location'" (click)="selectFilter('location')">
-                                <a href="javascript:void(0)">
-                                    <span>Geo Scope</span>
-                                    @if (selectedLocation.length > 0) {
-                                        <span class="filter_count">{{ selectedLocation.length }}</span>
-                                    }
-                                </a>
-                            </li>
-                            <li [class.active]="activeFilter === 'technology'" (click)="selectFilter('technology')">
-                                <a href="javascript:void(0)">
-                                    <span>Technology</span>
-                                    @if (selectedTech.length > 0) {
-                                        <span class="filter_count">{{ selectedTech.length }}</span>
-                                    }
-                                </a>
-                            </li>
-                        </ul>
+    @if (router.url.split('?')[0] === '/portfolio') {
+        <div class="headerFilter">
+            <div class="h_filter_box position-relative d-flex w-100 align-items-center">
+                <div>
+                    <div class="h_filter route-animate animate-fade-up" style="--route-delay: 240ms; --route-duration: 800ms;" (click)="toggleFilter()" [class.active]="isFilterOpen">
+                        <img src="assets/images/filter.svg" alt="Filter Icon" /> Filter
                     </div>
-                    <div class="hfd_right">
-                        <!-- =======================================
-                        Year List Start
-                        ======================================== -->
-                        <div class="hdfr_top" [class.d-none]="activeFilter !== 'year'">
-                            <div class="hdfrt_top">
-                                <p>Select one or more year</p>
-                                <button class="btn_reset" (click)="resetYears()">
-                                    <img src="assets/images/reset.svg" alt="Reset Icon" />
-                                    Reset Year
-                                </button>
-                            </div>
-                            <div class="hdfrt_bottom">
-                                <div class="hb_year">
-                                    <ul class="year_list">
-                                        @for (year of years; track year) {
-                                            <li
-                                            [class.active]="selectedYears.includes(year)"
-                                            (click)="toggleYear(year)"
-                                            >
-                                            {{ year }}
-                                            </li>
+                    <div class="h_filter_dropdown" [class.show]="isFilterOpen">
+                        <div class="hfd_left">
+                            <h4>Filter by</h4>
+                            <ul>
+                                <li [class.active]="activeFilter === 'year'" (click)="selectFilter('year')">
+                                    <a href="javascript:void(0)">
+                                        <span>Year</span> 
+                                        @if (selectedYears.length > 0) {
+                                            <span class="filter_count">{{ selectedYears.length }}</span>
                                         }
-                                    </ul>
-                                </div>
-                                <div class="selectedValue">
-                                    <p>Selected year: <span>{{ selectedYears.length }}</span></p>
-                                </div>
-                            </div>                        
-                        </div>
-                        <!-- =======================================
-                        Year List End
-                        ======================================== -->
-
-                        <!-- =======================================
-                        Domain List Start
-                        ======================================== -->
-                        <div class="hdfr_top" [class.d-none]="activeFilter !== 'domain'">
-                            <div class="hdfrt_top">
-                                <p>Select one or more domain</p>
-                                <button class="btn_reset" (click)="resetDomains()">
-                                    <img src="assets/images/reset.svg" alt="Reset Icon" />
-                                    Reset Domain
-                                </button>
-                            </div>
-                            <div class="hdfrt_bottom">
-                                <div class="hb_year">
-                                    <ul class="year_list">
-                                        @for (domain of domains; track domain) {
-                                            <li
-                                                [class.active]="selectedDomains.includes(domain)"
-                                                (click)="toggleDomains(domain)"
-                                            >
-                                                {{ domain }}
-                                            </li>
+                                    </a>
+                                </li>
+                                <li [class.active]="activeFilter === 'domain'" (click)="selectFilter('domain')">
+                                    <a href="javascript:void(0)">
+                                        <span>Domain</span>
+                                        @if (selectedDomains.length > 0) {
+                                            <span class="filter_count">{{ selectedDomains.length }}</span>
                                         }
-                                    </ul>
-                                </div>
-                                <div class="selectedValue">
-                                    <p>Selected domain: <span>{{ selectedDomains.length }}</span></p>
-                                </div>
-                            </div>                        
+                                    </a>
+                                </li>
+                                <li [class.active]="activeFilter === 'client'" (click)="selectFilter('client')">
+                                    <a href="javascript:void(0)">
+                                        <span>Client</span>
+                                        @if (selectedAgencies.length > 0) {
+                                            <span class="filter_count">{{ selectedAgencies.length }}</span>
+                                        }
+                                    </a>
+                                </li>
+                                <li [class.active]="activeFilter === 'location'" (click)="selectFilter('location')">
+                                    <a href="javascript:void(0)">
+                                        <span>Geo Scope</span>
+                                        @if (selectedLocation.length > 0) {
+                                            <span class="filter_count">{{ selectedLocation.length }}</span>
+                                        }
+                                    </a>
+                                </li>
+                                <li [class.active]="activeFilter === 'technology'" (click)="selectFilter('technology')">
+                                    <a href="javascript:void(0)">
+                                        <span>Technology</span>
+                                        @if (selectedTech.length > 0) {
+                                            <span class="filter_count">{{ selectedTech.length }}</span>
+                                        }
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                        <!-- =======================================
-                        Domain List End
-                        ======================================== -->
-
-                        <!-- =======================================
-                        Client List Start
-                        ======================================== -->
-                        <div class="hdfr_top" [class.d-none]="activeFilter !== 'client'">
-                            <div class="hdfrt_top">
-                                <p>Select one or more client</p>
-                                <button class="btn_reset" (click)="resetClients()">
-                                    <img src="assets/images/reset.svg" alt="Reset Icon" />
-                                    Reset Client
-                                </button>
+                        <div class="hfd_right">
+                            <!-- =======================================
+                            Year List Start
+                            ======================================== -->
+                            <div class="hdfr_top" [class.d-none]="activeFilter !== 'year'">
+                                <div class="hdfrt_top">
+                                    <p>Select one or more year</p>
+                                    <button class="btn_reset" (click)="resetYears()">
+                                        <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                        Reset Year
+                                    </button>
+                                </div>
+                                <div class="hdfrt_bottom">
+                                    <div class="hb_year">
+                                        <ul class="year_list">
+                                            @for (year of years; track year) {
+                                                <li
+                                                [class.active]="selectedYears.includes(year)"
+                                                (click)="toggleYear(year)"
+                                                >
+                                                {{ year }}
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="selectedValue">
+                                        <p>Selected year: <span>{{ selectedYears.length }}</span></p>
+                                    </div>
+                                </div>                        
                             </div>
-                            <div class="hdfrt_bottom">
-                                <div class="hb_year">
-                                    <div class="hb_client_search">
-                                        <div class="h_search">
-                                            <input type="search" placeholder="Search" [value]="clientSearch" (input)="onClientSearch($event)"/>
-                                            <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
-                                        </div>
-                                        <div class="hpc_sort">
-                                            <div class="dropdown">
-                                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                                    {{ selectedSort ?? 'Sort By' }}
-                                                </button>
+                            <!-- =======================================
+                            Year List End
+                            ======================================== -->
 
-                                                <ul class="dropdown-menu">
-                                                    @for (option of sortOptions; track option) {
-                                                    <li
-                                                        [class.active]="selectedSort === option"
-                                                        (click)="selectSort(option)"
-                                                    >
-                                                        <a
-                                                        class="dropdown-item"
-                                                        href="javascript:void(0)"
+                            <!-- =======================================
+                            Domain List Start
+                            ======================================== -->
+                            <div class="hdfr_top" [class.d-none]="activeFilter !== 'domain'">
+                                <div class="hdfrt_top">
+                                    <p>Select one or more domain</p>
+                                    <button class="btn_reset" (click)="resetDomains()">
+                                        <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                        Reset Domain
+                                    </button>
+                                </div>
+                                <div class="hdfrt_bottom">
+                                    <div class="hb_year">
+                                        <ul class="year_list">
+                                            @for (domain of domains; track domain) {
+                                                <li
+                                                    [class.active]="selectedDomains.includes(domain)"
+                                                    (click)="toggleDomains(domain)"
+                                                >
+                                                    {{ domain }}
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="selectedValue">
+                                        <p>Selected domain: <span>{{ selectedDomains.length }}</span></p>
+                                    </div>
+                                </div>                        
+                            </div>
+                            <!-- =======================================
+                            Domain List End
+                            ======================================== -->
+
+                            <!-- =======================================
+                            Client List Start
+                            ======================================== -->
+                            <div class="hdfr_top" [class.d-none]="activeFilter !== 'client'">
+                                <div class="hdfrt_top">
+                                    <p>Select one or more client</p>
+                                    <button class="btn_reset" (click)="resetClients()">
+                                        <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                        Reset Client
+                                    </button>
+                                </div>
+                                <div class="hdfrt_bottom">
+                                    <div class="hb_year">
+                                        <div class="hb_client_search">
+                                            <div class="h_search">
+                                                <input type="search" placeholder="Search" [value]="clientSearch" (input)="onClientSearch($event)"/>
+                                                <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+                                            </div>
+                                            <div class="hpc_sort">
+                                                <div class="dropdown">
+                                                    <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
+                                                        {{ selectedSort ?? 'Sort By' }}
+                                                    </button>
+
+                                                    <ul class="dropdown-menu">
+                                                        @for (option of sortOptions; track option) {
+                                                        <li
+                                                            [class.active]="selectedSort === option"
+                                                            (click)="selectSort(option)"
                                                         >
-                                                        {{ option }}
-                                                        </a>
-                                                    </li>
-                                                    }
-                                                </ul>
+                                                            <a
+                                                            class="dropdown-item"
+                                                            href="javascript:void(0)"
+                                                            >
+                                                            {{ option }}
+                                                            </a>
+                                                        </li>
+                                                        }
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="client_list">
-                                        <ul>
-                                            @if (sortedAgencies.length > 0) {
-                                                @for (agency of sortedAgencies; track agency) {
-                                                <li>
-                                                    <label class="agency-item">
-                                                    <input
-                                                        type="checkbox"
-                                                        [checked]="selectedAgencies.includes(agency)"
-                                                        (change)="toggleAgency(agency)"
-                                                    />
-                                                    <span>{{ agency }}</span>
-                                                    </label>
-                                                </li>
-                                                }
-                                            } @else {
-                                                <li class="no-data">No data found</li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="selectedValue">
-                                    <p>Selected client: <span>{{ selectedAgencies.length }}</span></p>
-                                </div>
-                            </div>                        
-                        </div>
-                        <!-- =======================================
-                        Client List End
-                        ======================================== -->
-
-                        <!-- =======================================
-                        Geo Scope List Start
-                        ======================================== -->
-                        <div class="hdfr_top" [class.d-none]="activeFilter !== 'location'">
-                            <div class="hdfrt_top">
-                                <p>Select one or more location</p>
-                                <button class="btn_reset" (click)="resetLocations()">
-                                    <img src="assets/images/reset.svg" alt="Reset Icon" />
-                                    Reset Location
-                                </button>
-                            </div>
-                            <div class="hdfrt_bottom">
-                                <div class="hb_year">
-                                    <div class="hb_client_search">
-                                        <div class="h_search">
-                                            <input type="search" placeholder="Search" [value]="locationSearch" (input)="onLocationSearch($event)"/>
-                                            <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
-                                        </div>
-                                        <div class="hpc_sort">
-                                            <div class="dropdown">
-                                                <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                                    {{ selectedLocationSort ?? 'Sort By' }}
-                                                </button>
-
-                                                <ul class="dropdown-menu">
-                                                    @for (option of sortLocationOptions; track option) {
-                                                    <li
-                                                        [class.active]="selectedLocationSort === option"
-                                                        (click)="selectLocationSort(option)"
-                                                    >
-                                                        <a
-                                                        class="dropdown-item"
-                                                        href="javascript:void(0)"
-                                                        >
-                                                        {{ option }}
-                                                        </a>
+                                        <div class="client_list">
+                                            <ul>
+                                                @if (sortedAgencies.length > 0) {
+                                                    @for (agency of sortedAgencies; track agency) {
+                                                    <li>
+                                                        <label class="agency-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            [checked]="selectedAgencies.includes(agency)"
+                                                            (change)="toggleAgency(agency)"
+                                                        />
+                                                        <span>{{ agency }}</span>
+                                                        </label>
                                                     </li>
                                                     }
-                                                </ul>
-                                                </div>
+                                                } @else {
+                                                    <li class="no-data">No data found</li>
+                                                }
+                                            </ul>
                                         </div>
                                     </div>
-                                    <div class="client_list">
-                                        <ul>
-                                            @if (sortedLocations.length > 0) {
-                                                <li class="parentLoc">Africa</li>
+                                    <div class="selectedValue">
+                                        <p>Selected client: <span>{{ selectedAgencies.length }}</span></p>
+                                    </div>
+                                </div>                        
+                            </div>
+                            <!-- =======================================
+                            Client List End
+                            ======================================== -->
 
-                                                @for (location of sortedLocations; track location) {
-                                                <li>
-                                                    <label class="agency-item">
-                                                    <input
-                                                        type="checkbox"
-                                                        [checked]="selectedLocation.includes(location)"
-                                                        (change)="toggleLocation(location)"
-                                                    />
-                                                    <span>{{ location }}</span>
-                                                    </label>
-                                                </li>
+                            <!-- =======================================
+                            Geo Scope List Start
+                            ======================================== -->
+                            <div class="hdfr_top" [class.d-none]="activeFilter !== 'location'">
+                                <div class="hdfrt_top">
+                                    <p>Select one or more location</p>
+                                    <button class="btn_reset" (click)="resetLocations()">
+                                        <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                        Reset Location
+                                    </button>
+                                </div>
+                                <div class="hdfrt_bottom">
+                                    <div class="hb_year">
+                                        <div class="hb_client_search">
+                                            <div class="h_search">
+                                                <input type="search" placeholder="Search" [value]="locationSearch" (input)="onLocationSearch($event)"/>
+                                                <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+                                            </div>
+                                            <div class="hpc_sort">
+                                                <div class="dropdown">
+                                                    <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
+                                                        {{ selectedLocationSort ?? 'Sort By' }}
+                                                    </button>
+
+                                                    <ul class="dropdown-menu">
+                                                        @for (option of sortLocationOptions; track option) {
+                                                        <li
+                                                            [class.active]="selectedLocationSort === option"
+                                                            (click)="selectLocationSort(option)"
+                                                        >
+                                                            <a
+                                                            class="dropdown-item"
+                                                            href="javascript:void(0)"
+                                                            >
+                                                            {{ option }}
+                                                            </a>
+                                                        </li>
+                                                        }
+                                                    </ul>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div class="client_list">
+                                            <ul>
+                                                @if (sortedLocations.length > 0) {
+                                                    <li class="parentLoc">Africa</li>
+
+                                                    @for (location of sortedLocations; track location) {
+                                                    <li>
+                                                        <label class="agency-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            [checked]="selectedLocation.includes(location)"
+                                                            (change)="toggleLocation(location)"
+                                                        />
+                                                        <span>{{ location }}</span>
+                                                        </label>
+                                                    </li>
+                                                    }
+                                                } @else {
+                                                    <li class="no-data">No data found</li>
                                                 }
-                                            } @else {
-                                                <li class="no-data">No data found</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="selectedValue">
+                                        <p>Selected location: <span>{{ selectedLocation.length }}</span></p>
+                                    </div>
+                                </div>                        
+                            </div>
+                            <!-- =======================================
+                            Geo Scope List End
+                            ======================================== -->
+
+                            <!-- =======================================
+                            Technology List Start
+                            ======================================== -->
+                            <div class="hdfr_top" [class.d-none]="activeFilter !== 'technology'">
+                                <div class="hdfrt_top">
+                                    <p>Select one or more technology</p>
+                                    <button class="btn_reset" (click)="resetTech()">
+                                        <img src="assets/images/reset.svg" alt="Reset Icon" />
+                                        Reset Technology
+                                    </button>
+                                </div>
+                                <div class="hdfrt_bottom">
+                                    <div class="hb_year techList">
+                                        <ul class="year_list">
+                                            @for (tech of techs; track tech.name) {
+                                                <li
+                                                [class.active]="selectedTech.includes(tech.name)"
+                                                (click)="toggleTech(tech.name)"
+                                                >
+                                                <img [src]="tech.image" [alt]="tech.alt">{{ tech.name }}
+                                                </li>
                                             }
                                         </ul>
                                     </div>
+                                    <div class="selectedValue">
+                                        <p>Selected technology: <span>{{ selectedTech.length }}</span></p>
+                                    </div>
+                                </div>                        
+                            </div>
+                            <!-- =======================================
+                            Technology List End
+                            ======================================== -->
+                            <div class="hdfr_footer">
+                                <div class="hf_filter_applied" [class.d-none]="appliedFilterCount === 0" >
+                                <p>
+                                {{ appliedFilterCount }}
+                                    Filter{{ appliedFilterCount === 1 ? '' : 's' }} applied
+                                </p>
                                 </div>
-                                <div class="selectedValue">
-                                    <p>Selected location: <span>{{ selectedLocation.length }}</span></p>
-                                </div>
-                            </div>                        
-                        </div>
-                        <!-- =======================================
-                        Geo Scope List End
-                        ======================================== -->
-
-                        <!-- =======================================
-                        Technology List Start
-                        ======================================== -->
-                        <div class="hdfr_top" [class.d-none]="activeFilter !== 'technology'">
-                            <div class="hdfrt_top">
-                                <p>Select one or more technology</p>
-                                <button class="btn_reset" (click)="resetTech()">
-                                    <img src="assets/images/reset.svg" alt="Reset Icon" />
-                                    Reset Technology
+                                <button class="clearFilterAll" (click)="clearFilterAll()" [disabled]="appliedFilterCount === 0">
+                                    <img src="assets/images/reset.svg" alt="Reset Icon" /> 
+                                    Clear All Filters
+                                </button>
+                                <button class="applyFilters">
+                                    Apply Filters
                                 </button>
                             </div>
-                            <div class="hdfrt_bottom">
-                                <div class="hb_year techList">
-                                    <ul class="year_list">
-                                        @for (tech of techs; track tech.name) {
-                                            <li
-                                            [class.active]="selectedTech.includes(tech.name)"
-                                            (click)="toggleTech(tech.name)"
-                                            >
-                                            <img [src]="tech.image" [alt]="tech.alt">{{ tech.name }}
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
-                                <div class="selectedValue">
-                                    <p>Selected technology: <span>{{ selectedTech.length }}</span></p>
-                                </div>
-                            </div>                        
-                        </div>
-                        <!-- =======================================
-                        Technology List End
-                        ======================================== -->
-                        <div class="hdfr_footer">
-                            <div class="hf_filter_applied" [class.d-none]="appliedFilterCount === 0" >
-                            <p>
-                               {{ appliedFilterCount }}
-    Filter{{                    appliedFilterCount === 1 ? '' : 's' }} applied
-                            </p>
-                            </div>
-                            <button class="clearFilterAll" (click)="clearFilterAll()" [disabled]="appliedFilterCount === 0">
-                                <img src="assets/images/reset.svg" alt="Reset Icon" /> 
-                                Clear All Filters
-                            </button>
-                            <button class="applyFilters">
-                                Apply Filters
-                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="h_search route-animate animate-fade-up" style="--route-delay: 280ms; --route-duration: 800ms;">
-                <input type="search" placeholder="Search" />
-                <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+                <div class="h_search route-animate animate-fade-up" style="--route-delay: 280ms; --route-duration: 800ms;">
+                    <input type="search" placeholder="Search" />
+                    <img class="search_icon" src="assets/images/search.svg" alt="Search Icon" />
+                </div>
             </div>
         </div>
-    </div>
+    }
     <div class="humburger route-animate animate-fade-up" style="--route-delay: 320ms; --route-duration: 800ms;">
         <img class="hb_menu pointer" src="assets/images/menu.svg" alt="Menu Icon" />
     </div>
