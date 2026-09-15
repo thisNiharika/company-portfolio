@@ -1,4 +1,8 @@
 .itm_loader {
+  --reveal-x: 50vw;
+  --reveal-y: 50vh;
+  --reveal-radius: 0px;
+
   position: fixed;
   inset: 0;
   z-index: 99999;
@@ -16,8 +20,34 @@
   transition:
     opacity 350ms ease,
     visibility 0s linear 350ms;
-}
 
+  /*
+   * Loader में circular transparent hole बनता है।
+   * इसी hole के अंदर पीछे का real Home HTML दिखाई देगा।
+   */
+  
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  will-change: opacity, -webkit-mask-image, mask-image;
+}
+.itm_loader.reveal-started{
+  -webkit-mask-image: radial-gradient(
+    circle at var(--reveal-x) var(--reveal-y),
+    transparent 0,
+    transparent var(--reveal-radius),
+    #000 calc(var(--reveal-radius) + 1px),
+    #000 100%
+  );
+  mask-image: radial-gradient(
+    circle at var(--reveal-x) var(--reveal-y),
+    transparent 0,
+    transparent var(--reveal-radius),
+    #000 calc(var(--reveal-radius) + 1px),
+    #000 100%
+  );
+}
 .itm_loader.is-leaving {
   opacity: 0;
   visibility: hidden;
@@ -27,7 +57,7 @@
 .itm_loader svg {
   position: relative;
   z-index: 1;
-  width: min(400px, 82vw);
+  width: min(35%, 82vw);
   overflow: visible;
 }
 
@@ -44,7 +74,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #db414c;
+  /* Dot अब color layer नहीं है; यह mask position/size controller है। */
+  background-color: transparent;
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -54,8 +85,19 @@
     width,
     height,
     opacity,
-    border-radius,
-    background-color;
+    border-radius;
+}
+
+/*
+ * असली Home content loader के नीचे हमेशा rendered रहेगा।
+ * Loader mask का transparent circle इसी content को reveal करेगा।
+ */
+.home-page-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  opacity: 1;
+  visibility: visible;
 }
 
 .logo-above-line,
@@ -96,9 +138,9 @@
   will-change: transform, opacity;
 }
 
-.home-page-entering {
+/* .home-page-entering {
   animation: home-enter 500ms ease-out both;
-}
+} */
 
 @keyframes home-enter {
   from {

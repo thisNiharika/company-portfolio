@@ -11,8 +11,7 @@ import {
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import { RouteTransitionService } from
-  '../../core/services/route-transition.service';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 
 interface PortfolioCard {
   category: string;
@@ -36,7 +35,6 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './p-design.css'
 })
 export class PDesign implements AfterViewInit, OnDestroy {
-
   @ViewChild('portfolioPage', { static: true })
   private portfolioPage!: ElementRef<HTMLElement>;
 
@@ -59,7 +57,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
           description:
             'The Gender Data Portal is an interactive, user-friendly digital platform designed as a comprehensive hub for gender statistics in Kyrgyzstan.',
           image: 'assets/images/portfolio/gender-data-portal.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'India | NITI Aayog, UNDP',
@@ -68,7 +66,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'The National Conference of Chief Secretaries is a flagship initiative of the Government of India, led by NITI Aayog.',
           image:
             'assets/images/portfolio/national-conferenc-of-chief-secretaries.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'India | NITI Aayog, UNDP',
@@ -77,7 +75,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'The Indian Electric Mobility Index is a first-of-its-kind national platform developed to assess and benchmark the progress of electric mobility.',
           image:
             'assets/images/portfolio/indian-electric-mobility-index.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'Bangladesh, India, Vietnam | GIZ',
@@ -86,7 +84,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'Digital Skills to Succeed is a digital learning and capacity-building initiative designed to equip youth and professionals.',
           image:
             'assets/images/portfolio/digital-skills-to-succeed.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'India | NITI Aayog, UNDP',
@@ -95,7 +93,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'A national platform developed to assess and benchmark the progress of electric mobility adoption across Indian States.',
           image:
             'assets/images/portfolio/indian-electric-mobility-index.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'Kyrgyzstan | UNFPA, UN Women',
@@ -104,7 +102,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'The Gender Data Portal is an interactive, user-friendly platform designed as a comprehensive hub for gender statistics.',
           image:
             'assets/images/portfolio/gender-data-portal.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         }
       ]
     },
@@ -118,7 +116,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'Digital Skills to Succeed is a digital learning and capacity-building initiative designed to equip youth and professionals.',
           image:
             'assets/images/portfolio/digital-skills-to-succeed.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'India | NITI Aayog, UNDP',
@@ -127,7 +125,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'A national platform developed to assess and benchmark the progress of electric mobility adoption across Indian States.',
           image:
             'assets/images/portfolio/indian-electric-mobility-index.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'Kyrgyzstan | UNFPA, UN Women',
@@ -136,7 +134,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'The Gender Data Portal is an interactive, user-friendly platform designed as a comprehensive hub for gender statistics.',
           image:
             'assets/images/portfolio/gender-data-portal.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         }
       ]
     },
@@ -150,7 +148,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'Digital Skills to Succeed is a digital learning and capacity-building initiative designed to equip youth and professionals.',
           image:
             'assets/images/portfolio/digital-skills-to-succeed.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'India | NITI Aayog, UNDP',
@@ -159,7 +157,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'A national platform developed to assess and benchmark the progress of electric mobility adoption across Indian States.',
           image:
             'assets/images/portfolio/indian-electric-mobility-index.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         },
         {
           category: 'Kyrgyzstan | UNFPA, UN Women',
@@ -168,7 +166,7 @@ export class PDesign implements AfterViewInit, OnDestroy {
             'The Gender Data Portal is an interactive, user-friendly platform designed as a comprehensive hub for gender statistics.',
           image:
             'assets/images/portfolio/gender-data-portal.jpg',
-          link: '/home'
+          link: '/portfolio-details'
         }
       ]
     }
@@ -435,8 +433,19 @@ export class PDesign implements AfterViewInit, OnDestroy {
     });
   }
 
-  goTo(url: string, event: MouseEvent): void {
-    void this.routeTransition.navigate(url, event);
+  goTo(
+    url: string,
+    event: MouseEvent,
+    contentShowDelay = 0
+  ): void {
+    void this.routeTransition.navigate(
+      url,
+      event,
+      {
+        contentShowDelay,
+        navigationLockDuration: 2000
+      }
+    );
   }
 
   ngOnDestroy(): void {

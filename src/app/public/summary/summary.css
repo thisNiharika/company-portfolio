@@ -1,0 +1,360 @@
+.home-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: clip;
+    font-family: "Montserrat", sans-serif;
+}
+
+.banner{
+    background: #090d18 url('/assets/images/banner.jpg') center center no-repeat;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    background-size: cover;
+}
+.full-scroll {
+    position: relative;
+    width: 100%;
+}
+
+/* Particles stay behind each section's content and do not block clicks. */
+.step1,
+.step2,
+.step3 {
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.section-particles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.step1 > .container-fluid,
+.step2 > .container-fluid,
+.step3 > .container-fluid {
+    position: relative;
+    z-index: 2;
+}
+
+.step2 > .content {
+    z-index: 3;
+}
+
+.step_wrapper{
+    width: 100%;
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: flex-start;
+    z-index: 10;
+}
+.content{
+    padding: clamp(70px, 7.97vw, 153px) 0 0 9.64vw;
+}
+.content h2 {
+    display: inline-block;
+    color: #fff;
+    font-size: clamp(50px, 5vw, 96px);
+    font-weight: 600;
+}
+.content h2 span{
+    color: #DD4451;
+}
+.content_absolute{
+    position: absolute;
+    width: 100%;
+    top: 0;
+}
+.svg_box{
+    position: relative;
+    width: 50%;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+.svg_img {  
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.98);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.svg_img.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+.svg_img svg{
+    max-width: 100%;
+    max-height: 100%;
+    margin-left: auto;    
+}
+.mx_width_80{
+    max-width: 80%;
+}
+.svg_img.first_slide svg path{
+    stroke-dasharray: 2200px;
+	stroke-dashoffset: 2200px;
+}
+#dots_box {
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+.opacity-0{
+    opacity: 0;
+}
+.svg_img.first_slide #circle_box path {
+    stroke-opacity: 0.15;
+}
+.svg_img.first_slide.active svg path {
+    animation: dash 2s linear forwards;
+    animation-delay: 0.5s;
+}
+.svg_img.first_slide svg #dot_pointer {
+    opacity: 1;
+    transition-delay: 0.4s;
+}
+.svg_img.active .opacity-0, .svg_img.active #dots_box{
+    opacity: 1;
+    transition-delay: 0.7s;
+}
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.svg_img #bar path{
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transform-box: fill-box;
+    transition: transform 0.8s ease;
+}
+.svg_img.second_slide.active #bar path{
+     transform: scaleY(1);
+     transition-delay: 0.4s;
+}
+.svg_img.second_slide.active #bar path:nth-child(1) { transition-delay: 0.4s; }
+.svg_img.second_slide.active #bar path:nth-child(2) { transition-delay: 0.43s; }
+.svg_img.second_slide.active #bar path:nth-child(3) { transition-delay: 0.45s; }
+.svg_img.second_slide.active #bar path:nth-child(4) { transition-delay: 0.47s; }
+.svg_img.second_slide.active #bar path:nth-child(5) { transition-delay: 0.49s; }
+.svg_img.second_slide.active #bar path:nth-child(6) { transition-delay: 0.51s; }
+.svg_img.second_slide.active #bar path:nth-child(7) { transition-delay: 0.54s; }
+.svg_img.second_slide #line path {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.5s ease;
+}
+
+.svg_img.second_slide.active #line path {
+  clip-path: inset(0 0 0 0);
+  transition-delay: 0.9s;
+}
+.svg_img.second_slide.active .opacity-0{
+    opacity: 1;
+    transition-delay: 1s;
+}
+/* =========================== Video =========================== */
+.video-section {
+    position: relative;
+    height: 300vh;
+}
+.video-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+.video-sticky video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.videoContent{
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+.contentSticky{
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* ========================= Dot Animation ============================= */
+.starBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    inset: 0;
+    z-index: 10;
+}
+.star_item {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+    z-index: 5;
+    will-change: left, top, transform, opacity;
+    transform-origin: center;
+}
+.star_item img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transition:
+        opacity 500ms cubic-bezier(.22, .61, .36, 1),
+        transform 500ms cubic-bezier(.22, .61, .36, 1),
+        filter 500ms ease;
+}
+/* =====================================
+   SHOOTING BEAM
+===================================== */
+.shooting_beam {
+    position: absolute;
+    height: 2px;
+    transform-origin: left center;
+    border-radius: 100px;
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0),
+        rgba(255,255,255,.15),
+        rgba(255,255,255,.5),
+        rgba(255,255,255,.9),
+        #fff
+    );
+    box-shadow:
+        0 0 5px rgba(255,255,255,.9),
+        0 0 12px rgba(255,255,255,.8),
+        0 0 25px rgba(255,255,255,.5);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 4;
+    animation-name: shootingBeam;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+/* =====================================
+   BRIGHT HEAD
+===================================== */
+.shooting_beam::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+        0 0 6px #fff,
+        0 0 14px #fff,
+        0 0 28px rgba(255,255,255,.9),
+        0 0 45px rgba(255,255,255,.5);
+}
+/* =====================================
+   FULL BEAM TRAVEL
+===================================== */
+
+@keyframes shootingBeam {
+
+    0% {
+        opacity: 0;
+
+        /*
+         * Beam ka head Star A par
+         */
+        clip-path: inset(
+            0 100% 0 0
+        );
+    }
+
+    5% {
+        opacity: 1;
+
+        clip-path: inset(
+            0 95% 0 0
+        );
+    }
+
+    85% {
+        opacity: 1;
+
+        /*
+         * Beam almost Star B
+         */
+        clip-path: inset(
+            0 5% 0 0
+        );
+    }
+
+    100% {
+        opacity: 0;
+
+        /*
+         * Puri beam Star B tak
+         */
+        clip-path: inset(
+            0 0 0 0
+        );
+    }
+}
+
+
+
+
+.canvas-video-section {
+    position: relative;
+    width: 100%;
+    height: 600vh;
+    overflow: visible;
+    background: #000;
+}
+
+.canvas-video-sticky {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+}
+
+#videoCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-particles {
+        display: none;
+    }
+}
