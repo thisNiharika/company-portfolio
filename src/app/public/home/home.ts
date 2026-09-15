@@ -55,6 +55,7 @@ export class Home implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (!this.showHomeLoader()) {
+      this.homeEntering.set(true);
       return;
     }
 
@@ -63,6 +64,7 @@ export class Home implements AfterViewInit, OnDestroy {
 
     if (!loader) {
       this.showHomeLoader.set(false);
+      this.homeEntering.set(true);
       return;
     }
 
@@ -749,6 +751,24 @@ export class Home implements AfterViewInit, OnDestroy {
 
         zoomDot.style.borderRadius =
           '50%';
+
+        /*
+         * शुरुआती छोटा circular reveal hole।
+         */
+        loader.style.setProperty(
+          '--reveal-x',
+          `${dotStartX}px`
+        );
+
+        loader.style.setProperty(
+          '--reveal-y',
+          `${dotStartY}px`
+        );
+
+        loader.style.setProperty(
+          '--reveal-radius',
+          `${initialDotSize / 2}px`
+        );
       };
 
     positionDotAtLineMiddle();
@@ -804,6 +824,11 @@ export class Home implements AfterViewInit, OnDestroy {
       const progress =
         smoothStep(currentProgress);
 
+        
+      loader.classList.toggle(
+        'reveal-started',
+        progress > 0.0001
+      );
       /*
        * Logo split movement
        */
@@ -888,22 +913,23 @@ export class Home implements AfterViewInit, OnDestroy {
         '50%';
 
       /*
-       * Red से black color animation
+       * Dot की जगह loader में transparent circular hole बनेगा।
+       * Circle जितना बड़ा होगा, उतना पीछे का Home HTML दिखाई देगा।
        */
-      const dotRed = Math.round(
-        219 * (1 - progress)
+      loader.style.setProperty(
+        '--reveal-x',
+        `${dotCenterX}px`
       );
 
-      const dotGreen = Math.round(
-        65 * (1 - progress)
+      loader.style.setProperty(
+        '--reveal-y',
+        `${dotCenterY}px`
       );
 
-      const dotBlue = Math.round(
-        76 * (1 - progress)
+      loader.style.setProperty(
+        '--reveal-radius',
+        `${currentDotSize / 2}px`
       );
-
-      zoomDot.style.backgroundColor =
-        `rgb(${dotRed}, ${dotGreen}, ${dotBlue})`;
 
       /*
        * Scroll शुरू होते ही line hide होगी।
@@ -1073,7 +1099,7 @@ export class Home implements AfterViewInit, OnDestroy {
         }
       };
 
-    loader.addEventListener(
+    window.addEventListener(
       'wheel',
       handleWheel,
       {
@@ -1081,7 +1107,7 @@ export class Home implements AfterViewInit, OnDestroy {
       }
     );
 
-    loader.addEventListener(
+    window.addEventListener(
       'touchstart',
       handleTouchStart,
       {
@@ -1089,7 +1115,7 @@ export class Home implements AfterViewInit, OnDestroy {
       }
     );
 
-    loader.addEventListener(
+    window.addEventListener(
       'touchmove',
       handleTouchMove,
       {
@@ -1097,7 +1123,7 @@ export class Home implements AfterViewInit, OnDestroy {
       }
     );
 
-    loader.addEventListener(
+    window.addEventListener(
       'touchend',
       handleTouchEnd
     );
@@ -1110,22 +1136,22 @@ export class Home implements AfterViewInit, OnDestroy {
     renderSplit();
 
     this.wheelCleanup = (): void => {
-      loader.removeEventListener(
+      window.removeEventListener(
         'wheel',
         handleWheel
       );
 
-      loader.removeEventListener(
+      window.removeEventListener(
         'touchstart',
         handleTouchStart
       );
 
-      loader.removeEventListener(
+      window.removeEventListener(
         'touchmove',
         handleTouchMove
       );
 
-      loader.removeEventListener(
+      window.removeEventListener(
         'touchend',
         handleTouchEnd
       );

@@ -16,7 +16,10 @@ body {
     --colorC5C8CD: #C5C8CD;
     --color4C4646: #4C4646;
     --colorD8D8D9: #D8D8D9;
+    --color666: #666;
+    --color999: #999;
     --colorHover: #DB414C;
+    --color318BF2: #318BF2;
     --filterHover: brightness(0) saturate(100%) invert(32%) sepia(88%) saturate(2209%) hue-rotate(334deg) brightness(91%) contrast(87%);
     --colorfff: #fff;
     --fontFamilyPoppins: "Poppins", sans-serif;
@@ -59,7 +62,7 @@ ul {
 }
 
 a,
-img {
+img, button {
   text-decoration: none;
   transition: all 0.3s ease-in-out;
 }
@@ -81,6 +84,9 @@ div {
   cursor: pointer;
 }
 /* =================================== */
+.zIndex-2{
+  z-index: 2;
+}
 .banner{
     background: url('../public/assets/images/banner.jpg') 0 0 no-repeat;
     background-size: cover;
@@ -147,19 +153,6 @@ body.itm-loader-open {
 /* ==================================
    NEW ROUTE HTML ANIMATION
 ================================== */
-/* .route-page-content-entering {
-  animation: route-content-show 0.5s ease-out both;
-}
-@keyframes route-content-show {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-} */
 @media (prefers-reduced-motion: reduce) {
   .route-transition-panel,
   .route-transition-panel-after-time {
@@ -334,6 +327,8 @@ body.itm-loader-open {
     animation-delay: 0ms !important;
   }
 }
+
+
 /* ========================================================== 
 Portfolio Page 
 =========================================================== */
