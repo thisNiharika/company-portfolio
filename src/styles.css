@@ -94,6 +94,7 @@ div {
 body.itm-loader-open {
   overflow: hidden;
 }
+
 /* ==================================
   Route Change Animation
 ================================== */
@@ -103,7 +104,7 @@ body.itm-loader-open {
   z-index: 999998;
   width: 100vw;
   height: 100vh;
-  background-color: #db414c;
+  background-color: var(--colorHover);
   opacity: 1;
   visibility: visible;
   pointer-events: none;
