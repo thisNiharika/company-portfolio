@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-project-details',
   imports: [],
@@ -17,6 +19,8 @@ import { gsap } from 'gsap';
 })
 export class ProjectDetails implements AfterViewInit, OnDestroy {
   readonly routeTransition = inject(RouteTransitionService);
+  private readonly pageElement = inject(ElementRef);
+  private scrollContext: any;
   goTo(
     url: string,
     event: MouseEvent,
@@ -38,11 +42,276 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
   activeTab = 'Overview';
 
   ngAfterViewInit(): void {
-    requestAnimationFrame(() => this.moveBackground());
     requestAnimationFrame(() => {
+      this.moveBackground();
       this.animateSlides(true);
       this.startAutoplay();
+
+      this.initPageScrollAnimation();
+
+      ScrollTrigger.refresh();
     });
+  }
+  
+  private initPageScrollAnimation(): void {
+    const page =
+      this.pageElement.nativeElement as HTMLElement;
+
+    this.scrollContext?.revert();
+
+    this.scrollContext = gsap.context(() => {
+
+      // Top banner animation
+      const bannerLeft =
+        page.querySelector<HTMLElement>('.pdb_left');
+
+      const bannerRight =
+        page.querySelector<HTMLElement>('.pdb_right');
+
+      if (bannerLeft) {
+        gsap.fromTo(
+          bannerLeft,
+          {
+            autoAlpha: 0,
+            x: -100
+          },
+          {
+            autoAlpha: 1,
+            x: 0,
+            duration: 1.1,
+            ease: 'power4.out'
+          }
+        );
+      }
+
+      if (bannerRight) {
+        gsap.fromTo(
+          bannerRight,
+          {
+            autoAlpha: 0,
+            x: 100,
+            scale: 0.94
+          },
+          {
+            autoAlpha: 1,
+            x: 0,
+            scale: 1,
+            duration: 1.2,
+            delay: 0.15,
+            ease: 'power4.out'
+          }
+        );
+      }
+
+      // All context sections
+      const contextBlocks =
+        page.querySelectorAll<HTMLElement>('.the_context');
+
+      contextBlocks.forEach(block => {
+        const number =
+          block.querySelector<HTMLElement>(
+            '.the_context_heading h2'
+          );
+
+        const title =
+          block.querySelector<HTMLElement>(
+            '.the_context_heading h3'
+          );
+
+        const content =
+          block.querySelector<HTMLElement>(
+            '.the_context_para'
+          );
+
+        const contentParts = content
+          ? Array.from(content.children) as HTMLElement[]
+          : [];
+
+        const listItems = Array.from(
+          block.querySelectorAll<HTMLElement>(
+            '.approachFocused li'
+          )
+        );
+
+        const blockImage =
+          block.querySelector<HTMLElement>(
+            '.approach_img, .certifications_img'
+          );
+
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: block,
+            start: 'top 78%',
+            // once: true
+            toggleActions: 'restart none restart none'
+          }
+        });
+
+        if (number) {
+          timeline.fromTo(
+            number,
+            {
+              autoAlpha: 0,
+              scale: 0.4,
+              rotate: -15,
+              x: -30
+            },
+            {
+              autoAlpha: 1,
+              scale: 1,
+              rotate: 0,
+              x: 0,
+              duration: 0.8,
+              ease: 'back.out(1.7)'
+            }
+          );
+        }
+
+        if (title) {
+          timeline.fromTo(
+            title,
+            {
+              autoAlpha: 0,
+              x: 70,
+              clipPath: 'inset(0 100% 0 0)'
+            },
+            {
+              autoAlpha: 1,
+              x: 0,
+              clipPath: 'inset(0 0% 0 0)',
+              duration: 0.9,
+              ease: 'power3.out'
+            },
+            '-=0.55'
+          );
+        }
+
+        if (contentParts.length) {
+          timeline.fromTo(
+            contentParts,
+            {
+              autoAlpha: 0,
+              y: 35
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.75,
+              stagger: 0.13,
+              ease: 'power3.out'
+            },
+            '-=0.45'
+          );
+        }
+
+        if (listItems.length) {
+          timeline.fromTo(
+            listItems,
+            {
+              autoAlpha: 0,
+              y: 30,
+              rotateX: -10
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 0.7,
+              stagger: 0.12,
+              ease: 'power3.out'
+            },
+            '-=0.35'
+          );
+        }
+
+        if (blockImage) {
+          timeline.fromTo(
+            blockImage,
+            {
+              autoAlpha: 0,
+              x: 90,
+              scale: 1.08,
+              clipPath: 'inset(0 0 0 100%)'
+            },
+            {
+              autoAlpha: 1,
+              x: 0,
+              scale: 1,
+              clipPath: 'inset(0 0 0 0%)',
+              duration: 1.1,
+              ease: 'power3.out'
+            },
+            '-=0.55'
+          );
+        }
+      });
+
+      // Context slider reveal
+      const slider =
+        page.querySelector<HTMLElement>('.context_slider');
+
+      if (slider) {
+        gsap.fromTo(
+          slider,
+          {
+            autoAlpha: 0,
+            y: 100,
+            scale: 0.9,
+            clipPath: 'inset(0 0 100% 0)'
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            clipPath: 'inset(0 0 0% 0)',
+            duration: 1.2,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: slider,
+              start: 'top 82%',
+              // once: true
+              toggleActions: 'restart none restart none'
+            }
+          }
+        );
+      }
+
+      // Impact cards stagger animation
+      const impactSection =
+        page.querySelector<HTMLElement>('.igList');
+
+      const impactCards = Array.from(
+        page.querySelectorAll<HTMLElement>('.igList li')
+      );
+
+      if (impactSection && impactCards.length) {
+        gsap.fromTo(
+          impactCards,
+          {
+            autoAlpha: 0,
+            y: 70,
+            rotateY: 12,
+            scale: 0.92
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            rotateY: 0,
+            scale: 1,
+            duration: 0.9,
+            stagger: 0.16,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: impactSection,
+              start: 'top 82%',
+              // once: true
+              toggleActions: 'restart none restart none'
+            }
+          }
+        );
+      }
+
+    }, page);
   }
 
   selectTab(tab: string): void {
@@ -419,15 +688,18 @@ this.sideOffset =
       cancelAnimationFrame(this.dragFrame);
     }
 
+    this.scrollContext?.revert();
+
     gsap.killTweensOf(this.items);
   }
   // ============================================= Slider
   onResize(): void {
     this.moveBackground();
-     if (!this.isDragging) {
+    if (!this.isDragging) {
       requestAnimationFrame(() => {
         this.animateSlides(true);
       });
     }
+    ScrollTrigger.refresh();
   }
 }

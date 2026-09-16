@@ -399,3 +399,11 @@
     border: clamp(10px, 1.04vw, 20px) solid #fff;
     box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
 }
+.the_context_heading,
+.the_context_para,
+.context_slider,
+.igList li,
+.approach_img,
+.certifications_img {
+  will-change: transform, opacity;
+}
