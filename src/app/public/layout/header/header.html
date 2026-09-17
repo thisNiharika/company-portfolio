@@ -331,3 +331,32 @@
         <img class="hb_menu pointer" src="assets/images/menu.svg" alt="Menu Icon" />
     </div>
 </header>
+
+<button
+    #scrollTopButton
+    type="button"
+    class="scroll-top-btn"
+    aria-label="Scroll to top"
+    (click)="scrollToTop()"
+>
+    <svg
+        class="scroll-top-progress"
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+    >
+        <circle
+            class="scroll-top-track"
+            cx="24"
+            cy="24"
+            r="20"
+        ></circle>
+        <circle
+            #scrollProgressCircle
+            class="scroll-top-progress-circle"
+            cx="24"
+            cy="24"
+            r="20"
+        ></circle>
+    </svg>
+    <span aria-hidden="true">↑</span>
+</button>

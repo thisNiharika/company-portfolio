@@ -11,7 +11,6 @@ import {
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
 interface RelatedCard {
   category: string;
   title: string;
@@ -23,7 +22,6 @@ interface RelatedProjects {
   cards: RelatedCard[];
 }
 
-
 gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-project-details',
@@ -32,6 +30,7 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './project-details.css',
 })
 export class ProjectDetails implements AfterViewInit, OnDestroy {
+  
   private readonly changeDetector = inject(ChangeDetectorRef);
   readonly routeTransition = inject(RouteTransitionService);
   private readonly pageElement = inject(ElementRef);
@@ -1503,4 +1502,5 @@ this.sideOffset =
       ]
     }
   ];
+  
 }

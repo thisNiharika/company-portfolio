@@ -426,6 +426,60 @@
     filter: brightness(0) saturate(100%) invert(39%) sepia(1%) saturate(786%) hue-rotate(341deg) brightness(101%) contrast(93%);
 }
 
+.scroll-top-btn {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 1000;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--colorHover);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+}
+.scroll-top-btn:hover {
+    bottom: 40px;
+}
+.scroll-top-progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scroll-top-track,
+.scroll-top-progress-circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.scroll-top-track {
+  stroke: rgb(255 255 255 / 30%);
+}
+
+.scroll-top-progress-circle {
+  stroke: var(--colorfff);
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translate(0px, 0px);
+}
+
+.scroll-top-btn span {
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  line-height: 1;
+}
 @media screen and (max-width: 1400px) {
     .hdfrt_bottom .techList ul.year_list{
         padding-right: clamp(40px, 3.93vw, 55px);

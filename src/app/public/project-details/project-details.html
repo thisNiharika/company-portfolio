@@ -67,7 +67,8 @@
     </div>
     <div class="w-100 overflow-hidden">
         <div class="context_slider" #slider [class.is-dragging]="isDragging" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
-            @for (slide of slides; track slide.src) {
+            @for (slide of slides; track $index) {
+            <!-- @for (slide of slides; track slide.src) { -->
             <div class="item" [class.active]="activeIndex === $index">
                 <img [src]="slide.src" [alt]="slide.alt">
             </div>
