@@ -202,7 +202,7 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
 
         const blockImage =
           block.querySelector<HTMLElement>(
-            '.approach_img, .certifications_img'
+            '.approach_img, .certifications_img, .ld_img'
           );
 
         const timeline = gsap.timeline({
@@ -310,6 +310,182 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
             },
             '-=0.55'
           );
+        }
+      });
+
+      // Branding ke typography cards ka scroll reveal.
+      const brandingVisuals = Array.from(
+        page.querySelectorAll<HTMLElement>(
+          '.pd_branding .typo_item'
+        )
+      );
+
+      brandingVisuals.forEach((visual) => {
+        gsap.set(visual, {
+          autoAlpha: 0,
+          y: 70,
+          scale: 0.94,
+          filter: 'blur(6px)'
+        });
+
+        const visualAnimation = gsap.to(visual, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+          duration: 0.9,
+          ease: 'power3.out',
+          paused: true
+        });
+
+        ScrollTrigger.create({
+          trigger: visual,
+          start: 'top 84%',
+          animation: visualAnimation,
+          toggleActions: 'play none restart reset',
+          invalidateOnRefresh: true
+        });
+
+        const visualRect = visual.getBoundingClientRect();
+        if (
+          visualRect.top <= window.innerHeight * 0.84 &&
+          visualRect.bottom >= 0
+        ) {
+          visualAnimation.play(0);
+        }
+      });
+
+      // Har typo_content ke h4 aur p separately stagger mein animate honge.
+      const brandingTextBlocks = Array.from(
+        page.querySelectorAll<HTMLElement>('.pd_branding .typo_content')
+      );
+
+      brandingTextBlocks.forEach((textBlock) => {
+        const textParts = Array.from(
+          textBlock.querySelectorAll<HTMLElement>(
+            ':scope > h4, :scope > p'
+          )
+        );
+
+        if (!textParts.length) {
+          return;
+        }
+
+        gsap.set(textParts, {
+          autoAlpha: 0,
+          y: 28
+        });
+
+        const textAnimation = gsap.timeline({
+          paused: true
+        });
+
+        textAnimation.to(textParts, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: 'power3.out'
+        });
+
+        ScrollTrigger.create({
+          trigger: textBlock,
+          start: 'top 86%',
+          animation: textAnimation,
+          toggleActions: 'play none restart reset',
+          invalidateOnRefresh: true
+        });
+
+        const textRect = textBlock.getBoundingClientRect();
+        if (
+          textRect.top <= window.innerHeight * 0.86 &&
+          textRect.bottom >= 0
+        ) {
+          textAnimation.play(0);
+        }
+      });
+
+      // Palette ka heading pehle aur uske baad colours ek-ek karke aayenge.
+      const brandingPalettes = Array.from(
+        page.querySelectorAll<HTMLElement>('.pd_branding .palette')
+      );
+
+      brandingPalettes.forEach((palette) => {
+        const paletteHeading = palette.querySelector<HTMLElement>(
+          ':scope > h5'
+        );
+
+        const paletteList = palette.querySelector<HTMLElement>(
+          ':scope > ul'
+        );
+
+        const paletteItems = paletteList
+          ? Array.from(paletteList.children) as HTMLElement[]
+          : [];
+
+        if (!paletteHeading && !paletteItems.length) {
+          return;
+        }
+
+        if (paletteHeading) {
+          gsap.set(paletteHeading, {
+            autoAlpha: 0,
+            y: 24
+          });
+        }
+
+        if (paletteItems.length) {
+          gsap.set(paletteItems, {
+            autoAlpha: 0,
+            y: 28,
+            scale: 0.86,
+            rotateX: -12
+          });
+        }
+
+        const paletteAnimation = gsap.timeline({
+          paused: true
+        });
+
+        if (paletteHeading) {
+          paletteAnimation.to(paletteHeading, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            ease: 'power3.out'
+          });
+        }
+
+        if (paletteItems.length) {
+          paletteAnimation.to(
+            paletteItems,
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              rotateX: 0,
+              duration: 0.55,
+              stagger: 0.1,
+              ease: 'back.out(1.4)'
+            },
+            '-=0.1'
+          );
+        }
+
+        ScrollTrigger.create({
+          trigger: palette,
+          start: 'top 86%',
+          animation: paletteAnimation,
+          toggleActions: 'play none restart reset',
+          invalidateOnRefresh: true
+        });
+
+        const paletteRect = palette.getBoundingClientRect();
+        if (
+          paletteRect.top <= window.innerHeight * 0.86 &&
+          paletteRect.bottom >= 0
+        ) {
+          paletteAnimation.play(0);
         }
       });
 
