@@ -147,6 +147,15 @@ export class Summary implements AfterViewInit, OnDestroy {
         active: false
       };
 
+      const mouseTrail: {
+        x: number;
+        y: number;
+        time: number;
+      }[] = [];
+
+      const maxTrailPoints = 280;
+      const trailLife = 300;
+
       let particles: Particle[] = [];
       let canvasWidth = 0;
       let canvasHeight = 0;
@@ -283,6 +292,62 @@ export class Summary implements AfterViewInit, OnDestroy {
         context.fill();
       };
 
+      const drawMouseTrail = (): void => {
+        if (!mouse.active || mouseTrail.length < 2) {
+          return;
+        }
+
+        const now = performance.now();
+
+        // Remove old trail points
+        while (
+          mouseTrail.length > 0 &&
+          now - mouseTrail[0]!.time > trailLife
+        ) {
+          mouseTrail.shift();
+        }
+
+        if (mouseTrail.length < 2) {
+          return;
+        }
+
+        context.save();
+
+        const total = mouseTrail.length;
+
+        for (let i = 1; i < total; i++) {
+          const previous = mouseTrail[i - 1]!;
+          const current = mouseTrail[i]!;
+
+          // Tail -> head
+          const progress = i / (total - 1);
+
+          // Very thin tail, slightly thicker near cursor
+          const width = 0.2 + progress * 1.3;
+
+          // Strong fade towards the tail
+          const opacity = Math.pow(progress, 3) * .8;
+
+          context.beginPath();
+          context.moveTo(previous.x, previous.y);
+          context.lineTo(current.x, current.y);
+
+          context.lineWidth = width;
+          context.lineCap = 'round';
+
+          context.strokeStyle =
+            `rgba(100, 98, 100, ${opacity})`;
+
+          context.shadowBlur = 3 + progress * 6;
+          context.shadowColor =
+            `rgba(100, 98, 100, ${opacity})`;
+
+          context.stroke();
+        }
+
+        context.restore();
+      };
+
       const animate = (): void => {
         context.clearRect(0, 0, canvasWidth, canvasHeight);
         drawConnections();
@@ -303,7 +368,9 @@ export class Summary implements AfterViewInit, OnDestroy {
           context.fill();
         });
 
+        drawMouseTrail();
         drawMouseEffect();
+
         context.shadowBlur = 0;
         animationFrame = this.requestFrame(animate);
       };
@@ -323,15 +390,51 @@ export class Summary implements AfterViewInit, OnDestroy {
 
       const handlePointerMove = (event: PointerEvent): void => {
         const rectangle = section.getBoundingClientRect();
-        mouse.x = event.clientX - rectangle.left;
-        mouse.y = event.clientY - rectangle.top;
+
+        const x = event.clientX - rectangle.left;
+        const y = event.clientY - rectangle.top;
+
+        const previousX = mouse.x;
+        const previousY = mouse.y;
+
+        mouse.x = x;
+        mouse.y = y;
         mouse.active = true;
+
+        // First movement
+        if (previousX < 0 || previousY < 0) {
+          return;
+        }
+
+        const dx = x - previousX;
+        const dy = y - previousY;
+
+        const distance = Math.hypot(dx, dy);
+
+        // Ignore tiny movements
+        if (distance < 2) {
+          return;
+        }
+
+        const directionX = dx / distance;
+        const directionY = dy / distance;
+
+        mouseTrail.push({
+          x,
+          y,
+          time: performance.now()
+        });
+
+        if (mouseTrail.length > maxTrailPoints) {
+          mouseTrail.shift();
+        }
       };
 
       const handlePointerLeave = (): void => {
         mouse.x = -1000;
         mouse.y = -1000;
         mouse.active = false;
+        mouseTrail.length = 0;
       };
 
       const handleResize = (): void => {
