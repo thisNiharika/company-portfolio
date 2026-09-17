@@ -497,6 +497,132 @@
 .pd_overview{
     overflow: hidden;
 }
+
+
+/* ================================== Branding ================================== */
+.typography{
+    padding: 0;
+    max-width: clamp(1000px, 66.35vw, 1274px);
+    width: 100%;
+    margin: 0 auto  clamp(60px, 5.21vw, 100px);
+}
+.typography .typo_item {
+    display: flex;
+    gap: clamp(12px, 9.48vw, 182px);
+    margin-bottom: clamp(30px, 3.65vw, 70px);
+    align-items: flex-start;
+}
+.typography .typo_item:last-child{
+    margin-bottom: 0;
+}
+.typography .typo_item .typo_fontFamily {
+    border-radius: clamp(10px, 1.04vw, 20px);
+    background: linear-gradient(180deg, rgba(17, 76, 164, 1) 0%, rgba(8, 36, 77, 1) 100%);
+    min-width: clamp(350px, 24.22vw, 465px);
+    padding-left: clamp(15px, 4.95vw, 95px);
+    padding-top: clamp(15px, 1.98vw, 38px);
+    padding-bottom: clamp(15px, 1.98vw, 38px);
+    padding-right: 15px;
+}
+.typography .typo_item .typo_fontFamily span {
+    font-size: clamp(14px, 1.04vw, 20px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 0.7;
+    margin-bottom: -5px;
+}
+.typography .typo_item .typo_fontFamily h2 {
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(40px, 3.65vw, 70px);
+    line-height: 1;
+}
+.typography .typo_content h4 {
+    font-size: clamp(20px, 1.67vw, 32px);
+    font-weight: 500;
+    color: #313842;
+    line-height: 1.5;
+    margin-bottom: clamp(15px, 1.04vw, 20px);
+}
+.typography .typo_content p{
+    font-size: clamp(14px, 1.04vw, 20px);
+    color: #747C8C;
+    line-height: 1.6;
+    margin-bottom: 0;
+    display: inline-block;
+    width: 100%;
+}
+.typography .typo_item .typo_fontFamily.mulishFont span, .typography .typo_item .typo_fontFamily.mulishFont h2{
+    font-family: var(--fontFamilyMulish);
+}
+.typography .typo_item .typo_fontFamily.interFont span, .typography .typo_item .typo_fontFamily.interFont h2{
+    font-family: var(--fontFamilyInter);
+}
+.palette {
+    margin-top: clamp(30px, 2.6vw, 50px);
+}
+.palette h5 {
+    color: #000;
+    font-size: clamp(12px, 0.73vw, 14px);
+    text-transform: uppercase;
+    line-height: 1.43;
+    padding-bottom: clamp(14px, 1.04vw, 20px);
+    margin-bottom: clamp(14px, 1.04vw, 20px);
+    border-bottom: 1px solid #CDCDCD;
+}
+.palette ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+.palette ul li {
+    width: calc(100% / 5);
+    padding: clamp(10px, 1.04vw, 20px);
+    height: 100px;
+    display: flex;
+    align-items: end;
+    color: #333;
+}
+.palette ul li p {
+    font-size: clamp(14px, 0.94vw, 18px);
+}
+.dark_blue{
+    background: #0A3473;
+    color: #fff !important;
+}
+.yellow{
+    background: #F4C41A;
+}
+.bright_orange{
+    background: #FA7901;
+    color: #fff !important;
+}
+.white{
+    background: #fff;
+}
+.bright_green{
+    background: #2A9F0D;
+    color: #fff !important;
+}
+.black{
+    background: #333;
+    color: #fff !important;
+}
+.mt-100{
+    margin-top: clamp(50px, 5.21vw, 100px);
+}
+.logoDesign{
+    padding:clamp(30px, 2.6vw, 50px) clamp(12px, 8.44vw, 162px) 0;
+    display: inline-block;
+    width: 100%;
+}
+.ld_img{
+    margin-top: clamp(15px, 1.04vw, 20px);
+    padding-bottom: clamp(30px, 2.08vw, 40px);
+}
+.ld_img img {
+    width: 78%;
+}
 @media (max-width: 767px) {
   .relatedCard .cardList {
     gap: 20px;

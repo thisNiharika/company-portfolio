@@ -210,93 +210,6 @@
             </div>
         </div>
     </div>
-    <div class="ourApproach">
-        <div class="the_context">
-            <div class="the_context_heading">
-                <h3>Related <span>Projects</span></h3>            
-            </div>
-            <div
-                class="relatedCard"
-                [class.related-static]="!isRelatedSliderEnabled"
-                #relatedSlider
-                (pointerdown)="onRelatedPointerDown($event)"
-                (pointermove)="onRelatedPointerMove($event)"
-                (pointerup)="onRelatedPointerUp($event)"
-                (pointercancel)="onRelatedPointerCancel($event)"
-            >
-                <div class="cardList">
-                    @for (card of relatedSliderCards; track $index; let cardIndex = $index) {
-                    <article class="card_items">
-
-                        <div class="card_route_entry">
-                        <div class="ci_content">
-
-                            <div class="cic_top">
-                            <span>{{ card.category }}</span>
-                            <h2>{{ card.title }}</h2>
-                            <p>{{ card.description }}</p>
-                            </div>
-
-                            <div class="cic_bottom d-flex justify-content-end">
-                            <a
-                                class="arrow_card"
-                                [attr.href]="card.link"
-                                (click)="goTo(card.link, $event)"
-                                [attr.aria-label]="'View ' + card.title"
-                            >
-                                <img
-                                src="assets/images/arrow_line.svg"
-                                alt="Arrow"
-                                >
-                            </a>
-                            </div>
-
-                        </div>
-                        </div>
-
-                        @if (card.image) {
-                        <div class="ci_img">
-                            <img
-                            [src]="card.image"
-                            [alt]="card.title"
-                            [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'"
-                            [attr.fetchpriority]="cardIndex < 2 ? 'high' : 'auto'"
-                            >
-                        </div>
-                        }
-
-                    </article>
-                    }
-
-                </div>
-                <div class="relatedSliderControls">
-                    <button
-                        type="button"
-                        class="slider_btn slider_prev"
-                        [disabled]="!isRelatedSliderEnabled"
-                        [class.is-disabled]="!isRelatedSliderEnabled"
-                        (pointerdown)="$event.stopPropagation()"
-                        (click)="previousRelatedSlide()"
-                        aria-label="Previous project">
-
-                        <img src="assets/images/sliderArrow.svg" alt="Previous"> Previous Project
-                    </button>
-
-                    <button
-                        type="button"
-                        class="slider_btn slider_next"
-                        [disabled]="!isRelatedSliderEnabled"
-                        [class.is-disabled]="!isRelatedSliderEnabled"
-                        (pointerdown)="$event.stopPropagation()"
-                        (click)="nextRelatedSlide()"
-                        aria-label="Next project">
-
-                        Next Project <img src="assets/images/sliderArrow.svg" alt="Next">
-                    </button>
-                </div>
-            </div>        
-        </div>
-    </div>
 </div>
 }
 @if (activeTab === 'Branding') {
@@ -323,7 +236,230 @@
                 <h4>Typography with Purpose</h4>
                 <p>The typography system combines Mulish and Inter, with each typeface assigned a specific role within the digital experience. Mulish establishes the brand's visual personality, while Inter is optimized for displaying numerical and data-driven information with clarity and consistency.</p>
             </div>
+            <div class="typography">
+                <div class="typo_item">
+                    <div class="typo_fontFamily mulishFont">
+                        <div>
+                            <span>Primary Font</span>
+                            <h2>MULISH</h2>
+                        </div>
+                    </div>
+                    <div class="typo_content">
+                        <h4>Primary Typeface · Brand Expression</h4>
+                        <p>Mulish provides a clean and approachable personality for the brand. Its distinctive character helps create a clear visual hierarchy across headings, titles, and key communication.</p>
+                    </div>
+                </div>
+                <div class="typo_item">
+                    <div class="typo_fontFamily interFont">
+                        <div>
+                            <span>Primary Font</span>
+                            <h2>INTER</h2>
+                        </div>
+                    </div>
+                    <div class="typo_content">
+                        <h4>Data Typeface · Numerical Clarity</h4>
+                        <p>Inter was primarily selected for numerical and data-driven content. Its clean forms and highly legible numerals make complex statistics easier to scan, compare, and understand across dashboards, indexes, and data visualizations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ourApproach">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>03</h2>
+                <h3>Color <span>Palette</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>A Flexible Color System for Consistent Brand Experiences</h4>
+                <p>The color palette was structured into three levels to maintain a consistent brand identity while allowing flexibility across different products, themes, and visual contexts.</p>                  
+            </div>
+            <div class="typography">
+                <div class="typo_content">
+                    <h4>Core Brand Identity</h4>
+                    <p>The primary colors form the foundation of the visual language and are used throughout the main design system. They establish the core brand presence across interfaces, key components, navigation, and primary interactions.</p>
+                </div>
+                <div class="palette">
+                    <h5>PRIMARY COLORS</h5>
+                    <ul>
+                        <li class="dark_blue">
+                            <p>DARK BLUE</p>
+                        </li>
+                        <li class="yellow">
+                            <p>YELLOW</p>
+                        </li>
+                        <li class="bright_orange">
+                            <p>BRIGHT ORANGE</p>
+                        </li>
+                        <li class="white">
+                            <p>WHITE</p>
+                        </li>
+                        <li class="bright_green">
+                            <p>BRIGHT GREEN</p>
+                        </li>
+                        <li class="black">
+                            <p>BLACK</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="typo_content mt-100">
+                    <h4>Theme & Visual Alignment</h4>
+                    <p>Secondary colors extend the primary palette to support different themes, categories, and content areas. They allow individual sections or experiences to have their own visual character while remaining aligned with the overall brand system.</p>
+                </div>
+                <div class="palette">
+                    <h5>SECONDARY COLORS</h5>
+                    <ul>
+                        <li style="background-color: #FFB6B6;">
+                            <p>#FFB6B6</p>
+                        </li>
+                        <li style="background-color: #FFD4B6;">
+                            <p>#FFD4B6</p>
+                        </li>
+                        <li style="background-color: #B6FFC6;">
+                            <p>#B6FFC6</p>
+                        </li>
+                        <li style="background-color: #B6CAFF;">
+                            <p>#B6CAFF</p>
+                        </li>
+                        <li style="background-color: #B6FFFB;">
+                            <p>#B6FFFB</p>
+                        </li>
+                        <li style="background-color: #FFB6EF;">
+                            <p>#FFB6EF</p>
+                        </li>
+
+                        <li style="background-color: #FFEEEE;">
+                            <p>#FFEEEE</p>
+                        </li>
+                        <li style="background-color: #B24545;">
+                            <p>#B24545</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="typo_content mt-100">
+                    <h4>Data & Visual Enrichment</h4>
+                    <p>Tertiary colors are used selectively to introduce additional visual distinction where the primary and secondary palettes are not sufficient. They are particularly useful for data visualization, charts, indicators, highlights, and supporting information.</p>
+                </div>
+                <div class="palette">
+                    <h5>TERCIARY COLORS</h5>
+                    <ul>
+                        <li style="background-color: #209BCF; color: #fff;">
+                            <p>DARK SKY BLUE</p>
+                        </li>
+                        <li style="background-color: #2BBAA0; color: #fff;">
+                            <p>SEA GREEN</p>
+                        </li>                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="logoDesign">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>04</h2>
+                <h3>Logo <span>Design</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Clarity Through Institutional Simplicity</h4>
+                <p>The logo was designed to establish a clear and authoritative identity for the National Conference of Chief Secretaries, while maintaining a strong connection with the Government of India.</p>
+                <div class="ld_img text-center">
+                    <img src="assets/images/logo_design.svg" alt="">
+                </div>
+                <p>The logo follows a simple, authoritative approach based on the client's requirement for clear product identification. The conference name is given strong visual prominence, while the Indian State Emblem establishes its official association with the Government of India. The restrained typography and color palette create a professional identity that remains clear across digital and official communication.</p>
+            </div>
         </div>
     </div>
 </div>
 }
+<div class="ourApproach">
+    <div class="the_context">
+        <div class="the_context_heading">
+            <h3>Related <span>Projects</span></h3>            
+        </div>
+        <div
+            class="relatedCard"
+            [class.related-static]="!isRelatedSliderEnabled"
+            #relatedSlider
+            (pointerdown)="onRelatedPointerDown($event)"
+            (pointermove)="onRelatedPointerMove($event)"
+            (pointerup)="onRelatedPointerUp($event)"
+            (pointercancel)="onRelatedPointerCancel($event)"
+        >
+            <div class="cardList">
+                @for (card of relatedSliderCards; track $index; let cardIndex = $index) {
+                <article class="card_items">
+
+                    <div class="card_route_entry">
+                    <div class="ci_content">
+
+                        <div class="cic_top">
+                        <span>{{ card.category }}</span>
+                        <h2>{{ card.title }}</h2>
+                        <p>{{ card.description }}</p>
+                        </div>
+
+                        <div class="cic_bottom d-flex justify-content-end">
+                        <a
+                            class="arrow_card"
+                            [attr.href]="card.link"
+                            (click)="goTo(card.link, $event)"
+                            [attr.aria-label]="'View ' + card.title"
+                        >
+                            <img
+                            src="assets/images/arrow_line.svg"
+                            alt="Arrow"
+                            >
+                        </a>
+                        </div>
+
+                    </div>
+                    </div>
+
+                    @if (card.image) {
+                    <div class="ci_img">
+                        <img
+                        [src]="card.image"
+                        [alt]="card.title"
+                        [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'"
+                        [attr.fetchpriority]="cardIndex < 2 ? 'high' : 'auto'"
+                        >
+                    </div>
+                    }
+
+                </article>
+                }
+
+            </div>
+            <div class="relatedSliderControls">
+                <button
+                    type="button"
+                    class="slider_btn slider_prev"
+                    [disabled]="!isRelatedSliderEnabled"
+                    [class.is-disabled]="!isRelatedSliderEnabled"
+                    (pointerdown)="$event.stopPropagation()"
+                    (click)="previousRelatedSlide()"
+                    aria-label="Previous project">
+
+                    <img src="assets/images/sliderArrow.svg" alt="Previous"> Previous Project
+                </button>
+
+                <button
+                    type="button"
+                    class="slider_btn slider_next"
+                    [disabled]="!isRelatedSliderEnabled"
+                    [class.is-disabled]="!isRelatedSliderEnabled"
+                    (pointerdown)="$event.stopPropagation()"
+                    (click)="nextRelatedSlide()"
+                    aria-label="Next project">
+
+                    Next Project <img src="assets/images/sliderArrow.svg" alt="Next">
+                </button>
+            </div>
+        </div>        
+    </div>
+</div>
