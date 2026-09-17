@@ -410,3 +410,101 @@
 .certifications_img {
   will-change: transform, opacity;
 }
+.relatedCard .cardList {
+    margin-top: clamp(40px, 4.17vw, 80px);
+    display: flex;
+}
+.relatedCard .card_items{
+    position: relative;
+    z-index: 1;
+    top: 0;
+}
+.relatedCard .card_route_entry {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+.relatedCard {
+  width: 100%;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  max-width: 1190px;
+  margin: 0 auto clamp(60px, 5.89vw, 113px);
+}
+
+.relatedCard:active {
+  cursor: grabbing;
+}
+
+.relatedCard .cardList {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: clamp(40px, 4.43vw, 85px);
+  margin-top: clamp(20px, 1.82vw, 35px);
+  grid-template-columns: none;
+  will-change: transform;
+  padding: 0 80px;
+}
+
+.relatedCard .card_items {
+  flex: 0 0 calc(
+    (100% - clamp(40px, 4.43vw, 85px)) / 2
+  );
+  width: calc(
+    (100% - clamp(40px, 4.43vw, 85px)) / 2
+  );
+  top: 0 !important;
+}
+
+.relatedCard .card_items img {
+  -webkit-user-drag: none;
+}
+.relatedCard.related-static .cardList {
+  transform: translate3d(0, 0, 0) !important;
+  flex-wrap: wrap;
+}
+
+.slider_btn:disabled,
+.slider_btn.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.relatedSliderControls{
+    padding: clamp(20px, 2.45vw, 47px) 80px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.relatedSliderControls .slider_btn {
+    font-size: clamp(14px, 1.04vw, 20px);
+    font-style: italic;
+    color: var(--color313842);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.relatedSliderControls .slider_btn.slider_next img {
+    transform: rotate(180deg);
+}
+.relatedSliderControls .slider_btn img{
+   filter: brightness(0) saturate(100%) invert(23%) sepia(0%) saturate(0%) hue-rotate(284deg) brightness(98%) contrast(85%);
+}
+@media (max-width: 767px) {
+  .relatedCard .cardList {
+    gap: 20px;
+  }
+
+  .relatedCard .card_items {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .relatedCard.related-static .card_items {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+}

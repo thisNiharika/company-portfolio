@@ -212,3 +212,91 @@
         </div>
     </div>
 </div>
+
+<div class="ourApproach">
+    <div class="the_context">
+        <div class="the_context_heading">
+            <h3>Related <span>Projects</span></h3>            
+        </div>
+        <div
+            class="relatedCard"
+            [class.related-static]="!isRelatedSliderEnabled"
+            #relatedSlider
+            (pointerdown)="onRelatedPointerDown($event)"
+            (pointermove)="onRelatedPointerMove($event)"
+            (pointerup)="onRelatedPointerUp($event)"
+            (pointercancel)="onRelatedPointerCancel($event)"
+        >
+            <div class="cardList">
+                @for (card of relatedSliderCards; track $index; let cardIndex = $index) {
+                <article class="card_items">
+
+                    <div class="card_route_entry">
+                    <div class="ci_content">
+
+                        <div class="cic_top">
+                        <span>{{ card.category }}</span>
+                        <h2>{{ card.title }}</h2>
+                        <p>{{ card.description }}</p>
+                        </div>
+
+                        <div class="cic_bottom d-flex justify-content-end">
+                        <a
+                            class="arrow_card"
+                            [attr.href]="card.link"
+                            (click)="goTo(card.link, $event)"
+                            [attr.aria-label]="'View ' + card.title"
+                        >
+                            <img
+                            src="assets/images/arrow_line.svg"
+                            alt="Arrow"
+                            >
+                        </a>
+                        </div>
+
+                    </div>
+                    </div>
+
+                    @if (card.image) {
+                    <div class="ci_img">
+                        <img
+                        [src]="card.image"
+                        [alt]="card.title"
+                        [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'"
+                        [attr.fetchpriority]="cardIndex < 2 ? 'high' : 'auto'"
+                        >
+                    </div>
+                    }
+
+                </article>
+                }
+
+            </div>
+            <div class="relatedSliderControls">
+                <button
+                    type="button"
+                    class="slider_btn slider_prev"
+                    [disabled]="!isRelatedSliderEnabled"
+                    [class.is-disabled]="!isRelatedSliderEnabled"
+                    (pointerdown)="$event.stopPropagation()"
+                    (click)="previousRelatedSlide()"
+                    aria-label="Previous project">
+
+                    <img src="assets/images/sliderArrow.svg" alt="Previous"> Previous Project
+                </button>
+
+                <button
+                    type="button"
+                    class="slider_btn slider_next"
+                    [disabled]="!isRelatedSliderEnabled"
+                    [class.is-disabled]="!isRelatedSliderEnabled"
+                    (pointerdown)="$event.stopPropagation()"
+                    (click)="nextRelatedSlide()"
+                    aria-label="Next project">
+
+                    Next Project <img src="assets/images/sliderArrow.svg" alt="Next">
+                </button>
+            </div>
+        </div>        
+    </div>
+</div>
