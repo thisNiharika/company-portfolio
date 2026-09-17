@@ -14,289 +14,316 @@
         </ul>
     </div>
 </div>
-<div class="pd_bottom">
-    <div class="pdb_banner">
-        <div class="pdb_left route-animate animate-fade-left" style="--route-delay: 450ms; --route-duration: 800ms;">
-            <img class="client_logo img-fluid" src="assets/images/clients/national-conference-of-chief-secretaries.svg"
-                alt="National Conference of Chief Secretaries">
-            <h3>National Conference of Chief Secretaries</h3>
-            <div class="client_details">
-                <span>Client</span>
-                <p>NITI Aayog, UNDP</p>
-            </div>
-            <div class="client_details">
-                <span>Duration</span>
-                <p>6 Months</p>
-            </div>
-            <div class="client_details">
-                <span>Geo Scope</span>
-                <p>Pan-India</p>
-            </div>
-            <div class="client_details">
-                <span>DOmain</span>
-                <p>National Governance & Digital Transformation Initiative</p>
-            </div>
-            <div class="client_details">
-                <span>Product Scale</span>
-                <p>National / Multi-State / Government Leadership</p>
-            </div>
-        </div>
-        <div class="pdb_right route-animate animate-fade-right" style="--route-delay: 450ms; --route-duration: 800ms;">
-            <div class="pdb_right_img">
-                <img class="img-fluid w-100" src="assets/images/project_details_banner.jpg"
+@if (activeTab === 'Overview') {
+<div class="pd_overview">
+    <div class="pd_bottom">
+        <div class="pdb_banner">
+            <div class="pdb_left route-animate animate-fade-left" style="--route-delay: 450ms; --route-duration: 800ms;">
+                <img class="client_logo img-fluid" src="assets/images/clients/national-conference-of-chief-secretaries.svg"
                     alt="National Conference of Chief Secretaries">
+                <h3>National Conference of Chief Secretaries</h3>
+                <div class="client_details">
+                    <span>Client</span>
+                    <p>NITI Aayog, UNDP</p>
+                </div>
+                <div class="client_details">
+                    <span>Duration</span>
+                    <p>6 Months</p>
+                </div>
+                <div class="client_details">
+                    <span>Geo Scope</span>
+                    <p>Pan-India</p>
+                </div>
+                <div class="client_details">
+                    <span>DOmain</span>
+                    <p>National Governance & Digital Transformation Initiative</p>
+                </div>
+                <div class="client_details">
+                    <span>Product Scale</span>
+                    <p>National / Multi-State / Government Leadership</p>
+                </div>
+            </div>
+            <div class="pdb_right route-animate animate-fade-right" style="--route-delay: 450ms; --route-duration: 800ms;">
+                <div class="pdb_right_img">
+                    <img class="img-fluid w-100" src="assets/images/project_details_banner.jpg"
+                        alt="National Conference of Chief Secretaries">
+                </div>
+            </div>
+        </div>
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>01</h2>
+                <h3>The <span>Context</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Where Governance Meets Collaboration</h4>
+                <p>The National Conference of Chief Secretaries brings together the highest levels of administrative
+                    leadership to deliberate on national priorities, strengthen Centre–State collaboration and accelerate
+                    the implementation of shared development agendas.</p>
+                <p>Our role was to transform this institutional ecosystem into a powerful digital experience, making
+                    critical information, knowledge and outcomes more accessible, structured and connected.</p>
             </div>
         </div>
     </div>
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>01</h2>
-            <h3>The <span>Context</span></h3>
-        </div>
-        <div class="the_context_para">
-            <h4>Where Governance Meets Collaboration</h4>
-            <p>The National Conference of Chief Secretaries brings together the highest levels of administrative
-                leadership to deliberate on national priorities, strengthen Centre–State collaboration and accelerate
-                the implementation of shared development agendas.</p>
-            <p>Our role was to transform this institutional ecosystem into a powerful digital experience, making
-                critical information, knowledge and outcomes more accessible, structured and connected.</p>
-        </div>
-    </div>
-</div>
-<div class="w-100 overflow-hidden">
-    <div class="context_slider" #slider [class.is-dragging]="isDragging" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
-        @for (slide of slides; track slide.src) {
-        <div class="item" [class.active]="activeIndex === $index">
-            <img [src]="slide.src" [alt]="slide.alt">
-        </div>
-        }
-        <div class="cs_btn">
-            <button type="button" class="slider_btn slider_prev" (pointerdown)="$event.stopPropagation()" (click)="previousSlide()">
-                <img src="assets/images/arrow_line.svg" alt="Arrow">
-            </button>
-
-            <button type="button" class="slider_btn slider_next" (pointerdown)="$event.stopPropagation()" (click)="nextSlide()">
-                <img src="assets/images/arrow_line.svg" alt="Arrow">
-            </button>
-        </div>
-    </div>
-</div>
-<div class="theChallenge">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>02</h2>
-            <h3>The <span>Challenge</span></h3>
-        </div>
-        <div class="the_context_para">
-            <h4>Connecting a Complex Governance Landscape</h4>
-            <p>Multiple stakeholders. Diverse information. National-scale coordination.</p>
-            <p>The platform needed to bring together conference proceedings, policy discussions, knowledge resources, programmes and institutional information within a single, intuitive digital environment.</p>
-            <p>The challenge was not simply to organise information, but to make a complex governance ecosystem understandable, discoverable and accessible.</p>
-        </div>
-    </div>
-</div>
-
-<div class="ourApproach">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>03</h2>
-            <h3>Our <span>Approach</span></h3>
-        </div>
-        <div class="the_context_para">
-            <h4>Designing for the Complexity of Governance</h4>
-            <p>We approached the platform as a digital knowledge and collaboration ecosystem, rather than a conventional event website.</p>
-            <div class="approachFocused">
-                <h3>Our approach focused on:</h3>
-                <ul>
-                    <li>
-                        <h5>Simplifying Complexity</h5>
-                        <p>Transforming extensive institutional information into clear and intuitive experiences.</p>
-                    </li>
-                    <li>
-                        <h5>Connecting Information</h5>
-                        <p>Creating relationships between conferences, themes, initiatives, resources and outcomes.</p>
-                    </li>
-                    <li>
-                        <h5>Designing for Scale</h5>
-                        <p>Building an experience capable of evolving with future conferences, programmes and governance initiatives.</p>
-                    </li>
-                    <li>
-                        <h5>Enabling Discovery</h5>
-                        <p>Making critical government knowledge easier to find, navigate and consume.</p>
-                    </li>
-                </ul>
-            </div>       
-        </div>
-        <img class="approach_img" src="assets/images/approach.jpg" alt="">
-    </div>
-</div>
-
-<div class="theTransformation">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>04</h2>
-            <h3>The <span>Transformation</span></h3>
-        </div>
-        <div class="the_context_para mb-0">
-            <h4>A Digital Home for Collaborative Governance</h4>
-            <p>We transformed the existing digital experience into a comprehensive governance and knowledge-sharing platform, bringing critical information and institutional resources together within a unified ecosystem.</p>
-            <div class="approachFocused">
-                <h3>The platform enables:</h3>
-                <ul>
-                    <li>Conference & programme discovery</li>
-                    <li>Structured content discovery</li>
-                    <li>Knowledge and resource access</li>
-                    <li>Stakeholder engagement</li>
-                    <li>Institutional information</li>
-                    <li>Digital dissemination of outcomes</li>
-                    <li>Policy & initiative visibility</li>
-                </ul>
-            </div>       
-        </div>
-    </div>
-</div>
-
-<div class="ourApproach impactGlance">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>05</h2>
-            <h3>Impact at a <span>Glance</span></h3>
-        </div>
-        <div class="the_context_para">
-            <h4>Building the Digital Infrastructure for Institutional Knowledge</h4>
-            <p>The transformation created a stronger digital foundation for the National Conference of Chief Secretaries, enabling centralised knowledge access, improved information discoverability and a more connected digital experience across the governance ecosystem.</p>
-        </div>
-    </div>
-</div>
-<div class="igList">
-    <ul>
-        <li>
-            <h5>Centralized Knowledge Access</h5>
-            <p>Consolidated conference resources, documents and institutional knowledge into a unified digital platform.</p>
-        </li>
-        <li>
-            <h5>Improved Information Discoverability</h5>
-            <p>Structured content architecture enabling faster access to critical information and resources.</p>
-        </li>
-        <li>
-            <h5>Enhanced Stakeholder Collaboration</h5>
-            <p>Created a shared digital environment supporting engagement across government stakeholders.</p>
-        </li>
-        <li>
-            <h5>Scalable Digital Foundation</h5>
-            <p>Established an extensible platform capable of supporting future conferences and governance initiatives.</p>
-        </li>
-        <li>
-            <h5>Unified Digital Experience</h5>
-            <p>Standardized information presentation across diverse content categories and stakeholder groups.</p>
-        </li>
-    </ul>
-</div>
-
-<div class="certifications">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h2>06</h2>
-            <h3>Recognition and <span>Certifications</span></h3>
-        </div>
-        <div class="the_context_para">
-            <h4><i>“Recognized for delivering a scalable and impactful digital platform that strengthened knowledge sharing and collaborative governance across stakeholders.”</i></h4>            
-        </div>
-        <div class="certifications_img">
-            <div class="ci_item">
-                <img class="img-fluid" src="assets/images/certifications_1.jpg" alt="">
+    <div class="w-100 overflow-hidden">
+        <div class="context_slider" #slider [class.is-dragging]="isDragging" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
+            @for (slide of slides; track slide.src) {
+            <div class="item" [class.active]="activeIndex === $index">
+                <img [src]="slide.src" [alt]="slide.alt">
             </div>
-            <div class="ci_item">
-                <img class="img-fluid" src="assets/images/certifications_2.jpg" alt="">
+            }
+            <div class="cs_btn">
+                <button type="button" class="slider_btn slider_prev" (pointerdown)="$event.stopPropagation()" (click)="previousSlide()">
+                    <img src="assets/images/arrow_line.svg" alt="Arrow">
+                </button>
+
+                <button type="button" class="slider_btn slider_next" (pointerdown)="$event.stopPropagation()" (click)="nextSlide()">
+                    <img src="assets/images/arrow_line.svg" alt="Arrow">
+                </button>
             </div>
         </div>
     </div>
-</div>
-
-<div class="ourApproach">
-    <div class="the_context">
-        <div class="the_context_heading">
-            <h3>Related <span>Projects</span></h3>            
+    <div class="theChallenge">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>02</h2>
+                <h3>The <span>Challenge</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Connecting a Complex Governance Landscape</h4>
+                <p>Multiple stakeholders. Diverse information. National-scale coordination.</p>
+                <p>The platform needed to bring together conference proceedings, policy discussions, knowledge resources, programmes and institutional information within a single, intuitive digital environment.</p>
+                <p>The challenge was not simply to organise information, but to make a complex governance ecosystem understandable, discoverable and accessible.</p>
+            </div>
         </div>
-        <div
-            class="relatedCard"
-            [class.related-static]="!isRelatedSliderEnabled"
-            #relatedSlider
-            (pointerdown)="onRelatedPointerDown($event)"
-            (pointermove)="onRelatedPointerMove($event)"
-            (pointerup)="onRelatedPointerUp($event)"
-            (pointercancel)="onRelatedPointerCancel($event)"
-        >
-            <div class="cardList">
-                @for (card of relatedSliderCards; track $index; let cardIndex = $index) {
-                <article class="card_items">
+    </div>
+    <div class="ourApproach">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>03</h2>
+                <h3>Our <span>Approach</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Designing for the Complexity of Governance</h4>
+                <p>We approached the platform as a digital knowledge and collaboration ecosystem, rather than a conventional event website.</p>
+                <div class="approachFocused">
+                    <h3>Our approach focused on:</h3>
+                    <ul>
+                        <li>
+                            <h5>Simplifying Complexity</h5>
+                            <p>Transforming extensive institutional information into clear and intuitive experiences.</p>
+                        </li>
+                        <li>
+                            <h5>Connecting Information</h5>
+                            <p>Creating relationships between conferences, themes, initiatives, resources and outcomes.</p>
+                        </li>
+                        <li>
+                            <h5>Designing for Scale</h5>
+                            <p>Building an experience capable of evolving with future conferences, programmes and governance initiatives.</p>
+                        </li>
+                        <li>
+                            <h5>Enabling Discovery</h5>
+                            <p>Making critical government knowledge easier to find, navigate and consume.</p>
+                        </li>
+                    </ul>
+                </div>       
+            </div>
+            <img class="approach_img" src="assets/images/approach.jpg" alt="">
+        </div>
+    </div>
+    <div class="theTransformation">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>04</h2>
+                <h3>The <span>Transformation</span></h3>
+            </div>
+            <div class="the_context_para mb-0">
+                <h4>A Digital Home for Collaborative Governance</h4>
+                <p>We transformed the existing digital experience into a comprehensive governance and knowledge-sharing platform, bringing critical information and institutional resources together within a unified ecosystem.</p>
+                <div class="approachFocused">
+                    <h3>The platform enables:</h3>
+                    <ul>
+                        <li>Conference & programme discovery</li>
+                        <li>Structured content discovery</li>
+                        <li>Knowledge and resource access</li>
+                        <li>Stakeholder engagement</li>
+                        <li>Institutional information</li>
+                        <li>Digital dissemination of outcomes</li>
+                        <li>Policy & initiative visibility</li>
+                    </ul>
+                </div>       
+            </div>
+        </div>
+    </div>
+    <div class="ourApproach impactGlance">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>05</h2>
+                <h3>Impact at a <span>Glance</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Building the Digital Infrastructure for Institutional Knowledge</h4>
+                <p>The transformation created a stronger digital foundation for the National Conference of Chief Secretaries, enabling centralised knowledge access, improved information discoverability and a more connected digital experience across the governance ecosystem.</p>
+            </div>
+        </div>
+    </div>
+    <div class="igList">
+        <ul>
+            <li>
+                <h5>Centralized Knowledge Access</h5>
+                <p>Consolidated conference resources, documents and institutional knowledge into a unified digital platform.</p>
+            </li>
+            <li>
+                <h5>Improved Information Discoverability</h5>
+                <p>Structured content architecture enabling faster access to critical information and resources.</p>
+            </li>
+            <li>
+                <h5>Enhanced Stakeholder Collaboration</h5>
+                <p>Created a shared digital environment supporting engagement across government stakeholders.</p>
+            </li>
+            <li>
+                <h5>Scalable Digital Foundation</h5>
+                <p>Established an extensible platform capable of supporting future conferences and governance initiatives.</p>
+            </li>
+            <li>
+                <h5>Unified Digital Experience</h5>
+                <p>Standardized information presentation across diverse content categories and stakeholder groups.</p>
+            </li>
+        </ul>
+    </div>
+    <div class="certifications">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>06</h2>
+                <h3>Recognition and <span>Certifications</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4><i>“Recognized for delivering a scalable and impactful digital platform that strengthened knowledge sharing and collaborative governance across stakeholders.”</i></h4>            
+            </div>
+            <div class="certifications_img">
+                <div class="ci_item">
+                    <img class="img-fluid" src="assets/images/certifications_1.jpg" alt="">
+                </div>
+                <div class="ci_item">
+                    <img class="img-fluid" src="assets/images/certifications_2.jpg" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ourApproach">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h3>Related <span>Projects</span></h3>            
+            </div>
+            <div
+                class="relatedCard"
+                [class.related-static]="!isRelatedSliderEnabled"
+                #relatedSlider
+                (pointerdown)="onRelatedPointerDown($event)"
+                (pointermove)="onRelatedPointerMove($event)"
+                (pointerup)="onRelatedPointerUp($event)"
+                (pointercancel)="onRelatedPointerCancel($event)"
+            >
+                <div class="cardList">
+                    @for (card of relatedSliderCards; track $index; let cardIndex = $index) {
+                    <article class="card_items">
 
-                    <div class="card_route_entry">
-                    <div class="ci_content">
+                        <div class="card_route_entry">
+                        <div class="ci_content">
 
-                        <div class="cic_top">
-                        <span>{{ card.category }}</span>
-                        <h2>{{ card.title }}</h2>
-                        <p>{{ card.description }}</p>
-                        </div>
+                            <div class="cic_top">
+                            <span>{{ card.category }}</span>
+                            <h2>{{ card.title }}</h2>
+                            <p>{{ card.description }}</p>
+                            </div>
 
-                        <div class="cic_bottom d-flex justify-content-end">
-                        <a
-                            class="arrow_card"
-                            [attr.href]="card.link"
-                            (click)="goTo(card.link, $event)"
-                            [attr.aria-label]="'View ' + card.title"
-                        >
-                            <img
-                            src="assets/images/arrow_line.svg"
-                            alt="Arrow"
+                            <div class="cic_bottom d-flex justify-content-end">
+                            <a
+                                class="arrow_card"
+                                [attr.href]="card.link"
+                                (click)="goTo(card.link, $event)"
+                                [attr.aria-label]="'View ' + card.title"
                             >
-                        </a>
+                                <img
+                                src="assets/images/arrow_line.svg"
+                                alt="Arrow"
+                                >
+                            </a>
+                            </div>
+
+                        </div>
                         </div>
 
-                    </div>
-                    </div>
+                        @if (card.image) {
+                        <div class="ci_img">
+                            <img
+                            [src]="card.image"
+                            [alt]="card.title"
+                            [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'"
+                            [attr.fetchpriority]="cardIndex < 2 ? 'high' : 'auto'"
+                            >
+                        </div>
+                        }
 
-                    @if (card.image) {
-                    <div class="ci_img">
-                        <img
-                        [src]="card.image"
-                        [alt]="card.title"
-                        [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'"
-                        [attr.fetchpriority]="cardIndex < 2 ? 'high' : 'auto'"
-                        >
-                    </div>
+                    </article>
                     }
 
-                </article>
-                }
+                </div>
+                <div class="relatedSliderControls">
+                    <button
+                        type="button"
+                        class="slider_btn slider_prev"
+                        [disabled]="!isRelatedSliderEnabled"
+                        [class.is-disabled]="!isRelatedSliderEnabled"
+                        (pointerdown)="$event.stopPropagation()"
+                        (click)="previousRelatedSlide()"
+                        aria-label="Previous project">
 
-            </div>
-            <div class="relatedSliderControls">
-                <button
-                    type="button"
-                    class="slider_btn slider_prev"
-                    [disabled]="!isRelatedSliderEnabled"
-                    [class.is-disabled]="!isRelatedSliderEnabled"
-                    (pointerdown)="$event.stopPropagation()"
-                    (click)="previousRelatedSlide()"
-                    aria-label="Previous project">
+                        <img src="assets/images/sliderArrow.svg" alt="Previous"> Previous Project
+                    </button>
 
-                    <img src="assets/images/sliderArrow.svg" alt="Previous"> Previous Project
-                </button>
+                    <button
+                        type="button"
+                        class="slider_btn slider_next"
+                        [disabled]="!isRelatedSliderEnabled"
+                        [class.is-disabled]="!isRelatedSliderEnabled"
+                        (pointerdown)="$event.stopPropagation()"
+                        (click)="nextRelatedSlide()"
+                        aria-label="Next project">
 
-                <button
-                    type="button"
-                    class="slider_btn slider_next"
-                    [disabled]="!isRelatedSliderEnabled"
-                    [class.is-disabled]="!isRelatedSliderEnabled"
-                    (pointerdown)="$event.stopPropagation()"
-                    (click)="nextRelatedSlide()"
-                    aria-label="Next project">
-
-                    Next Project <img src="assets/images/sliderArrow.svg" alt="Next">
-                </button>
-            </div>
-        </div>        
+                        Next Project <img src="assets/images/sliderArrow.svg" alt="Next">
+                    </button>
+                </div>
+            </div>        
+        </div>
     </div>
 </div>
+}
+@if (activeTab === 'Branding') {
+<div class="pd_branding" [class.is-active]="activeTab === 'Branding'">
+    <div class="pd_bottom">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>01</h2>
+                <h3>Brand <span>Overview</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Crafting a Visual Identity for Collaborative Governance</h4>
+                <p>The National Conference of Chief Secretaries required a visual identity that reflected authority, collaboration, national significance and modern governance. Our objective was to create a cohesive design language that would resonate across digital platforms, communication materials and stakeholder touchpoints.</p>
+            </div>
+        </div>
+    </div>
+    <div class="pd_bottom">
+        <div class="the_context">
+            <div class="the_context_heading">
+                <h2>02</h2>
+                <h3>Brand <span>Typography</span></h3>
+            </div>
+            <div class="the_context_para">
+                <h4>Typography with Purpose</h4>
+                <p>The typography system combines Mulish and Inter, with each typeface assigned a specific role within the digital experience. Mulish establishes the brand's visual personality, while Inter is optimized for displaying numerical and data-driven information with clarity and consistency.</p>
+            </div>
+        </div>
+    </div>
+</div>
+}

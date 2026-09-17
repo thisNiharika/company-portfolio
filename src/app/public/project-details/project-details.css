@@ -494,6 +494,9 @@
 .relatedSliderControls .slider_btn img{
    filter: brightness(0) saturate(100%) invert(23%) sepia(0%) saturate(0%) hue-rotate(284deg) brightness(98%) contrast(85%);
 }
+.pd_overview{
+    overflow: hidden;
+}
 @media (max-width: 767px) {
   .relatedCard .cardList {
     gap: 20px;

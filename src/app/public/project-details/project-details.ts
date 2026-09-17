@@ -5,7 +5,8 @@ import {
   HostListener,
   inject,
   ViewChild,
-  OnDestroy
+  OnDestroy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { gsap } from 'gsap';
@@ -31,6 +32,7 @@ gsap.registerPlugin(ScrollTrigger);
   styleUrl: './project-details.css',
 })
 export class ProjectDetails implements AfterViewInit, OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
   readonly routeTransition = inject(RouteTransitionService);
   private readonly pageElement = inject(ElementRef);
   private scrollContext: any;
@@ -55,8 +57,8 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
       }
     );
   }
-
   @ViewChild('tabs') tabs!: ElementRef<HTMLUListElement>;
+  @ViewChild('slider') slider!: ElementRef<HTMLElement>;
 
   tabList = ['Overview', 'Branding'];
   activeTab = 'Overview';
@@ -75,8 +77,43 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
       ScrollTrigger.refresh();
     });
   }
+
+  /**
+   * Tab ke @if DOM ko paint hone se pehle banners ki starting state set karta hai.
+   * Isse banner pehle visible hokar phir animation start nahi karta.
+   */
+  private resetIntroBanners(): void {
+    const page =
+      this.pageElement.nativeElement as HTMLElement;
+
+    const bannerLeft =
+      page.querySelector<HTMLElement>('.pdb_left');
+
+    const bannerRight =
+      page.querySelector<HTMLElement>('.pdb_right');
+
+    if (bannerLeft) {
+      gsap.killTweensOf(bannerLeft);
+      gsap.set(bannerLeft, {
+        autoAlpha: 0,
+        x: -100
+      });
+    }
+
+    if (bannerRight) {
+      gsap.killTweensOf(bannerRight);
+      gsap.set(bannerRight, {
+        autoAlpha: 0,
+        x: 100,
+        scale: 0.94
+      });
+    }
+  }
   
-  private initPageScrollAnimation(): void {
+  private initPageScrollAnimation(
+    replayIntro = true,
+    introDelay = 0
+  ): void {
     const page =
       this.pageElement.nativeElement as HTMLElement;
 
@@ -95,36 +132,39 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
       const bannerRight =
         page.querySelector<HTMLElement>('.pdb_right');
 
-      if (bannerLeft) {
-        gsap.fromTo(
+      if (replayIntro && bannerLeft) {
+        gsap.set(bannerLeft, {
+          autoAlpha: 0,
+          x: -100
+        });
+
+        gsap.to(
           bannerLeft,
-          {
-            autoAlpha: 0,
-            x: -100
-          },
           {
             autoAlpha: 1,
             x: 0,
             duration: 1.1,
+            delay: introDelay,
             ease: 'power4.out'
           }
         );
       }
 
-      if (bannerRight) {
-        gsap.fromTo(
+      if (replayIntro && bannerRight) {
+        gsap.set(bannerRight, {
+          autoAlpha: 0,
+          x: 100,
+          scale: 0.94
+        });
+
+        gsap.to(
           bannerRight,
-          {
-            autoAlpha: 0,
-            x: 100,
-            scale: 0.94
-          },
           {
             autoAlpha: 1,
             x: 0,
             scale: 1,
             duration: 1.2,
-            delay: 0.15,
+            delay: introDelay,
             ease: 'power4.out'
           }
         );
@@ -274,10 +314,10 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
       });
 
       // Context slider reveal
-      const slider =
-        page.querySelector<HTMLElement>('.context_slider');
+      const sliders =
+        page.querySelectorAll<HTMLElement>('.context_slider');
 
-      if (slider) {
+      sliders.forEach((slider) => {
         gsap.fromTo(
           slider,
           {
@@ -295,13 +335,14 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
             ease: 'power4.out',
             scrollTrigger: {
               trigger: slider,
-              start: 'top 82%',
-              // once: true
-              toggleActions: 'restart none restart none'
+              start: 'top 85%',
+              end: 'top 45%',
+              scrub: 1.2,
+              invalidateOnRefresh: true
             }
           }
         );
-      }
+      });
 
       // Related cards scroll reveal
       // Card par transform nahi lagaya gaya hai, isliye related slider ka
@@ -510,10 +551,27 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
   }
 
   selectTab(tab: string): void {
+    // Purana context turant hatao, taaki old banner tween tab change ke baad
+    // naye banner ke saath compete na kare.
+    this.scrollContext?.revert();
+    this.scrollContext = undefined;
+
     this.activeTab = tab;
+    this.changeDetector.detectChanges();
+
+    // @if se bane naye banners ko browser ke next paint se pehle hide karo.
+    this.resetIntroBanners();
 
     requestAnimationFrame(() => {
       this.moveBackground();
+
+      requestAnimationFrame(() => {
+        this.animateSlides(true);
+        this.startAutoplay();
+
+        this.initPageScrollAnimation(true, 0.5);
+        ScrollTrigger.refresh();
+      });
     });
   }
 
@@ -530,8 +588,8 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
   // ============================================= Slider
   
 
-  @ViewChild('slider', { static: true })
-  slider!: ElementRef<HTMLElement>;
+  // @ViewChild('slider', { static: true })
+  // slider!: ElementRef<HTMLElement>;
 
   slides = [
     {
