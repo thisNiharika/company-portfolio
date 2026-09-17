@@ -431,7 +431,7 @@
   touch-action: pan-y;
   cursor: grab;
   user-select: none;
-  max-width: 1190px;
+  max-width: clamp(990px, 61.98vw, 1190px);
   margin: 0 auto clamp(60px, 5.89vw, 113px);
 }
 

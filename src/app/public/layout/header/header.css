@@ -428,11 +428,11 @@
 
 .scroll-top-btn {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
+  right: clamp(20px, 1.56vw, 30px);
+  bottom: clamp(20px, 1.56vw, 30px);
   z-index: 1000;
-  width: 56px;
-  height: 56px;
+  width: clamp(40px, 2.92vw, 56px);
+  height: clamp(40px, 2.92vw, 56px);
   display: grid;
   place-items: center;
   padding: 0;
@@ -446,7 +446,7 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
 }
 .scroll-top-btn:hover {
-    bottom: 40px;
+    bottom: clamp(30px, 2.08vw, 40px);
 }
 .scroll-top-progress {
   position: absolute;
