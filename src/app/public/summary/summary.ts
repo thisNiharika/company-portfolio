@@ -439,6 +439,17 @@ export class Summary implements AfterViewInit, OnDestroy {
       starTemplate.style.display = '';
       return;
     }
+    svgImages.forEach((svg) => {
+      svg.querySelectorAll<SVGPathElement>('#circle_box path')
+        .forEach((path) => {
+          const length = path.getTotalLength();
+
+          path.style.setProperty(
+            '--draw-length',
+            `${length}px`
+          );
+        });
+    });
 
     const svgTargets: SvgTargetConfig[] = [
       {
@@ -556,7 +567,7 @@ export class Summary implements AfterViewInit, OnDestroy {
     const scheduleNextSvg = (): void => {
       this.clearScheduled(svgTimer);
 
-      const randomTime = Math.floor(Math.random() * 5000) + 10000;
+      const randomTime = Math.floor(Math.random() * 5000) + 15000;
 
       svgTimer = this.schedule(() => {
         svgTimer = null;

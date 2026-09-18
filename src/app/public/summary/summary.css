@@ -121,13 +121,34 @@
 .opacity-0{
     opacity: 0;
 }
-.svg_img.first_slide #circle_box path {
-    stroke-opacity: 0.15;
-}
-.svg_img.first_slide.active svg path {
+
+.svg_img.first_slide.active svg #line path{
     animation: dash 2s linear forwards;
     animation-delay: 0.5s;
 }
+.svg_img.first_slide #connect_box path {
+  fill-opacity: 0;
+}
+
+.svg_img.first_slide.active #connect_box path {
+  animation:
+    dash 2s linear 1.5s forwards,
+    fillShape .5s linear 3s forwards;
+}
+.svg_img.first_slide.active svg #circle_box path{
+    animation: dash 2s linear forwards;
+    animation-delay: 3.5s;
+}
+@keyframes fillShape {
+  from {
+    fill-opacity: 0;
+  }
+
+  to {
+    fill-opacity: 0.12;
+  }
+}
+
 .svg_img.first_slide svg #dot_pointer {
     opacity: 1;
     transition-delay: 0.4s;
@@ -141,7 +162,9 @@
         stroke-dashoffset: 0;
     }
 }
-
+.svg_img.second_slide {
+    padding-right: clamp(15px, 5.21vw, 100px);
+}
 .svg_img #bar path{
     transform: scaleY(0);
     transform-origin: bottom;
