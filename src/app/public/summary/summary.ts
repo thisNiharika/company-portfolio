@@ -451,14 +451,28 @@ export class Summary implements AfterViewInit, OnDestroy {
         });
     });
 
+    if (svgImages.length < 4) {
+      stars.forEach((star) => star.remove());
+      starTemplate.style.display = '';
+      return;
+    }
+
     const svgTargets: SvgTargetConfig[] = [
       {
         element: svgImages[0]!,
-        selector: '[id^="dot"]'
+        selector: '#dots_box > [id^="dot"]'
       },
       {
         element: svgImages[1]!,
-        selector: '[id^="bar_dot"]'
+        selector: '#bar_dot > [id^="bar_dot"]'
+      },
+      {
+        element: svgImages[2]!,
+        selector: '#line_dot_box > [id^="line_dot"]'
+      },
+      {
+        element: svgImages[3]!,
+        selector: '#bub_dot_box > [id^="bub_dot"]'
       }
     ];
 
@@ -580,7 +594,7 @@ export class Summary implements AfterViewInit, OnDestroy {
       }, randomTime);
     };
 
-    const changeSvg = (): void => {
+    const changeSvg = (): void => {      
       if (!step2Started || svgChanging) {
         return;
       }
@@ -596,7 +610,8 @@ export class Summary implements AfterViewInit, OnDestroy {
       }
 
       const oldSvg = svgImages[currentSvgIndex]!;
-      currentSvgIndex = (currentSvgIndex + 1) % svgImages.length;
+      currentSvgIndex = (currentSvgIndex + 1) % svgTargets.length;
+      // currentSvgIndex = (currentSvgIndex + 1) % svgImages.length;
       const newSvg = svgImages[currentSvgIndex]!;
 
       oldSvg.classList.remove('active');
