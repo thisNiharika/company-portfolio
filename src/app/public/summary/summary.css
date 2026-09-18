@@ -63,8 +63,9 @@
     color: #fff;
     font-size: clamp(50px, 5vw, 96px);
     font-weight: 600;
+    font-family: "Montserrat", sans-serif;
 }
-.content h2 span{
+.content h2 .accent{
     color: #DD4451;
 }
 .content_absolute{
@@ -227,6 +228,10 @@
 .svg_img.three_slide.active svg #line{
     animation: dash 2s linear forwards;
     animation-delay: 0.5s;
+}
+/* =========================== Step 3 ========================== */
+.step3 .content {
+    padding-top: clamp(70px, 7.29vw, 140px);
 }
 /* =========================== Video =========================== */
 .video-section {
@@ -413,4 +418,31 @@
     .section-particles {
         display: none;
     }
+}
+
+.summary-title {
+  perspective: 900px;
+}
+
+.summary-line {
+  display: block;
+  overflow: hidden;
+  color: inherit !important;
+}
+
+.summary-word {
+  /* display: inline-block; */
+  color: inherit !important;
+  transform-style: preserve-3d;
+}
+
+.summary-word.accent {
+  color: #DD4451 !important;
+}
+.step4 .content_absolute{
+    z-index: 1;
+}
+.step4 .summary-scroll-text{
+    position: sticky;
+    top: 30px;
 }

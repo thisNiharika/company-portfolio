@@ -38,7 +38,7 @@ export class CanvasVideo implements AfterViewInit, OnDestroy {
       }
     );
   }
-  @Input() frameCount = 300;
+  @Input() frameCount = 240;
   @Input() frameFolder = 'assets/frames';
   @Input() frameExtension = 'webp';
   @Input() smoothness = 0.18;

@@ -12,7 +12,18 @@
                 <div class="row h-100">
                     <div class="col-md-12 h-100">
                         <div class="content content_absolute">
-                            <h2>Every Dataset <br>tells a <span>story.</span></h2>
+                            <!-- <h2 [class.summary-heading-active]="introActive">Every Dataset <br>tells a <span>story.</span></h2> -->
+                            <h2 #summaryTitle class="summary-title">
+                                <span class="summary-line">
+                                    <span class="summary-word">Every </span>
+                                    <span class="summary-word">Dataset</span>
+                                </span>
+                                <span class="summary-line">
+                                    <span class="summary-word">tells </span>
+                                    <span class="summary-word">a </span>
+                                    <span class="summary-word accent"> story.</span>
+                                </span>
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -21,7 +32,19 @@
         <section class="step2 particles-section zindex-1 position-relative step_wrapper">
             <canvas class="section-particles" id="step2Particles" aria-hidden="true"></canvas>
             <div class="content h-100 content_absolute">
-                <h2>Every story <br>revels an <span>insight</span>.</h2>
+                <!-- <h2>Every story <br>revels an <span class="accent">insight</span>.</h2> -->
+                <h2 class="summary-scroll-text">
+                    <span class="summary-line">
+                        <span class="summary-word">Every </span>
+                        <span class="summary-word">story </span>
+                    </span>
+
+                    <span class="summary-line">
+                        <span class="summary-word">revels </span>
+                        <span class="summary-word">an </span>
+                        <span class="summary-word accent">insight.</span>
+                    </span>
+                </h2>
             </div>
             <div class="container-fluid h-100">
                 <div class="row h-100">
@@ -1867,7 +1890,19 @@
                 <div class="row h-100">
                     <div class="col-md-12 h-100">
                         <div class="content content_absolute h-100">
-                            <h2>Every insight <br>guides a <span>decision</span>.</h2>
+                            <!-- <h2>Every insight <br>guides a <span class="accent">decision</span>.</h2> -->
+                            <h2 class="summary-scroll-text">
+                                <span class="summary-line">
+                                    <span class="summary-word">Every </span>
+                                    <span class="summary-word">insight </span>
+                                </span>
+
+                                <span class="summary-line">
+                                    <span class="summary-word">guides </span>
+                                    <span class="summary-word">a </span>
+                                    <span class="summary-word accent">decision.</span>
+                                </span>
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -1876,6 +1911,19 @@
     </div>
     <!-- The original canvas-video.js was not included in the upload. -->
     <section class="step4 zindex-1 position-relative">
+        <div class="content h-100 content_absolute">
+                <h2 class="summary-scroll-text">
+                    <span class="summary-line">
+                        <span class="summary-word">Every </span>
+                        <span class="summary-word">decision </span>
+                    </span>
+
+                    <span class="summary-line">
+                        <span class="summary-word">drives </span>
+                        <span class="summary-word accent">action.</span>
+                    </span>
+                </h2>
+            </div>
         <app-canvas-video></app-canvas-video>
     </section>
 </div>
