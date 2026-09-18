@@ -1,7 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { RouteTransitionService } from '../../../core/services/route-transition.service';
 import { Router } from '@angular/router';
-
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
 interface Technology {
   name: string;
   image: string;
@@ -329,5 +331,129 @@ resetLocations(): void {
     this.resetLocations();
     this.resetTech();
   }
+
+  // ================================== Scroll Top
+  ngAfterViewInit(): void {
+    this.initScrollTopButton();
+  }
+  @ViewChild('scrollTopButton')
+  scrollTopButton!: ElementRef<HTMLButtonElement>;
+
+  @ViewChild('scrollProgressCircle')
+  scrollProgressCircle!: ElementRef<SVGCircleElement>;
+
+  private readonly scrollTopThreshold = 120;
+  private scrollProgressCircumference = 0;
+  private scrollTopTween?: gsap.core.Tween;
+  private initScrollTopButton(): void {
+    const button = this.scrollTopButton?.nativeElement;
+    const circle = this.scrollProgressCircle?.nativeElement;
+
+    if (!button || !circle) {
+      return;
+    }
+
+    const radius = Number(circle.getAttribute('r')) || 20;
+
+    this.scrollProgressCircumference =
+      2 * Math.PI * radius;
+
+    button.style.pointerEvents = 'none';
+
+    gsap.set(button, {
+      autoAlpha: 0,
+      scale: 0.8
+    });
+
+    gsap.set(circle, {
+      strokeDasharray: this.scrollProgressCircumference,
+      strokeDashoffset: this.scrollProgressCircumference,
+      rotation: -90,
+      transformOrigin: '50% 50%'
+    });
+
+    this.updateScrollTopProgress(true);
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.updateScrollTopProgress();
+  }
+
+  private updateScrollTopProgress(immediate = false): void {
+    const button = this.scrollTopButton?.nativeElement;
+    const circle = this.scrollProgressCircle?.nativeElement;
+
+    if (
+      !button ||
+      !circle ||
+      !this.scrollProgressCircumference
+    ) {
+      return;
+    }
+
+    const scrollTop =
+      window.scrollY ||
+      document.documentElement.scrollTop;
+
+    const scrollHeight = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    );
+
+    const scrollableHeight = Math.max(
+      scrollHeight - window.innerHeight,
+      1
+    );
+
+    const progress = Math.min(
+      Math.max(scrollTop / scrollableHeight, 0),
+      1
+    );
+
+    const showButton =
+      scrollTop > this.scrollTopThreshold;
+
+    const duration = immediate ? 0 : 0.3;
+
+    gsap.to(button, {
+      autoAlpha: showButton ? 1 : 0,
+      scale: showButton ? 1 : 0.8,
+      duration,
+      ease: 'power2.out',
+      overwrite: 'auto',
+      onStart: () => {
+        button.style.pointerEvents =
+          showButton ? 'auto' : 'none';
+      }
+    });
+
+    gsap.to(circle, {
+      strokeDashoffset:
+        this.scrollProgressCircumference *
+        (1 - progress),
+      duration,
+      ease: 'power2.out',
+      overwrite: 'auto'
+    });
+  }
+
+  scrollToTop(): void {
+    this.scrollTopTween?.kill();
+
+    const scrollElement =
+      (document.scrollingElement as HTMLElement | null) ??
+      document.documentElement;
+
+    this.scrollTopTween = gsap.to(scrollElement, {
+      scrollTop: 0,
+      duration: 0.3,
+      ease: 'power3.inOut',
+      overwrite: 'auto',
+      onUpdate: () => this.updateScrollTopProgress(),
+      onComplete: () => this.updateScrollTopProgress()
+    });
+  }
+  // ================================== Scroll Top
   
 }

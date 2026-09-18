@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 body {
   padding: 0;
   margin: 0;
@@ -25,6 +25,8 @@ body {
     --fontFamilyPoppins: "Poppins", sans-serif;
     --fontFamilyRoboto: "Roboto Serif", serif;
     --fontFamilyAgbalumo: "Agbalumo", system-ui;
+    --fontFamilyMulish: "Mulish", sans-serif;
+    --fontFamilyInter: "Inter", sans-serif;
     --html-show-time: 1s;
 }
 ::-webkit-scrollbar {
@@ -94,6 +96,7 @@ div {
 body.itm-loader-open {
   overflow: hidden;
 }
+
 /* ==================================
   Route Change Animation
 ================================== */
@@ -103,7 +106,7 @@ body.itm-loader-open {
   z-index: 999998;
   width: 100vw;
   height: 100vh;
-  background-color: #db414c;
+  background-color: var(--colorHover);
   opacity: 1;
   visibility: visible;
   pointer-events: none;
