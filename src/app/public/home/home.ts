@@ -812,13 +812,13 @@ export class Home implements AfterViewInit, OnDestroy {
 
       if (
         Math.abs(difference) <
-        0.0001
+        0.008
       ) {
         currentProgress =
           targetProgress;
       } else {
         currentProgress +=
-          difference * 0.12;
+          difference * 0.18;
       }
 
       const progress =
@@ -962,7 +962,7 @@ export class Home implements AfterViewInit, OnDestroy {
        */
       if (
         targetProgress >= 1 &&
-        currentProgress >= 0.9999 &&
+        currentProgress >= 0.99 &&
         !completionStarted
       ) {
         completionStarted = true;
@@ -1206,17 +1206,22 @@ export class Home implements AfterViewInit, OnDestroy {
     loader.classList.add(
       'is-leaving'
     );
-
+    document.body.classList.remove('itm-loader-open');
     await this.wait(380);
 
     if (this.destroyed) {
       return;
     }
 
-    document.body.classList.remove(
-      'itm-loader-open'
-    );
+    // document.body.classList.remove(
+    //   'itm-loader-open'
+    // );
 
     this.showHomeLoader.set(false);
+    window.requestAnimationFrame(() => {
+      if (!this.destroyed) {
+        this.homeEntering.set(true);
+      }
+    });
   }
 }

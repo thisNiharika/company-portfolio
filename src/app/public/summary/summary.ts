@@ -4,9 +4,15 @@ import {
   ElementRef,
   OnDestroy,
   ViewChild,
-  ViewEncapsulation
+  Input,
+  ViewEncapsulation,
+  SimpleChanges,
+  OnChanges
 } from '@angular/core';
 import { CanvasVideo } from './canvas-video/canvas-video';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
 interface Particle {
   x: number;
   y: number;
@@ -35,6 +41,16 @@ interface SvgTargetConfig {
   encapsulation: ViewEncapsulation.None
 })
 export class Summary implements AfterViewInit, OnDestroy {
+  // ============================ Text Animation
+  private summaryGsapContext?: gsap.Context;
+  @Input() introActive = false;
+
+  @ViewChild('summaryTitle')
+  summaryTitle!: ElementRef<HTMLElement>;
+
+  private summaryTimeline?: gsap.core.Timeline;
+  private summaryPlayed = false;
+  // ============================ Text Animation
   @ViewChild('homePage', { static: true })
   private homePage!: ElementRef<HTMLElement>;
 
@@ -49,6 +65,14 @@ export class Summary implements AfterViewInit, OnDestroy {
       this.initializeParticles(root);
       this.initializeStarScene(root);
     });
+    // ====================== Text Animation
+    this.setSummaryTitleInitialState();
+
+    if (this.introActive) {
+      this.animateSummaryTitle();
+    }
+    this.initSummaryTextAnimations();
+    // ====================== Text Animation
   }
 
   ngOnDestroy(): void {
@@ -67,6 +91,7 @@ export class Summary implements AfterViewInit, OnDestroy {
       window.cancelAnimationFrame(frameId);
     }
     this.frameIds.clear();
+    this.summaryGsapContext?.revert();
   }
 
   private schedule(callback: () => void, delay: number): number {
@@ -439,15 +464,40 @@ export class Summary implements AfterViewInit, OnDestroy {
       starTemplate.style.display = '';
       return;
     }
+    svgImages.forEach((svg) => {
+      svg.querySelectorAll<SVGPathElement>('#circle_box path')
+        .forEach((path) => {
+          const length = path.getTotalLength();
+
+          path.style.setProperty(
+            '--draw-length',
+            `${length}px`
+          );
+        });
+    });
+
+    if (svgImages.length < 4) {
+      stars.forEach((star) => star.remove());
+      starTemplate.style.display = '';
+      return;
+    }
 
     const svgTargets: SvgTargetConfig[] = [
       {
         element: svgImages[0]!,
-        selector: '[id^="dot"]'
+        selector: '#dots_box > [id^="dot"]'
       },
       {
         element: svgImages[1]!,
-        selector: '[id^="bar_dot"]'
+        selector: '#bar_dot > [id^="bar_dot"]'
+      },
+      {
+        element: svgImages[2]!,
+        selector: '#line_dot_box > [id^="line_dot"]'
+      },
+      {
+        element: svgImages[3]!,
+        selector: '#bub_dot_box > [id^="bub_dot"]'
       }
     ];
 
@@ -556,7 +606,7 @@ export class Summary implements AfterViewInit, OnDestroy {
     const scheduleNextSvg = (): void => {
       this.clearScheduled(svgTimer);
 
-      const randomTime = Math.floor(Math.random() * 5000) + 10000;
+      const randomTime = Math.floor(Math.random() * 5000) + 15000;
 
       svgTimer = this.schedule(() => {
         svgTimer = null;
@@ -569,7 +619,7 @@ export class Summary implements AfterViewInit, OnDestroy {
       }, randomTime);
     };
 
-    const changeSvg = (): void => {
+    const changeSvg = (): void => {      
       if (!step2Started || svgChanging) {
         return;
       }
@@ -585,7 +635,8 @@ export class Summary implements AfterViewInit, OnDestroy {
       }
 
       const oldSvg = svgImages[currentSvgIndex]!;
-      currentSvgIndex = (currentSvgIndex + 1) % svgImages.length;
+      currentSvgIndex = (currentSvgIndex + 1) % svgTargets.length;
+      // currentSvgIndex = (currentSvgIndex + 1) % svgImages.length;
       const newSvg = svgImages[currentSvgIndex]!;
 
       oldSvg.classList.remove('active');
@@ -893,4 +944,108 @@ export class Summary implements AfterViewInit, OnDestroy {
       starTemplate.style.display = '';
     });
   }
+  // ================================ Text Animation
+  private setSummaryTitleInitialState(): void {
+    const words =
+      this.summaryTitle.nativeElement.querySelectorAll('.summary-word');
+
+    gsap.set(words, {
+      autoAlpha: 0,
+      yPercent: 120,
+      rotateX: -80,
+      filter: 'blur(12px)',
+      transformOrigin: '0% 100%'
+    });
+  }
+
+  private animateSummaryTitle(): void {
+    if (this.summaryPlayed || !this.summaryTitle) {
+      return;
+    }
+
+    this.summaryPlayed = true;
+
+    const title = this.summaryTitle.nativeElement;
+    const words = title.querySelectorAll('.summary-word');
+    const accent = title.querySelector('.accent');
+
+    this.summaryTimeline = gsap.timeline();
+
+    this.summaryTimeline.to(words, {
+      autoAlpha: 1,
+      yPercent: 0,
+      rotateX: 0,
+      filter: 'blur(0px)',
+      duration: 0.9,
+      stagger: 0.13,
+      ease: 'back.out(1.7)'
+    });
+
+    if (accent) {
+      this.summaryTimeline.fromTo(
+        accent,
+        {
+          scale: 0.7,
+          transformOrigin: 'left bottom',
+          textShadow: '0 0 0 rgba(221, 68, 81, 0)'
+        },
+        {
+          scale: 1,
+          textShadow: '0 0 18px rgba(221, 68, 81, 0.45)',
+          duration: 0.6,
+          ease: 'back.out(2)'
+        },
+        '-=0.45'
+      );
+    }
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['introActive']?.currentValue === true) {
+      requestAnimationFrame(() => {
+        this.animateSummaryTitle();
+      });
+    }
+  }
+
+  private initSummaryTextAnimations(): void {
+    const root = this.homePage.nativeElement;
+
+    this.summaryGsapContext = gsap.context(() => {
+      root.querySelectorAll<HTMLElement>('.summary-scroll-text')
+        .forEach((heading) => {
+          const words =
+            heading.querySelectorAll<HTMLElement>('.summary-word');
+
+          const section =
+            (heading.closest('.step_wrapper') as HTMLElement) || heading;
+
+          gsap.set(words, {
+            autoAlpha: 0,
+            yPercent: 120,
+            rotateX: -80,
+            filter: 'blur(12px)',
+            transformOrigin: '0% 100%'
+          });
+
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 75%',
+              toggleActions: 'restart none restart reset'
+            }
+          }).to(words, {
+            autoAlpha: 1,
+            yPercent: 0,
+            rotateX: 0,
+            filter: 'blur(0px)',
+            duration: 0.85,
+            stagger: 0.12,
+            ease: 'back.out(1.7)'
+          });
+        });
+    }, root);
+
+    ScrollTrigger.refresh();
+  }
+  // ================================ Text Animation
 }
