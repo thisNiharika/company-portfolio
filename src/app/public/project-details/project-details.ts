@@ -201,7 +201,7 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
 
         const blockImage =
           block.querySelector<HTMLElement>(
-            '.approach_img, .certifications_img, .ld_img'
+            '.approach_img, .ld_img'
           );
 
         const timeline = gsap.timeline({
@@ -311,6 +311,35 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
           );
         }
       });
+      // Certifications images: viewport ke 40%–50% area me aane par reveal
+const certificationBlock =
+  page.querySelector<HTMLElement>('.certifications_img');
+
+if (certificationBlock) {
+  gsap.fromTo(
+    certificationBlock,
+    {
+      autoAlpha: 0,
+      x: 90,
+      scale: 1.08,
+      clipPath: 'inset(0 0 0 100%)'
+    },
+    {
+      autoAlpha: 1,
+      x: 0,
+      scale: 1,
+      clipPath: 'inset(0 0 0 0%)',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: certificationBlock,
+        start: 'top 60%',
+        end: 'top 40%',
+        scrub: 1.4,
+        invalidateOnRefresh: true
+      }
+    }
+  );
+}
 
       // Branding ke typography cards ka scroll reveal.
       const brandingVisuals = Array.from(

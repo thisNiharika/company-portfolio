@@ -244,9 +244,9 @@ export class PDesign implements AfterViewInit, OnDestroy {
   const cardTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: card,
-      start: 'top 92%',
-      end: 'top 48%',
-      scrub: 0.8,
+      start: 'top 70%',
+      end: 'top 30%',
+      scrub: 1.2,
       invalidateOnRefresh: true
     }
   });

@@ -64,7 +64,10 @@
     padding: clamp(5px, 0.42vw, 8px);
     border-radius: 50px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+}
+.pd_tab ul li:hover{
+    color: var(--color318BF2);
 }
 .pd_tab ul li.active{
     color: var(--colorfff);
@@ -142,12 +145,12 @@
 .the_context_heading h3 {
     font-size: clamp(50px, 3.65vw, 70px);
     color: #313842;
-    line-height: 1;
+    line-height: 0.8;
 }
 .the_context_heading h3 span{
     display: block;
     font-family: var(--fontFamilyAgbalumo);
-    line-height: 1.3;
+    line-height: 1;
 }
 .the_context_para {
     max-width: clamp(750px, 49.48vw, 950px);

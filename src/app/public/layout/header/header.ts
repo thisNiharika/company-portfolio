@@ -3,6 +3,8 @@ import { RouteTransitionService } from '../../../core/services/route-transition.
 import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
+gsap.registerPlugin(MorphSVGPlugin);
 gsap.registerPlugin(ScrollTrigger);
 interface Technology {
   name: string;
@@ -40,11 +42,33 @@ export class Header {
   }
 
   constructor(public router: Router) {}
+  // ================================ Filter Btn
   isFilterOpen = false;
+  @ViewChild('filterShape')
+  filterShape!: ElementRef<SVGPathElement>;
 
-  toggleFilter(): void {
+  @ViewChild('filterBarsTarget')
+  filterBarsTarget!: ElementRef<SVGPathElement>;
+
+  @ViewChild('activeDots')
+  activeDots!: ElementRef<SVGPathElement>;
+
+  private filterTimeline!: gsap.core.Timeline;
+  toggleFilter(event: MouseEvent): void {
+    event.stopPropagation();
     this.isFilterOpen = !this.isFilterOpen;
+    if (this.isFilterOpen) {
+      this.filterTimeline.play();
+    } else {
+      this.filterTimeline.reverse();
+    }
   }
+  @HostListener('document:click')
+  closeFilterOutside(): void {
+    this.isFilterOpen = false;
+    this.filterTimeline.reverse();
+  }
+  // ================================ Filter Btn
   // ================================ Left Side
   activeFilter: FilterType = 'year';
   selectFilter(filter: FilterType): void {
@@ -335,6 +359,34 @@ resetLocations(): void {
   // ================================== Scroll Top
   ngAfterViewInit(): void {
     this.initScrollTopButton();
+    // ================================ Filter Btn
+    gsap.set(this.activeDots.nativeElement, {
+      opacity: 0,
+      scale: 0.4,
+      transformOrigin: 'center center'
+    });
+
+    this.filterTimeline = gsap.timeline({
+      paused: true
+    });
+
+    this.filterTimeline
+      .to(this.filterShape.nativeElement, {
+        duration: 0.65,
+        morphSVG: this.filterBarsTarget.nativeElement,
+        ease: 'power2.inOut'
+      })
+      .to(
+        this.activeDots.nativeElement,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.35,
+          ease: 'back.out(1.8)'
+        },
+        0.25
+      );
+    // ================================ Filter Btn
   }
   @ViewChild('scrollTopButton')
   scrollTopButton!: ElementRef<HTMLButtonElement>;

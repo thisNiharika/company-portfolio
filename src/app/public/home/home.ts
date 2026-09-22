@@ -160,12 +160,14 @@ export class Home implements AfterViewInit, OnDestroy {
         '(prefers-reduced-motion: reduce)'
       ).matches;
 
+    await this.wait(300);
     if (reducedMotion) {
       void this.finishHomeLoader(loader);
       return;
     }
 
-    this.startWheelSplitAnimation(loader);
+    // this.startWheelSplitAnimation(loader);
+    this.startWheelSplitAnimation(loader, true);
   }
 
   private wait(duration: number): Promise<void> {
@@ -577,7 +579,8 @@ export class Home implements AfterViewInit, OnDestroy {
   // =========================================================
 
   private startWheelSplitAnimation(
-    loader: HTMLDivElement
+    loader: HTMLDivElement,
+    autoStart = true
   ): void {
     const upperPart =
       loader.querySelector<SVGGElement>(
@@ -773,7 +776,8 @@ export class Home implements AfterViewInit, OnDestroy {
 
     positionDotAtLineMiddle();
 
-    let targetProgress = 0;
+    // let targetProgress = 0;
+    let targetProgress = autoStart ? 1 : 0;
     let currentProgress = 0;
     let animationFrame: number | null = null;
     let completionStarted = false;
@@ -818,7 +822,7 @@ export class Home implements AfterViewInit, OnDestroy {
           targetProgress;
       } else {
         currentProgress +=
-          difference * 0.18;
+          difference * 0.08;
       }
 
       const progress =
@@ -1099,39 +1103,23 @@ export class Home implements AfterViewInit, OnDestroy {
         }
       };
 
-    window.addEventListener(
-      'wheel',
-      handleWheel,
-      {
+    if (!autoStart) {
+      window.addEventListener('wheel', handleWheel, {
         passive: false
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchstart',
-      handleTouchStart,
-      {
+      window.addEventListener('touchstart', handleTouchStart, {
         passive: true
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchmove',
-      handleTouchMove,
-      {
+      window.addEventListener('touchmove', handleTouchMove, {
         passive: false
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchend',
-      handleTouchEnd
-    );
+      window.addEventListener('touchend', handleTouchEnd);
+    }
 
-    window.addEventListener(
-      'resize',
-      handleResize
-    );
+    window.addEventListener('resize', handleResize);
 
     renderSplit();
 
