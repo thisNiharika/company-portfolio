@@ -11,40 +11,40 @@ export class ProjectService {
 
   private http = inject(HttpClient);
 
-  private readonly apiUrl =
-    'http://localhost:3000/projects';
-
+  private apiUrl =
+    'https://questionnaire-stood-gsm-object.trycloudflare.com/projects';
 
   // =========================
   // GET ALL PROJECTS
   // =========================
 
-getProjects(): Observable<Project[]> {
-  return this.http
-    .get<any[]>(this.apiUrl)
-    .pipe(
-      map(projects =>
-        projects.map(project => ({
+  getProjects(): Observable<Project[]> {
+    return this.http
+      .get<any[]>(this.apiUrl)
+      .pipe(
+        map(projects =>
+          projects.map(project => ({
+            ...project,
+            id: project._id
+          }))
+        )
+      );
+  }
+
+  // =========================
+  // GET PROJECT BY ID
+  // =========================
+
+  getProjectById(id: string): Observable<Project> {
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(project => ({
           ...project,
           id: project._id
         }))
-      )
-    );
-}
-
-
-  // =========================
-  // GET PROJECT
-  // =========================
-
-  getProjectById(
-    id: string
-  ): Observable<Project> {
-    return this.http.get<Project>(
-      `${this.apiUrl}/${id}`
-    );
+      );
   }
-
 
   // =========================
   // ADD PROJECT
@@ -54,12 +54,15 @@ getProjects(): Observable<Project[]> {
     project: Omit<Project, 'id'>
   ): Observable<Project> {
 
-    return this.http.post<Project>(
-      this.apiUrl,
-      project
-    );
+    return this.http
+      .post<any>(this.apiUrl, project)
+      .pipe(
+        map(createdProject => ({
+          ...createdProject,
+          id: createdProject._id
+        }))
+      );
   }
-
 
   // =========================
   // UPDATE PROJECT
@@ -69,29 +72,32 @@ getProjects(): Observable<Project[]> {
     project: Project
   ): Observable<Project> {
 
-    return this.http.patch<Project>(
-      `${this.apiUrl}/${project.id}`,
-      {
-        year: project.year,
-        serialNo: project.serialNo,
-        title: project.title,
-        description: project.description,
-        coverImage: project.coverImage,
-        slug: project.slug,
-        status: project.status
-      }
-    );
+    return this.http
+      .patch<any>(
+        `${this.apiUrl}/${project.id}`,
+        {
+          year: project.year,
+          serialNo: project.serialNo,
+          title: project.title,
+          description: project.description,
+          coverImage: project.coverImage,
+          slug: project.slug,
+          status: project.status
+        }
+      )
+      .pipe(
+        map(updatedProject => ({
+          ...updatedProject,
+          id: updatedProject._id
+        }))
+      );
   }
-
 
   // =========================
   // DELETE PROJECT
   // =========================
 
-  deleteProject(
-    id: string
-  ): Observable<void> {
-
+  deleteProject(id: string): Observable<void> {
     return this.http.delete<void>(
       `${this.apiUrl}/${id}`
     );
