@@ -147,7 +147,7 @@
     display: block;
     font-family: var(--fontFamilyAgbalumo);
     line-height: 1.4;
-    margin-top: -14px;
+    margin-top: -10px;
 }
 .the_context_para {
     max-width: clamp(750px, 49.48vw, 950px);
