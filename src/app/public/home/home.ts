@@ -44,6 +44,7 @@ export class Home implements AfterViewInit, OnDestroy {
   private destroyed = false;
   private loaderFinished = false;
   private startFrame: number | null = null;
+  private countFrame: number | null = null;
   private wheelCleanup: (() => void) | null = null;
 
   private readonly activeAnimations =
@@ -98,6 +99,10 @@ export class Home implements AfterViewInit, OnDestroy {
 
       this.startFrame = null;
     }
+    if (this.countFrame !== null) {
+  window.cancelAnimationFrame(this.countFrame);
+  this.countFrame = null;
+}
 
     this.wheelCleanup?.();
     this.wheelCleanup = null;
@@ -149,7 +154,7 @@ export class Home implements AfterViewInit, OnDestroy {
   private async runHomeLoader(
     loader: HTMLDivElement
   ): Promise<void> {
-    await this.startLogoAnimation(loader);
+    await this.startCountAnimation(loader);
 
     if (this.destroyed) {
       return;
@@ -160,12 +165,14 @@ export class Home implements AfterViewInit, OnDestroy {
         '(prefers-reduced-motion: reduce)'
       ).matches;
 
+    await this.wait(300);
     if (reducedMotion) {
       void this.finishHomeLoader(loader);
       return;
     }
 
-    this.startWheelSplitAnimation(loader);
+    // this.startWheelSplitAnimation(loader);
+    this.startWheelSplitAnimation(loader, true);
   }
 
   private wait(duration: number): Promise<void> {
@@ -173,6 +180,96 @@ export class Home implements AfterViewInit, OnDestroy {
       window.setTimeout(resolve, duration);
     });
   }
+  private startCountAnimation(
+  loader: HTMLDivElement
+): Promise<void> {
+  const countElement =
+    loader.querySelector<HTMLElement>(
+      '.loader-count'
+    );
+
+  const progressFill =
+    loader.querySelector<HTMLElement>(
+      '.loader-progress-fill'
+    );
+
+  const progressBar =
+    loader.querySelector<HTMLElement>(
+      '.loader-progress'
+    );
+
+  if (!countElement) {
+    return Promise.resolve();
+  }
+
+  const setProgress = (value: number): void => {
+    countElement.textContent = String(value);
+
+    if (progressFill) {
+      progressFill.style.width = `${value}%`;
+    }
+
+    progressBar?.setAttribute(
+      'aria-valuenow',
+      String(value)
+    );
+  };
+
+  const reducedMotion =
+    window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+  if (reducedMotion) {
+    setProgress(100);
+    return Promise.resolve();
+  }
+
+  const duration = 3500;
+  const startTime = performance.now();
+
+  return new Promise<void>((resolve) => {
+    const updateCount = (
+      currentTime: number
+    ): void => {
+      if (this.destroyed) {
+        this.countFrame = null;
+        resolve();
+        return;
+      }
+
+      const progress = Math.min(
+        (currentTime - startTime) / duration,
+        1
+      );
+
+      const easedProgress =
+        1 - Math.pow(1 - progress, 3);
+
+      const value = Math.round(
+        easedProgress * 100
+      );
+
+      setProgress(value);
+
+      if (progress < 1) {
+        this.countFrame =
+          window.requestAnimationFrame(
+            updateCount
+          );
+      } else {
+        this.countFrame = null;
+        setProgress(100);
+        resolve();
+      }
+    };
+
+    this.countFrame =
+      window.requestAnimationFrame(
+        updateCount
+      );
+  });
+}
 
   private async waitForAnimation(
     animation: Animation
@@ -577,8 +674,15 @@ export class Home implements AfterViewInit, OnDestroy {
   // =========================================================
 
   private startWheelSplitAnimation(
-    loader: HTMLDivElement
+    loader: HTMLDivElement,
+    autoStart = true
   ): void {
+    const counter =
+    loader.querySelector<HTMLElement>(
+      '.loader-counter'
+    );
+
+  counter?.classList.add('is-hiding');
     const upperPart =
       loader.querySelector<SVGGElement>(
         '.logo-above-line'
@@ -773,7 +877,8 @@ export class Home implements AfterViewInit, OnDestroy {
 
     positionDotAtLineMiddle();
 
-    let targetProgress = 0;
+    // let targetProgress = 0;
+    let targetProgress = autoStart ? 1 : 0;
     let currentProgress = 0;
     let animationFrame: number | null = null;
     let completionStarted = false;
@@ -812,13 +917,13 @@ export class Home implements AfterViewInit, OnDestroy {
 
       if (
         Math.abs(difference) <
-        0.008
+        0.05
       ) {
         currentProgress =
           targetProgress;
       } else {
         currentProgress +=
-          difference * 0.18;
+          difference * 0.05;
       }
 
       const progress =
@@ -1099,39 +1204,23 @@ export class Home implements AfterViewInit, OnDestroy {
         }
       };
 
-    window.addEventListener(
-      'wheel',
-      handleWheel,
-      {
+    if (!autoStart) {
+      window.addEventListener('wheel', handleWheel, {
         passive: false
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchstart',
-      handleTouchStart,
-      {
+      window.addEventListener('touchstart', handleTouchStart, {
         passive: true
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchmove',
-      handleTouchMove,
-      {
+      window.addEventListener('touchmove', handleTouchMove, {
         passive: false
-      }
-    );
+      });
 
-    window.addEventListener(
-      'touchend',
-      handleTouchEnd
-    );
+      window.addEventListener('touchend', handleTouchEnd);
+    }
 
-    window.addEventListener(
-      'resize',
-      handleResize
-    );
+    window.addEventListener('resize', handleResize);
 
     renderSplit();
 

@@ -3,7 +3,7 @@
 ========================================= -->
 @if (showHomeLoader()) {
   <div class="itm_loader" #itmLoader>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 348.48 183.53">
+      <svg class="loader-geometry" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 348.48 183.53">
           <g id="Layer_2" data-name="Layer 2">
               <g id="Layer_1-2" data-name="Layer 1">
                   <g class="logo-text-below-line">
@@ -72,6 +72,20 @@
               </g>
           </g>
       </svg>
+      <div class="loader-counter" aria-live="polite">
+  <div class="loader-count-value">
+    <span class="loader-count">0</span><span>%</span>
+  </div>
+
+  <div
+    class="loader-progress"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow="0">
+    <span class="loader-progress-fill"></span>
+  </div>
+</div>
       <span class="zoom-dot" aria-hidden="true"></span>
   </div>
 }

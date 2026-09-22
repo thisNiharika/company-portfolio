@@ -137,7 +137,62 @@
   transform: translateY(5px);
   will-change: transform, opacity;
 }
+/* SVG DOM में रहेगा ताकि split animation काम करे */
+.loader-geometry {
+  opacity: 0;
+  pointer-events: none;
+}
 
+.loader-counter {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+
+  color: #58595b;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.loader-count-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  font-size: clamp(42px, 6vw, 100px);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.loader-progress {
+  width: clamp(180px, 22vw, 320px);
+  height: 5px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: rgba(88, 89, 91, 0.2);
+}
+
+.loader-progress-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #db414c;
+  will-change: width;
+}
+
+.loader-counter.is-hiding {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+}
 /* .home-page-entering {
   animation: home-enter 500ms ease-out both;
 } */

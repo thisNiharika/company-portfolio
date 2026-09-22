@@ -43,7 +43,7 @@ export class CanvasVideo implements AfterViewInit, OnDestroy {
   @Input() frameExtension = 'webp';
   @Input() smoothness = 0.18;
   @Input() imageFit: CanvasImageFit = 'cover';
-  @Input() buttonText = 'Portfolio';
+  @Input() buttonText = 'Discover our work';
 
   @Output() completionClick = new EventEmitter<void>();
 
