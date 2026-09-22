@@ -791,346 +791,489 @@ if (certificationBlock) {
 
   // ============================================= Slider
   
+slides = [
+  {
+    src: 'assets/images/slider_1.jpg',
+    alt: 'Slide 1'
+  },
+  {
+    src: 'assets/images/slider_2.jpg',
+    alt: 'Slide 2'
+  },
+  {
+    src: 'assets/images/slider_2.jpg',
+    alt: 'Slide 3'
+  },
+  {
+    src: 'assets/images/slider_1.jpg',
+    alt: 'Slide 4'
+  }
+];
 
-  // @ViewChild('slider', { static: true })
-  // slider!: ElementRef<HTMLElement>;
+activeIndex = 0;
+isDragging = false;
 
-  slides = [
-    {
-      src: 'assets/images/slider_1.jpg',
-      alt: 'Slide 1'
-    },
-    {
-      src: 'assets/images/slider_2.jpg',
-      alt: 'Slide 2'
-    },
-    {
-      src: 'assets/images/slider_2.jpg',
-      alt: 'Slide 3'
-    },
-    {
-      src: 'assets/images/slider_1.jpg',
-      alt: 'Slide 4'
-    }
-  ];
+private readonly sideScale = 784 / 1274;
 
-  activeIndex = 0;
-  isDragging = false;
+private dragStartX = 0;
+private dragDistance = 0;
+private pendingDragDistance = 0;
+private sideOffset = 0;
+private pointerId: number | null = null;
 
-  private readonly sideScale = 784 / 1274;
+private dragFrame: number | null = null;
 
-  private dragStartX = 0;
-  private dragDistance = 0;
-  private sideOffset = 0;
-  private pointerId: number | null = null;
+private pointerDownItemIndex: number | null = null;
+private suppressSlideClick = false;
 
-  private dragFrame: number | null = null;
-  private pendingDragDistance = 0;
+private baseX = new Map<HTMLElement, number>();
 
-  private baseX = new Map<HTMLElement, number>();
+private autoplayTimer:
+  ReturnType<typeof setInterval> | undefined;
 
-  private autoplayTimer:
-    ReturnType<typeof setInterval> | undefined;
-  private get items(): HTMLElement[] {
-    if (!this.slider) {
-      return [];
-    }
-
-    return Array.from(
-      this.slider.nativeElement.querySelectorAll<HTMLElement>('.item')
-    );
+private get items(): HTMLElement[] {
+  if (!this.slider) {
+    return [];
   }
 
-  private getRelativePosition(
-    index: number,
-    total: number
-  ): number {
-    let position = (index - this.activeIndex) % total;
+  return Array.from(
+    this.slider.nativeElement.querySelectorAll<HTMLElement>(
+      '.item'
+    )
+  );
+}
 
-    if (position > total / 2) {
-      position -= total;
-    }
+private getRelativePosition(
+  index: number,
+  total: number
+): number {
+  let position =
+    (index - this.activeIndex) % total;
 
-    if (position < -total / 2) {
-      position += total;
-    }
-
-    return position;
+  if (position > total / 2) {
+    position -= total;
   }
 
-  private animateSlides(immediate = false): void {
-    const items = this.items;
+  if (position < -total / 2) {
+    position += total;
+  }
 
-    if (!items.length) {
-      return;
-    }
+  return position;
+}
 
+private animateSlides(
+  immediate = false
+): void {
+  const items = this.items;
 
-    /*
-      Side card ko active card ke around position karna hai.
-      1274px active width par offset approximately 850px hoga.
-    */
-    const activeWidth = items[0].offsetWidth;
+  if (!items.length || !this.slider) {
+    return;
+  }
 
-// 784 / 1274 = 0.615
-const sideWidth = activeWidth * this.sideScale;
+  const activeWidth =
+    items[0].offsetWidth;
 
-// 1920px par gap 161px,
-// smaller screen par gap responsive rahega
-const gap = Math.max(
-  24,
-  Math.min(161, this.slider.nativeElement.offsetWidth * (161 / 1920))
-);
+  const sideWidth =
+    activeWidth * this.sideScale;
 
-// Active ke edge aur side slide ke edge ke beech gap
-this.sideOffset =
-  (activeWidth + sideWidth) / 2 + gap;
+  const sliderWidth =
+    this.slider.nativeElement.offsetWidth;
 
-    gsap.killTweensOf(items);
+  const gap = Math.max(
+    24,
+    Math.min(
+      161,
+      sliderWidth * (161 / 1920)
+    )
+  );
 
-    items.forEach((item, index) => {
-      const position = this.getRelativePosition(
+  this.sideOffset =
+    (activeWidth + sideWidth) / 2 + gap;
+
+  gsap.killTweensOf(items);
+
+  items.forEach((item, index) => {
+    const position =
+      this.getRelativePosition(
         index,
         items.length
       );
 
-      const isActive = position === 0;
-      const isSide = Math.abs(position) === 1;
+    const isActive =
+      position === 0;
 
-      const targetX = position * this.sideOffset;
+    const isSide =
+      Math.abs(position) === 1;
 
-      this.baseX.set(item, targetX);
+    const targetX =
+      position * this.sideOffset;
 
-      gsap.set(item, {
-        zIndex: isActive ? 5 : isSide ? 3 : 0
-      });
+    this.baseX.set(
+      item,
+      targetX
+    );
 
-      item.style.pointerEvents =
-        isActive || isSide ? 'auto' : 'none';
-
-      const animation = {
-        xPercent: -50,
-        yPercent: -50,
-        x: targetX,
-        y: isActive ? 0 : 12,
-
-        // Active: 1
-        // Previous/Next: 0.615 = 784 / 1274
-        scale: isActive
-          ? 1
-          : isSide
-            ? this.sideScale
-            : this.sideScale * 0.85,
-
-        opacity: isActive
-          ? 1
-          : isSide
-            ? 0.72
-            : 0,
-
-        rotateY: isActive
-          ? 0
-          : position > 0
-            ? -5
-            : 5
-      };
-
-      if (immediate) {
-        gsap.set(item, animation);
-      } else {
-        gsap.to(item, {
-          ...animation,
-          duration: 1.5,
-          ease: 'power3.inOut',
-          overwrite: 'auto'
-        });
-      }
+    gsap.set(item, {
+      zIndex: isActive
+        ? 5
+        : isSide
+          ? 3
+          : 0
     });
-  }
 
-  nextSlide(): void {
-    if (this.slides.length < 2) {
-      return;
+    item.style.pointerEvents =
+      isActive || isSide
+        ? 'auto'
+        : 'none';
+
+    const animation = {
+      xPercent: -50,
+      yPercent: -50,
+      x: targetX,
+      y: isActive ? 0 : 12,
+
+      scale: isActive
+        ? 1
+        : isSide
+          ? this.sideScale
+          : this.sideScale * 0.85,
+
+      opacity: isActive
+        ? 1
+        : isSide
+          ? 0.72
+          : 0,
+
+      rotateY: isActive
+        ? 0
+        : position > 0
+          ? -5
+          : 5
+    };
+
+    if (immediate) {
+      gsap.set(item, animation);
+    } else {
+      gsap.to(item, {
+        ...animation,
+        duration: 1.5,
+        ease: 'power3.inOut',
+        overwrite: 'auto'
+      });
     }
+  });
+}
 
-    this.activeIndex =
-      (this.activeIndex + 1) % this.slides.length;
-
-    this.animateSlides();
+nextSlide(): void {
+  if (this.slides.length < 2) {
+    return;
   }
 
-  previousSlide(): void {
-    if (this.slides.length < 2) {
-      return;
-    }
+  this.activeIndex =
+    (this.activeIndex + 1) %
+    this.slides.length;
 
-    this.activeIndex =
-      (this.activeIndex - 1 + this.slides.length) %
-      this.slides.length;
+  this.animateSlides();
+}
 
-    this.animateSlides();
+previousSlide(): void {
+  if (this.slides.length < 2) {
+    return;
   }
 
-  onPointerDown(event: PointerEvent): void {
-    this.isDragging = true;
-    this.pointerId = event.pointerId;
-    this.dragStartX = event.clientX;
-    this.dragDistance = 0;
+  this.activeIndex =
+    (this.activeIndex - 1 + this.slides.length) %
+    this.slides.length;
 
-    this.stopAutoplay();
-    gsap.killTweensOf(this.items);
+  this.animateSlides();
+}
 
-    // Agar animation ke beech drag start ho
-    this.items.forEach(item => {
-      const currentX = Number(
+/*
+ * Side previous/next item click
+ */
+onSlideItemClick(
+  index: number,
+  event: MouseEvent
+): void {
+  event.stopPropagation();
+
+  /*
+   * Drag ke baad generated click ignore karein
+   */
+  if (this.suppressSlideClick) {
+    return;
+  }
+
+  /*
+   * Active item par action nahi
+   */
+  if (index === this.activeIndex) {
+    return;
+  }
+
+  /*
+   * Click kiya hua item center mein laayein
+   */
+  this.activeIndex = index;
+
+  this.animateSlides();
+  this.startAutoplay();
+}
+
+onPointerDown(
+  event: PointerEvent
+): void {
+  const target =
+    event.target as HTMLElement;
+
+  /*
+   * Arrow buttons par drag start nahi hoga
+   */
+  if (target.closest('.slider_btn')) {
+    return;
+  }
+
+  const clickedItem =
+    target.closest<HTMLElement>('.item');
+
+  const itemIndex = clickedItem
+    ? this.items.indexOf(clickedItem)
+    : -1;
+
+  this.pointerDownItemIndex =
+    itemIndex >= 0
+      ? itemIndex
+      : null;
+
+  this.suppressSlideClick = false;
+  this.isDragging = true;
+  this.pointerId = event.pointerId;
+  this.dragStartX = event.clientX;
+  this.dragDistance = 0;
+  this.pendingDragDistance = 0;
+
+  this.stopAutoplay();
+
+  gsap.killTweensOf(this.items);
+
+  this.items.forEach((item) => {
+    const currentX =
+      Number(
         gsap.getProperty(item, 'x')
       );
 
-      this.baseX.set(
-        item,
-        Number.isFinite(currentX) ? currentX : 0
-      );
-    });
-
-    const target = event.currentTarget as HTMLElement;
-
-    target.setPointerCapture(event.pointerId);
-  }
-
-  onPointerMove(event: PointerEvent): void {
-    if (
-      !this.isDragging ||
-      event.pointerId !== this.pointerId
-    ) {
-      return;
-    }
-
-    this.pendingDragDistance =
-      event.clientX - this.dragStartX;
-
-    this.dragDistance = this.pendingDragDistance;
-
-    if (Math.abs(this.dragDistance) > 5) {
-      event.preventDefault();
-    }
-
-    /*
-      Har pointer event par GSAP update karne ke bajay
-      requestAnimationFrame se smooth update.
-    */
-    if (this.dragFrame === null) {
-      this.dragFrame = requestAnimationFrame(() => {
-        this.dragFrame = null;
-        this.paintDrag(this.pendingDragDistance);
-      });
-    }
-  }
-
-  private paintDrag(distance: number): void {
-    const items = this.items;
-
-    if (!items.length || !this.sideOffset) {
-      return;
-    }
-
-    const progress = Math.min(
-      Math.abs(distance) / this.sideOffset,
-      1
+    this.baseX.set(
+      item,
+      Number.isFinite(currentX)
+        ? currentX
+        : 0
     );
+  });
 
-    const incomingPosition =
-      distance < 0 ? 1 : -1;
+  const sliderElement =
+    event.currentTarget as HTMLElement;
 
-    items.forEach((item, index) => {
-      const position = this.getRelativePosition(
+  sliderElement.setPointerCapture(
+    event.pointerId
+  );
+}
+
+onPointerMove(
+  event: PointerEvent
+): void {
+  if (
+    !this.isDragging ||
+    event.pointerId !== this.pointerId
+  ) {
+    return;
+  }
+
+  this.pendingDragDistance =
+    event.clientX - this.dragStartX;
+
+  this.dragDistance =
+    this.pendingDragDistance;
+
+  if (Math.abs(this.dragDistance) > 5) {
+    event.preventDefault();
+  }
+
+  if (this.dragFrame === null) {
+    this.dragFrame =
+      requestAnimationFrame(() => {
+        this.dragFrame = null;
+
+        this.paintDrag(
+          this.pendingDragDistance
+        );
+      });
+  }
+}
+
+private paintDrag(
+  distance: number
+): void {
+  const items = this.items;
+
+  if (
+    !items.length ||
+    !this.sideOffset
+  ) {
+    return;
+  }
+
+  const progress = Math.min(
+    Math.abs(distance) / this.sideOffset,
+    1
+  );
+
+  const incomingPosition =
+    distance < 0 ? 1 : -1;
+
+  items.forEach((item, index) => {
+    const position =
+      this.getRelativePosition(
         index,
         items.length
       );
 
-      const originalX =
-        this.baseX.get(item) ?? 0;
+    const originalX =
+      this.baseX.get(item) ?? 0;
 
-      if (position === 0) {
-        gsap.set(item, {
-          x: originalX + distance,
-          scale:
-            1 - (1 - this.sideScale) * progress,
-          opacity:
-            1 - 0.28 * progress
-        });
-      }
+    if (position === 0) {
+      gsap.set(item, {
+        x: originalX + distance,
+        scale:
+          1 -
+          (1 - this.sideScale) *
+            progress,
+        opacity:
+          1 - 0.28 * progress
+      });
+    }
 
-      if (position === incomingPosition) {
-        gsap.set(item, {
-          x: originalX + distance,
-          scale:
-            this.sideScale +
-            (1 - this.sideScale) * progress,
-          opacity:
-            0.72 + 0.28 * progress
-        });
-      }
-    });
-  }
-
-  onPointerUp(event: PointerEvent): void {
     if (
-      !this.isDragging ||
-      event.pointerId !== this.pointerId
+      position === incomingPosition
     ) {
-      return;
+      gsap.set(item, {
+        x: originalX + distance,
+        scale:
+          this.sideScale +
+          (1 - this.sideScale) *
+            progress,
+        opacity:
+          0.72 + 0.28 * progress
+      });
     }
+  });
+}
 
-    if (this.dragFrame !== null) {
-      cancelAnimationFrame(this.dragFrame);
-      this.dragFrame = null;
-    }
-
-    this.paintDrag(this.dragDistance);
-
-    this.isDragging = false;
-
-    const threshold = 60;
-
-    if (Math.abs(this.dragDistance) > threshold) {
-      if (this.dragDistance < 0) {
-        this.nextSlide();
-      } else {
-        this.previousSlide();
-      }
-    } else {
-      // Threshold se kam drag hone par wapas snap hoga
-      this.animateSlides();
-    }
-
-    const target = event.currentTarget as HTMLElement;
-
-    if (target.hasPointerCapture(event.pointerId)) {
-      target.releasePointerCapture(event.pointerId);
-    }
-
-    this.pointerId = null;
-    this.startAutoplay();
+onPointerUp(
+  event: PointerEvent
+): void {
+  if (
+    !this.isDragging ||
+    event.pointerId !== this.pointerId
+  ) {
+    return;
   }
 
-  private startAutoplay(): void {
-    this.stopAutoplay();
+  if (this.dragFrame !== null) {
+    cancelAnimationFrame(
+      this.dragFrame
+    );
 
-    if (this.slides.length < 2) {
-      return;
+    this.dragFrame = null;
+  }
+
+  const distance =
+    this.dragDistance;
+
+  const clickedIndex =
+    this.pointerDownItemIndex;
+
+  const clickThreshold = 10;
+  const dragThreshold = 60;
+
+  const wasDrag =
+    Math.abs(distance) > clickThreshold;
+
+  this.paintDrag(distance);
+  this.isDragging = false;
+
+  if (Math.abs(distance) > dragThreshold) {
+    if (distance < 0) {
+      this.nextSlide();
+    } else {
+      this.previousSlide();
     }
+  } else if (
+    !wasDrag &&
+    clickedIndex !== null &&
+    clickedIndex !== this.activeIndex
+  ) {
+    /*
+     * Clicked previous/next item center mein aaye
+     */
+    this.activeIndex = clickedIndex;
+    this.animateSlides();
+  } else {
+    this.animateSlides();
+  }
 
-    this.autoplayTimer = setInterval(() => {
+  this.pointerDownItemIndex = null;
+
+  /*
+   * Drag ke baad browser ke generated click ko block karein
+   */
+  if (wasDrag) {
+    this.suppressSlideClick = true;
+
+    window.setTimeout(() => {
+      this.suppressSlideClick = false;
+    }, 0);
+  }
+
+  const sliderElement =
+    event.currentTarget as HTMLElement;
+
+  if (
+    sliderElement.hasPointerCapture(
+      event.pointerId
+    )
+  ) {
+    sliderElement.releasePointerCapture(
+      event.pointerId
+    );
+  }
+
+  this.pointerId = null;
+  this.startAutoplay();
+}
+
+private startAutoplay(): void {
+  this.stopAutoplay();
+
+  if (this.slides.length < 2) {
+    return;
+  }
+
+  this.autoplayTimer =
+    setInterval(() => {
       this.nextSlide();
     }, 40000);
-  }
+}
 
-  private stopAutoplay(): void {
-    if (this.autoplayTimer) {
-      clearInterval(this.autoplayTimer);
-      this.autoplayTimer = undefined;
-    }
+private stopAutoplay(): void {
+  if (this.autoplayTimer) {
+    clearInterval(
+      this.autoplayTimer
+    );
+
+    this.autoplayTimer =
+      undefined;
   }
+}
 
   ngOnDestroy(): void {
     this.stopAutoplay();
