@@ -92,7 +92,7 @@
                             <div class="hdfr_top" [class.d-none]="activeFilter !== 'year'">
                                 <div class="hdfrt_top">
                                     <p>Select one or more year</p>
-                                    <button class="btn_reset" (click)="resetYears()">
+                                    <button class="btn_reset" (click)="resetYears()" [disabled]="selectedYears.length === 0">
                                         <img src="assets/images/reset.svg" alt="Reset Icon" />
                                         Reset Year
                                     </button>
@@ -125,7 +125,7 @@
                             <div class="hdfr_top" [class.d-none]="activeFilter !== 'domain'">
                                 <div class="hdfrt_top">
                                     <p>Select one or more domain</p>
-                                    <button class="btn_reset" (click)="resetDomains()">
+                                    <button class="btn_reset" (click)="resetDomains()" [disabled]="selectedDomains.length === 0">
                                         <img src="assets/images/reset.svg" alt="Reset Icon" />
                                         Reset Domain
                                     </button>
@@ -158,7 +158,7 @@
                             <div class="hdfr_top" [class.d-none]="activeFilter !== 'client'">
                                 <div class="hdfrt_top">
                                     <p>Select one or more client</p>
-                                    <button class="btn_reset" (click)="resetClients()">
+                                    <button class="btn_reset" (click)="resetClients()" [disabled]="selectedAgencies.length === 0">
                                         <img src="assets/images/reset.svg" alt="Reset Icon" />
                                         Reset Client
                                     </button>
@@ -230,7 +230,7 @@
                             <div class="hdfr_top" [class.d-none]="activeFilter !== 'location'">
                                 <div class="hdfrt_top">
                                     <p>Select one or more location</p>
-                                    <button class="btn_reset" (click)="resetLocations()">
+                                    <button class="btn_reset" (click)="resetLocations()" [disabled]="selectedLocation.length === 0">
                                         <img src="assets/images/reset.svg" alt="Reset Icon" />
                                         Reset Location
                                     </button>
@@ -304,7 +304,7 @@
                             <div class="hdfr_top" [class.d-none]="activeFilter !== 'technology'">
                                 <div class="hdfrt_top">
                                     <p>Select one or more technology</p>
-                                    <button class="btn_reset" (click)="resetTech()">
+                                    <button class="btn_reset" (click)="resetTech()"  [disabled]="selectedTech.length === 0">
                                         <img src="assets/images/reset.svg" alt="Reset Icon" />
                                         Reset Technology
                                     </button>
@@ -341,7 +341,7 @@
                                     <img src="assets/images/reset.svg" alt="Reset Icon" /> 
                                     Clear All Filters
                                 </button>
-                                <button class="applyFilters">
+                                <button class="applyFilters" disabled>
                                     Apply Filters
                                 </button>
                             </div>

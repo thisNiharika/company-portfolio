@@ -21,12 +21,8 @@
     filter: brightness(0) saturate(100%) invert(40%) sepia(4%) saturate(26%) hue-rotate(328deg) brightness(94%) contrast(81%);
 }
 .arrow_back:hover{
-    border-color: var(--colorHover);
-    background: var(--colorHover);
-    color: var(--colorfff);
-}
-.arrow_back:hover img{
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7471%) hue-rotate(193deg) brightness(97%) contrast(100%);
+    background-color: #F0F7FF;
+    border-color: var(--color318BF2);
 }
 .pd_tab ul {
     position: relative;
@@ -234,6 +230,19 @@
 }
 .cs_btn .slider_btn:hover img{
     filter: var(--filterHover);
+}
+.slider_btn.slider_next:hover img {
+    transform: translate(10px, 0px);
+}
+.cs_btn .slider_btn.slider_prev:hover img {
+    transform: rotate(180deg) translate(10px, 0px);
+}
+.context_slider .item {
+  cursor: pointer;
+}
+
+.context_slider .item.active {
+  cursor: default;
 }
 /* Mobile responsive */
 @media (max-width: 768px) {

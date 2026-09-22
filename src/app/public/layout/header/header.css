@@ -71,6 +71,7 @@
         top 0.45s cubic-bezier(.22, 1, .36, 1),
         border-radius 0.35s ease,
         visibility 0s linear 0.45s;
+    box-shadow: 0 12px 39px rgb(0 0 0 / 16%);
 }
 .h_filter_dropdown.show {
   top: clamp(52px, 3.33vw, 64px);
@@ -184,6 +185,14 @@
 .hdfrt_top button.btn_reset:hover img{
     filter: var(--filterHover);
 }
+.hdfrt_top button.btn_reset:disabled{
+    opacity: 0.8;
+    pointer-events: none;
+    color: #999;
+}
+.hdfrt_top button.btn_reset:disabled img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(0%) saturate(0%) hue-rotate(347deg) brightness(98%) contrast(87%);
+}
 .hdfrt_bottom {
     height: calc(100% - clamp(36px, 2.4vw, 46px));
 }
@@ -277,6 +286,11 @@
 .applyFilters:hover{
     border-color: var(--colorHover);
     background: var(--colorHover);
+}
+.applyFilters:disabled{
+    background: #999;
+    opacity: 0.85;
+    border: #999;
 }
 .hb_client_search {
     display: flex;
