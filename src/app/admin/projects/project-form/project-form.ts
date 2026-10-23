@@ -1121,72 +1121,27 @@ private finaliseMovedProject(
   newSerialNo: number,
   formValue: any
 ): void {
-
-  const updatedProject: Project = {
-
+  this.projectService.updateProject({
     ...existingProject,
-
-    year:
-      Number(formValue.year),
-
-    serialNo:
-      newSerialNo,
-
-    title:
-      formValue.title!.trim(),
-
-    description:
-      formValue.description!.trim(),
-
-    coverImage:
-      formValue.coverImage!,
-
-    slug:
-      formValue.slug!.trim(),
-
-    status:
-      formValue.status!
-
-  };
-
-
-  this.projectService
-    .updateProject(updatedProject)
-    .subscribe({
-
-      next: () => {
-
-        this.saving = false;
-
-        this.successMessage =
-          'Project updated successfully.';
-
-        setTimeout(() => {
-
-          this.router.navigate([
-            '/admin/projects'
-          ]);
-
-        }, 700);
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to update project:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to update project.';
-
-      }
-
-    });
+    year: formValue.year,
+    serialNo: newSerialNo,
+    title: formValue.title,
+    description: formValue.description,
+    coverImage: formValue.coverImage || '',
+    slug: formValue.slug,
+    status: formValue.status
+  }).subscribe({
+    next: (updatedProject) => {
+      this.saving = false;
+      this.successMessage = 'Project order updated successfully.';
+      console.log('FINAL PROJECT UPDATE SUCCESS:', updatedProject);
+    },
+    error: (error) => {
+      console.error('FINAL PROJECT UPDATE FAILED:', error);
+      this.saving = false;
+      this.errorMessage = 'Failed to finalize project order.';
+    }
+  });
 }
 
 private sendNormalUpdate(
@@ -1263,89 +1218,6 @@ private sendNormalUpdate(
 }
 
 
-private moveProjectDown(
-  existingProject: Project,
-  newSerialNo: number,
-  oldSerialNo: number,
-  formValue: any
-): void {
-
-  const affectedProjects =
-    this.projects
-      .filter(
-        project =>
-          project.id !== existingProject.id &&
-          Number(project.serialNo) > oldSerialNo &&
-          Number(project.serialNo) <= newSerialNo
-      )
-      .sort(
-        (a, b) =>
-          Number(a.serialNo) -
-          Number(b.serialNo)
-      );
-
-
-  /*
-   * Example:
-   *
-   * A = 1
-   * B = 2
-   * C = 3
-   *
-   * A moves to 3
-   *
-   * B -> 1
-   * C -> 2
-   *
-   * Update from lowest to highest.
-   */
-  from(affectedProjects)
-    .pipe(
-
-      concatMap(project => {
-
-        return this.projectService
-          .updateProject({
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) - 1
-
-          });
-
-      })
-
-    )
-    .subscribe({
-
-      complete: () => {
-
-        this.finaliseMovedProject(
-          existingProject,
-          newSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to move projects:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-}
 
 private moveProjectUp(
   existingProject: Project,
@@ -1429,7 +1301,112 @@ private moveProjectUp(
       }
 
     });
+
+    complete: () => {
+  console.log('REORDER SEQUENCE COMPLETED');
+
+  this.finaliseMovedProject(
+    existingProject,
+    newSerialNo,
+    formValue
+  );
 }
+}
+
+private moveProjectDown(
+  existingProject: Project,
+  newSerialNo: number,
+  oldSerialNo: number,
+  formValue: any
+): void {
+
+  const affectedProjects =
+    this.projects
+      .filter(
+        project =>
+          project.id !== existingProject.id &&
+          Number(project.serialNo) > oldSerialNo &&
+          Number(project.serialNo) <= newSerialNo
+      )
+      .sort(
+        (a, b) =>
+          Number(a.serialNo) -
+          Number(b.serialNo)
+      );
+
+
+  /*
+   * Example:
+   *
+   * A = 1
+   * B = 2
+   * C = 3
+   *
+   * A moves to 3
+   *
+   * B -> 1
+   * C -> 2
+   *
+   * Update from lowest to highest.
+   */
+  from(affectedProjects)
+    .pipe(
+
+      concatMap(project => {
+
+        return this.projectService
+          .updateProject({
+
+            ...project,
+
+            serialNo:
+              Number(project.serialNo) - 1
+
+          });
+
+      })
+
+    )
+    .subscribe({
+
+      complete: () => {
+
+        this.finaliseMovedProject(
+          existingProject,
+          newSerialNo,
+          formValue
+        );
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to move projects:',
+          error
+        );
+
+        this.saving = false;
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Failed to change project order.';
+
+      }
+
+    });
+
+    complete: () => {
+  console.log('REORDER SEQUENCE COMPLETED');
+
+  this.finaliseMovedProject(
+    existingProject,
+    newSerialNo,
+    formValue
+  );
+}
+}
+
 
 private reorderForEdit(
   existingProject: Project,
