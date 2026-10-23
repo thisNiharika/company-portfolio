@@ -1,290 +1,893 @@
 <div class="project-form-page">
 
-  <!-- Header -->
-  <div class="page-header">
+  <!-- =========================================
+       TOP BAR
+  ========================================== -->
 
-    <div>
-      <h1>
-        {{ isEditMode ? 'Edit Project' : 'Add Project' }}
-      </h1>
+  <header class="form-header">
 
-      <p>
-        {{
-          isEditMode
-            ? 'Update your project details.'
-            : 'Add a new project to your portfolio.'
-        }}
-      </p>
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="cancel()"
+        [disabled]="saving"
+        aria-label="Back to projects"
+      >
+        <span>←</span>
+      </button>
+
+      <div class="header-copy">
+
+        <div class="breadcrumb">
+          <span>ADMIN</span>
+          <b>/</b>
+          <span>PROJECTS</span>
+          <b>/</b>
+          <span>
+            {{ isEditMode ? 'EDIT' : 'NEW' }}
+          </span>
+        </div>
+
+        <h1>
+          {{ isEditMode ? 'Edit Project' : 'Add Project' }}
+        </h1>
+
+        <p>
+          {{ isEditMode
+            ? 'Update the project information and portfolio settings.'
+            : 'Create a new project for your portfolio.'
+          }}
+        </p>
+
+      </div>
+
     </div>
 
-    <button
-      type="button"
-      class="cancel-btn"
-      (click)="router.navigate(['/admin/projects'])">
-      Cancel
-    </button>
+    <div class="header-status">
+
+      <span
+        class="status-indicator"
+        [class.published]="
+          projectForm.controls.status.value === 'published'
+        "
+      ></span>
+
+      {{
+        projectForm.controls.status.value === 'published'
+          ? 'Published'
+          : 'Draft'
+      }}
+
+    </div>
+
+  </header>
+
+
+  <!-- =========================================
+       MESSAGES
+  ========================================== -->
+
+  <div
+    class="form-message success"
+    *ngIf="successMessage"
+  >
+
+    <span class="message-symbol">✓</span>
+
+    <div>
+      <strong>Success</strong>
+      <p>{{ successMessage }}</p>
+    </div>
 
   </div>
 
 
-  <!-- Form -->
-  <form
-    [formGroup]="projectForm"
-    (ngSubmit)="saveProject()"
-    class="project-form">
+  <div
+    class="form-message error"
+    *ngIf="errorMessage"
+  >
+
+    <span class="message-symbol">!</span>
+
+    <div>
+      <strong>Something went wrong</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
+
+  </div>
 
 
-    <!-- Basic Information -->
-    <div class="form-section">
+  <!-- =========================================
+       FORM
+  ========================================== -->
 
-      <h2>Project Information</h2>
+<!-- ADD PROJECT LOADER -->
 
-      <div class="form-grid">
+<div
+  class="page-loader"
+  *ngIf="loadingProjects && !isEditMode"
+>
+  <div class="loader-spinner"></div>
+
+  <span>
+    Preparing project form...
+  </span>
+</div>
 
 
-        <!-- Project Title -->
-        <div class="form-group full-width">
+<!-- PROJECT FORM -->
 
-          <label for="title">
-            Project Title
-          </label>
+<form
+  *ngIf="!loadingProjects || isEditMode"
+  [formGroup]="projectForm"
+  (ngSubmit)="saveProject()"
+  class="project-form"
+  novalidate
+>
 
-          <input
-            id="title"
-            type="text"
-            formControlName="title"
-            placeholder="Enter project title"
-            (input)="generateSlug()" />
+    <div class="editor-layout">
 
-          @if (
-            projectForm.controls.title.touched &&
-            projectForm.controls.title.invalid
-          ) {
-            <small class="error">
-              Project title is required.
-            </small>
-          }
+
+      <main class="editor-main">
+
+        <section class="editor-section">
+
+          <div class="section-top">
+
+            <div class="section-index">
+              01
+            </div>
+
+            <div>
+
+              <h2>Project Information</h2>
+
+              <p>
+                Basic information displayed throughout the portfolio.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="fields">
+
+            <!-- TITLE -->
+
+            <div class="field full">
+
+              <label for="title">
+                Project title
+                <span>*</span>
+              </label>
+
+              <input
+                id="title"
+                type="text"
+                formControlName="title"
+                placeholder="Enter project title"
+                (input)="generateSlug()"
+              />
+
+              <small
+                class="validation"
+                *ngIf="
+                  projectForm.controls.title.invalid &&
+                  projectForm.controls.title.touched
+                "
+              >
+                Project title is required.
+              </small>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="field full">
+
+              <label for="description">
+                Description
+                <span>*</span>
+              </label>
+
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="5"
+                placeholder="Write a short description of the project..."
+              ></textarea>
+
+              <small
+                class="validation"
+                *ngIf="
+                  projectForm.controls.description.invalid &&
+                  projectForm.controls.description.touched
+                "
+              >
+                Description is required.
+              </small>
+
+            </div>
+
+
+            <!-- YEAR -->
+
+            <div class="field">
+
+              <label for="year">
+                Year
+                <span>*</span>
+              </label>
+
+              <input
+                id="year"
+                type="number"
+                formControlName="year"
+                min="1900"
+                max="2100"
+              />
+
+            </div>
+
+
+            <!-- S.NO -->
+
+            <div class="field">
+
+              <label for="serialNo">
+                S.No.
+                <span>*</span>
+              </label>
+
+              <div class="serial-field">
+
+                <input
+                  id="serialNo"
+                  type="number"
+                  formControlName="serialNo"
+                  min="1"
+                  (change)="onSerialNoChange()"
+                />
+
+                <span class="serial-suffix">
+                  ORDER
+                </span>
+
+              </div>
+
+              <small class="field-help">
+                Controls the project's position in the portfolio.
+              </small>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================
+             02 — URL
+        ==================================== -->
+
+        <section class="editor-section">
+
+          <div class="section-top">
+
+            <div class="section-index">
+              02
+            </div>
+
+            <div>
+
+              <h2>Project URL</h2>
+
+              <p>
+                Configure the public address for this project.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="fields">
+
+            <div class="field full">
+
+              <label for="slug">
+                Slug
+                <span>*</span>
+              </label>
+
+              <div class="slug-field">
+
+                <span class="slug-prefix">
+                  /
+                </span>
+
+                <input
+                  id="slug"
+                  type="text"
+                  formControlName="slug"
+                  placeholder="project-name"
+                  (input)="onSlugEdit()"
+                />
+
+              </div>
+
+              <small class="field-help">
+                This becomes the public project URL.
+              </small>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================
+             03 — COVER IMAGE
+        ==================================== -->
+
+        <section class="editor-section">
+
+          <div class="section-top">
+
+            <div class="section-index">
+              03
+            </div>
+
+            <div>
+
+              <h2>Cover Image</h2>
+
+              <p>
+                Choose the image displayed on the project listing.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="image-editor">
+
+            <div class="image-preview">
+
+              <img
+                *ngIf="imagePreview"
+                [src]="imagePreview"
+                alt="Project cover preview"
+              />
+
+              <div
+                class="image-empty"
+                *ngIf="!imagePreview"
+              >
+
+                <span class="empty-image-icon">
+                  IMG
+                </span>
+
+                <strong>
+                  No image selected
+                </strong>
+
+                <small>
+                  Upload a cover image to preview it here.
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="image-controls">
+
+              <div>
+
+                <span class="control-label">
+                  PROJECT COVER
+                </span>
+
+                <h3>
+                  Portfolio thumbnail
+                </h3>
+
+                <p>
+                  This image will appear on project cards
+                  and portfolio listings.
+                </p>
+
+              </div>
+
+
+              <label
+                class="upload-button"
+                for="projectImage"
+              >
+                <span>↑</span>
+                Choose Image
+              </label>
+
+              <input
+                id="projectImage"
+                type="file"
+                accept="image/*"
+                hidden
+                (change)="onFileSelected($event)"
+              />
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===================================
+             04 — PUBLISHING
+        ==================================== -->
+
+        <section class="editor-section">
+
+          <div class="section-top">
+
+            <div class="section-index">
+              04
+            </div>
+
+            <div>
+
+              <h2>Publishing</h2>
+
+              <p>
+                Control whether this project is visible publicly.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="publishing-options">
+
+            <label
+              class="publish-option"
+              [class.selected]="
+                projectForm.controls.status.value === 'draft'
+              "
+            >
+
+              <input
+                type="radio"
+                formControlName="status"
+                value="draft"
+              />
+
+              <span class="radio-mark"></span>
+
+              <span class="publish-copy">
+
+                <strong>Draft</strong>
+
+                <small>
+                  Keep this project hidden from the public portfolio.
+                </small>
+
+              </span>
+
+              <span class="option-tag">
+                PRIVATE
+              </span>
+
+            </label>
+
+
+            <label
+              class="publish-option"
+              [class.selected]="
+                projectForm.controls.status.value === 'published'
+              "
+            >
+
+              <input
+                type="radio"
+                formControlName="status"
+                value="published"
+              />
+
+              <span class="radio-mark"></span>
+
+              <span class="publish-copy">
+
+                <strong>Published</strong>
+
+                <small>
+                  Make this project visible on the public portfolio.
+                </small>
+
+              </span>
+
+              <span class="option-tag">
+                LIVE
+              </span>
+
+            </label>
+
+          </div>
+
+        </section>
+
+      </main>
+
+
+      <!-- =====================================
+           SIDEBAR
+      ====================================== -->
+
+      <aside class="editor-sidebar">
+
+
+        <!-- ORDER -->
+
+        <section class="side-panel order-panel">
+
+          <div class="side-panel-heading">
+
+            <span>
+              PROJECT ORDER
+            </span>
+
+            <span class="side-code">
+              01
+            </span>
+
+          </div>
+
+          <div class="order-display">
+
+            <span class="order-value">
+              {{
+                (projectForm.controls.serialNo.value || 0)
+                  | number:'2.0'
+              }}
+            </span>
+
+            <span class="order-label">
+              S.NO.
+            </span>
+
+          </div>
+
+          <div class="order-line"></div>
+
+          <p>
+            Projects are arranged using S.No.
+            The number is unique across the entire portfolio.
+          </p>
+
+        </section>
+
+
+        <!-- PREVIEW -->
+
+        <section class="side-panel">
+
+          <div class="side-panel-heading">
+
+            <span>
+              LIVE PREVIEW
+            </span>
+
+            <span class="preview-dot"></span>
+
+          </div>
+
+
+          <div class="side-preview">
+
+            <div class="side-preview-image">
+
+              <img
+                *ngIf="imagePreview"
+                [src]="imagePreview"
+                [alt]="
+                  projectForm.controls.title.value ||
+                  'Project'
+                "
+              />
+
+              <span *ngIf="!imagePreview">
+                IMAGE
+              </span>
+
+            </div>
+
+
+            <div class="side-preview-content">
+
+              <span class="preview-number">
+                {{
+                  (projectForm.controls.serialNo.value || 0)
+                    | number:'2.0'
+                }}
+              </span>
+
+              <div>
+
+                <strong>
+                  {{
+                    projectForm.controls.title.value ||
+                    'Project title'
+                  }}
+                </strong>
+
+                <small>
+                  {{
+                    projectForm.controls.year.value ||
+                    'Year'
+                  }}
+                </small>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- URL PREVIEW -->
+
+        <section class="side-panel url-panel">
+
+          <div class="side-panel-heading">
+
+            <span>
+              PUBLIC URL
+            </span>
+
+          </div>
+
+          <div class="public-url">
+
+            <span>
+              /{{ projectForm.controls.slug.value || 'project-slug' }}
+            </span>
+
+          </div>
+
+        </section>
+
+
+        <!-- NOTE -->
+
+        <div class="editor-note">
+
+          <span class="note-icon">
+            i
+          </span>
+
+          <p>
+            S.No. is globally unique. If you select an
+            existing number, affected projects will move
+            down automatically after confirmation.
+          </p>
 
         </div>
 
-
-        <!-- Slug -->
-        <div class="form-group full-width">
-
-          <label for="slug">
-            Slug
-          </label>
-
-          <input
-            id="slug"
-            type="text"
-            formControlName="slug"
-            placeholder="project-name"
-            (input)="onSlugEdit()" />
-
-          <small class="form-help">
-            This is used in the project URL.
-            It is automatically generated from the project title,
-            but you can edit it.
-          </small>
-
-          @if (
-            projectForm.controls.slug.touched &&
-            projectForm.controls.slug.invalid
-          ) {
-            <small class="error">
-              Slug is required.
-            </small>
-          }
-
-        </div>
-
-
-        <!-- Year -->
-        <div class="form-group">
-
-          <label for="year">
-            Year
-          </label>
-
-          <input
-            id="year"
-            type="number"
-            formControlName="year"
-            min="1" />
-
-          @if (
-            projectForm.controls.year.touched &&
-            projectForm.controls.year.invalid
-          ) {
-            <small class="error">
-              Year is required.
-            </small>
-          }
-
-        </div>
-
-
-        <!-- Serial Number -->
-        <div class="form-group">
-
-          <label for="serialNo">
-            S.No.
-          </label>
-
-          <input
-            id="serialNo"
-            type="number"
-            formControlName="serialNo"
-            min="1" />
-
-          <small class="form-help">
-            Controls the global project order.
-          </small>
-
-          @if (
-            projectForm.controls.serialNo.touched &&
-            projectForm.controls.serialNo.invalid
-          ) {
-            <small class="error">
-              S.No. must be at least 1.
-            </small>
-          }
-
-        </div>
-
-
-        <!-- Status -->
-        <div class="form-group">
-
-          <label for="status">
-            Status
-          </label>
-
-          <select
-            id="status"
-            formControlName="status">
-
-            <option value="draft">
-              Draft
-            </option>
-
-            <option value="published">
-              Published
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- Description -->
-        <div class="form-group full-width">
-
-          <label for="description">
-            Description
-          </label>
-
-          <textarea
-            id="description"
-            rows="6"
-            formControlName="description"
-            placeholder="Enter project description">
-          </textarea>
-
-          @if (
-            projectForm.controls.description.touched &&
-            projectForm.controls.description.invalid
-          ) {
-            <small class="error">
-              Description is required.
-            </small>
-          }
-
-        </div>
-
-      </div>
+      </aside>
 
     </div>
 
 
-    <!-- Cover Image -->
-    <div class="form-section">
+    <!-- =========================================
+         ACTION BAR
+    ========================================== -->
 
-      <h2>Cover Image</h2>
+    <footer class="form-actions">
 
-      <div class="form-group">
+      <div class="action-info">
 
-        <label for="coverImage">
-          Project Cover
-        </label>
+        <span
+          class="action-status"
+          [class.active]="!projectForm.invalid"
+        ></span>
 
-        <input
-          id="coverImage"
-          type="file"
-          accept="image/*"
-          (change)="onFileSelected($event)" />
-
-        <small class="form-help">
-          Select an image for the project cover.
-        </small>
+        <span>
+          {{
+            projectForm.invalid
+              ? 'Complete required fields'
+              : 'Ready to save'
+          }}
+        </span>
 
       </div>
 
 
-      <!-- Image Preview -->
-      @if (imagePreview) {
+      <div class="action-buttons">
 
-        <div class="image-preview">
-
-          <img
-            [src]="imagePreview"
-            [alt]="
-              projectForm.controls.title.value ||
-              'Project cover preview'
-            " />
-
-        </div>
-
-      }
+        <button
+          type="button"
+          class="button-secondary"
+          (click)="cancel()"
+          [disabled]="saving"
+        >
+          Cancel
+        </button>
 
 
-      @if (
-        projectForm.controls.coverImage.touched &&
-        projectForm.controls.coverImage.invalid
-      ) {
-        <small class="error">
-          Cover image is required.
-        </small>
-      }
+        <button
+          type="submit"
+          class="button-primary"
+          [disabled]="saving || projectForm.invalid"
+        >
 
-    </div>
+          <span
+            class="button-loader"
+            *ngIf="saving"
+          ></span>
+
+          <span *ngIf="!saving">
+            {{ isEditMode ? 'Save Changes' : 'Add Project' }}
+          </span>
+
+          <span *ngIf="saving">
+            Saving...
+          </span>
+
+        </button>
+
+      </div>
+
+    </footer>
+
+  </form>
 
 
-    <!-- Actions -->
-    <div class="form-actions">
+  <!-- =========================================
+       S.NO CONFLICT MODAL
+  ========================================== -->
+
+  <div
+    class="modal-backdrop"
+    *ngIf="showOrderModal"
+    (click)="cancelOrderChange()"
+  >
+
+    <div
+      class="order-modal"
+      (click)="$event.stopPropagation()"
+    >
 
       <button
         type="button"
-        class="cancel-btn"
-        (click)="router.navigate(['/admin/projects'])">
-        Cancel
+        class="modal-close"
+        (click)="cancelOrderChange()"
+      >
+        ×
       </button>
 
-      <button
-        type="submit"
-        class="save-btn">
 
-        {{
-          isEditMode
-            ? 'Update Project'
-            : 'Save Project'
-        }}
+      <div class="modal-top">
 
-      </button>
+        <div class="modal-symbol">
+          ↕
+        </div>
+
+        <div>
+
+          <span class="modal-label">
+            PROJECT ORDER
+          </span>
+
+          <h2>
+            Change project position?
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <p class="modal-text">
+
+        S.No.
+        <strong>{{ requestedSerialNo }}</strong>
+        already belongs to
+        <strong>
+          "{{ conflictingProject?.title }}"
+        </strong>.
+
+      </p>
+
+
+      <div class="order-change">
+
+        <div class="change-item">
+
+          <span>
+            CURRENT
+          </span>
+
+          <strong>
+            {{ conflictingProject?.title }}
+          </strong>
+
+          <small>
+            S.No. {{ requestedSerialNo }}
+          </small>
+
+        </div>
+
+
+        <div class="change-arrow">
+          →
+        </div>
+
+
+        <div class="change-item new-position">
+
+          <span>
+            NEW PROJECT
+          </span>
+
+          <strong>
+            {{ projectForm.controls.title.value || 'New project' }}
+          </strong>
+
+          <small>
+            S.No. {{ requestedSerialNo }}
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-information">
+
+        <span>i</span>
+
+        <p>
+          The existing project and all projects after
+          this position will move down by one.
+          Their years will remain unchanged.
+        </p>
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="modal-cancel"
+          (click)="cancelOrderChange()"
+        >
+          Keep Current Order
+        </button>
+
+        <button
+          type="button"
+          class="modal-confirm"
+          (click)="confirmOrderChange()"
+        >
+          Change Order
+        </button>
+
+      </div>
 
     </div>
 
-  </form>
+  </div>
 
 </div>

@@ -48,7 +48,7 @@ export const routes: Routes = [
     path: 'admin/projects',
     loadComponent: () =>
       import('./admin/projects/project-list/project-list')
-        .then(m => m.ProjectList)
+        .then(m => m.ProjectListComponent)
   },
 
   {

@@ -12,11 +12,7 @@ export class ProjectService {
   private http = inject(HttpClient);
 
   private apiUrl =
-    'https://questionnaire-stood-gsm-object.trycloudflare.com/projects';
-
-  // =========================
-  // GET ALL PROJECTS
-  // =========================
+    'https://company-portfolio-api.onrender.com/projects';
 
   getProjects(): Observable<Project[]> {
     return this.http
@@ -31,10 +27,6 @@ export class ProjectService {
       );
   }
 
-  // =========================
-  // GET PROJECT BY ID
-  // =========================
-
   getProjectById(id: string): Observable<Project> {
     return this.http
       .get<any>(`${this.apiUrl}/${id}`)
@@ -46,14 +38,7 @@ export class ProjectService {
       );
   }
 
-  // =========================
-  // ADD PROJECT
-  // =========================
-
-  addProject(
-    project: Omit<Project, 'id'>
-  ): Observable<Project> {
-
+  addProject(project: Omit<Project, 'id'>): Observable<Project> {
     return this.http
       .post<any>(this.apiUrl, project)
       .pipe(
@@ -64,14 +49,7 @@ export class ProjectService {
       );
   }
 
-  // =========================
-  // UPDATE PROJECT
-  // =========================
-
-  updateProject(
-    project: Project
-  ): Observable<Project> {
-
+  updateProject(project: Project): Observable<Project> {
     return this.http
       .patch<any>(
         `${this.apiUrl}/${project.id}`,
@@ -92,10 +70,6 @@ export class ProjectService {
         }))
       );
   }
-
-  // =========================
-  // DELETE PROJECT
-  // =========================
 
   deleteProject(id: string): Observable<void> {
     return this.http.delete<void>(
