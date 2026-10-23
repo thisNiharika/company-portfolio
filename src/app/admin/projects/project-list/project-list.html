@@ -1,69 +1,407 @@
-<div class="project-list-page">
+<div class="projects-page">
 
-  <div class="page-header">
+  <!-- HEADER -->
+  <header class="projects-header">
 
     <div>
-      <h1>Manage Projects</h1>
-      <p>Manage your portfolio projects.</p>
+      <div class="breadcrumb">
+        ADMIN
+        <span>/</span>
+        PROJECTS
+      </div>
+
+      <h1>Projects</h1>
+
+      <p>
+        Manage your portfolio projects and published work.
+      </p>
     </div>
 
-    <a
-      routerLink="/admin/projects/new"
-      class="add-project-btn"
+    <button
+      type="button"
+      class="add-project"
+      (click)="addProject()"
     >
-      + Add Project
-    </a>
+      <span>+</span>
+      Add Project
+    </button>
 
+  </header>
+
+
+  <!-- STATS -->
+  <section class="stats">
+
+    <div class="stat">
+      <span class="stat-label">Total Projects</span>
+      <strong>{{ projects.length }}</strong>
+    </div>
+
+    <div class="stat">
+      <span class="stat-label">Published</span>
+      <strong>
+        {{ projects.filter(p => p.status === 'published').length }}
+      </strong>
+    </div>
+
+    <div class="stat">
+      <span class="stat-label">Drafts</span>
+      <strong>
+        {{ projects.filter(p => p.status === 'draft').length }}
+      </strong>
+    </div>
+
+  </section>
+
+
+  <!-- LOADING -->
+  <div
+    class="loading"
+    *ngIf="loading"
+  >
+    <span class="spinner"></span>
+    Loading projects...
   </div>
 
 
-  <div class="project-list">
+  <!-- ERROR -->
+  <div
+    class="error"
+    *ngIf="error && !loading"
+  >
+    <strong>Unable to load projects</strong>
+    <span>{{ error }}</span>
 
-    @for (project of projects; track project.id) {
+    <button
+      type="button"
+      (click)="loadProjects()"
+    >
+      Retry
+    </button>
+  </div>
 
-      <div class="project-row">
+
+  <!-- PROJECTS -->
+  <section
+    class="project-section"
+    *ngIf="!loading && !error"
+  >
+
+    <div class="section-header">
+
+      <div>
+        <span class="section-label">
+          PORTFOLIO
+        </span>
+
+        <h2>
+          All Projects
+        </h2>
+      </div>
+
+      <span class="count">
+        {{ projects.length }}
+        {{ projects.length === 1 ? 'project' : 'projects' }}
+      </span>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="project-table">
+
+      <!-- TABLE HEADER -->
+      <div class="table-head">
+
+        <span class="project-column">
+          PROJECT
+        </span>
+
+        <span>
+          YEAR
+        </span>
+
+        <span>
+          STATUS
+        </span>
+
+        <span class="action-column">
+          ACTIONS
+        </span>
+
+      </div>
+
+
+      <!-- PROJECT ROW -->
+      <div
+        class="project-row"
+        *ngFor="let project of projects"
+      >
+
+        <!-- PROJECT -->
 
         <div class="project-info">
 
-          <div class="project-serial">
-            {{ project.serialNo }}
+          <div class="project-number">
+            {{ project.serialNo | number:'2.0' }}
           </div>
 
-          <div class="project-details">
+          <div class="project-image">
 
-            <h3>{{ project.title }}</h3>
+            <img
+              [src]="project.coverImage"
+              [alt]="project.title"
+            />
 
-            <div class="project-meta">
-              <span>{{ project.year }}</span>
-              <span>—</span>
-              <span>{{ project.status }}</span>
-            </div>
+          </div>
+
+          <div class="project-text">
+
+            <h3>
+              {{ project.title }}
+            </h3>
+
+            <p>
+              {{ project.description }}
+            </p>
+
+            <span>
+              /{{ project.slug }}
+            </span>
 
           </div>
 
         </div>
 
 
-        <div class="project-actions">
-          <a [routerLink]="['/admin/projects', project.id, 'edit']">
-            Edit
-          </a>
+        <!-- YEAR -->
 
-          <a [routerLink]="['/admin/projects', project.id, 'builder']">
-            Add Details
-          </a>
+        <div class="project-year">
+          {{ project.year }}
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div>
+
+          <span
+            class="status"
+            [class.published]="project.status === 'published'"
+            [class.draft]="project.status === 'draft'"
+          >
+
+            <span></span>
+
+            {{ project.status }}
+
+          </span>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="actions">
 
           <button
             type="button"
-            (click)="deleteProject(project)"
-            class="delete-btn">
-            Delete
+            class="action-button"
+            (click)="toggleMenu(project.id)"
+            [attr.aria-expanded]="openMenuId === project.id"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
+
+
+          <!-- DROPDOWN -->
+
+          <div
+            class="action-menu"
+            *ngIf="openMenuId === project.id"
+          >
+
+            <button
+              type="button"
+              (click)="viewProject(project)"
+            >
+
+              View project
+            </button>
+
+            <button
+              type="button"
+              (click)="editProject(project)"
+            >
+             
+              Edit project
+            </button>
+
+            <button
+              type="button"
+              (click)="duplicateProject(project)"
+            >
+             
+              Duplicate
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <button
+              type="button"
+              class="danger-action"
+              (click)="openDeleteModal(project)"
+            >
+            
+              Delete
+            </button>
+
+          </div>
+
         </div>
 
       </div>
 
-    }
+
+      <!-- EMPTY -->
+      <div
+        class="empty"
+        *ngIf="!projects.length"
+      >
+
+        <div class="empty-icon">
+          +
+        </div>
+
+        <h3>
+          No projects yet
+        </h3>
+
+        <p>
+          Add your first project to start building your portfolio.
+        </p>
+
+        <button
+          type="button"
+          (click)="addProject()"
+        >
+          Add Project
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- DELETE MODAL -->
+
+  <div
+    class="modal-backdrop"
+    *ngIf="deleteModalOpen"
+    (click)="closeDeleteModal()"
+  >
+
+    <div
+      class="delete-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <button
+        type="button"
+        class="modal-close"
+        (click)="closeDeleteModal()"
+      >
+        ×
+      </button>
+
+
+      <div class="modal-icon">
+        !
+      </div>
+
+
+      <span class="modal-eyebrow">
+        DELETE PROJECT
+      </span>
+
+
+      <h2>
+        {{ selectedProject?.title }}
+      </h2>
+
+
+      <p class="modal-description">
+        Choose what you want to do with this project.
+      </p>
+
+
+      <div class="delete-options">
+
+        <!-- ARCHIVE -->
+
+        <button
+          type="button"
+          class="delete-option archive"
+          (click)="archiveProject()"
+        >
+
+          <div>
+            <strong>
+              Archive Project
+            </strong>
+
+            <span>
+              Remove it from the active portfolio.
+            </span>
+          </div>
+
+          <span class="option-arrow">
+            →
+          </span>
+
+        </button>
+
+
+        <!-- PERMANENT -->
+
+        <button
+          type="button"
+          class="delete-option permanent"
+          (click)="permanentDeleteProject()"
+        >
+
+          <div>
+            <strong>
+              Delete Permanently
+            </strong>
+
+            <span>
+              This action cannot be undone.
+            </span>
+          </div>
+
+          <span class="option-arrow">
+            →
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="cancel-button"
+        (click)="closeDeleteModal()"
+      >
+        Cancel
+      </button>
+
+    </div>
 
   </div>
 

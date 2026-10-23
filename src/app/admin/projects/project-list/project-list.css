@@ -1,0 +1,1038 @@
+:host {
+  display: block;
+}
+
+.projects-page {
+  min-height: 100vh;
+
+  padding: 34px 48px 60px;
+
+  background: #f6f6f4;
+
+  color: #222;
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.projects-header {
+  max-width: 1400px;
+
+  margin: 0 auto 32px;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+}
+
+.breadcrumb {
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 9px;
+
+  color: #858585;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .13em;
+}
+
+.breadcrumb span {
+  color: #b3b3b0;
+}
+
+.projects-header h1 {
+  margin: 0;
+
+  font-size: 36px;
+
+  line-height: 1;
+
+  font-weight: 600;
+
+  letter-spacing: -.045em;
+}
+
+.projects-header p {
+  margin: 9px 0 0;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+
+/* =====================================
+   ADD
+===================================== */
+
+.add-project {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 15px;
+
+  border: 1px solid #242424;
+
+  border-radius: 3px;
+
+  background: #242424;
+
+  color: #fff;
+
+  font: inherit;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+.add-project:hover {
+  background: #6f3038;
+
+  border-color: #6f3038;
+}
+
+.add-project span {
+  font-size: 15px;
+
+  font-weight: 300;
+}
+
+
+/* =====================================
+   STATS
+===================================== */
+
+.stats {
+  max-width: 1400px;
+
+  margin: 0 auto 40px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  border-top: 1px solid #d7d7d4;
+
+  border-bottom: 1px solid #d7d7d4;
+}
+
+.stat {
+  min-height: 68px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 14px 22px;
+
+  border-right: 1px solid #dededb;
+}
+
+.stat:last-child {
+  border-right: 0;
+}
+
+.stat-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #777;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: .1em;
+}
+
+.stat strong {
+  font-size: 22px;
+
+  font-weight: 500;
+
+  line-height: 1;
+}
+
+
+/* =====================================
+   SECTION
+===================================== */
+
+.project-section {
+  max-width: 1400px;
+
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  margin-bottom: 13px;
+}
+
+.section-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #888;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .13em;
+}
+
+.section-header h2 {
+  margin: 0;
+
+  font-size: 21px;
+
+  font-weight: 600;
+
+  letter-spacing: -.025em;
+}
+
+.count {
+  color: #777;
+
+  font-size: 10px;
+}
+
+
+/* =====================================
+   TABLE
+===================================== */
+
+.project-table {
+  border: 1px solid #d9d9d6;
+
+  background: #fff;
+}
+
+.table-head,
+.project-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(420px, 1fr)
+    100px
+    140px
+    100px;
+
+  align-items: center;
+}
+
+.table-head {
+  min-height: 36px;
+
+  padding: 0 18px;
+
+  background: #f1f1ef;
+
+  border-bottom: 1px solid #dcdcd9;
+
+  color: #777;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .1em;
+}
+
+.action-column {
+  text-align: right;
+}
+
+
+/* =====================================
+   ROW
+===================================== */
+
+.project-row {
+  position: relative;
+
+  min-height: 96px;
+
+  padding: 10px 18px;
+
+  border-bottom: 1px solid #e8e8e5;
+
+  transition: background .15s ease;
+}
+
+.project-row:last-child {
+  border-bottom: 0;
+}
+
+.project-row:hover {
+  background: #fafaf8;
+}
+
+
+/* =====================================
+   PROJECT
+===================================== */
+
+.project-info {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.project-number {
+  width: 27px;
+
+  flex: 0 0 27px;
+
+  color: #999;
+
+  font-family: monospace;
+
+  font-size: 9px;
+}
+
+.project-image {
+  width: 92px;
+
+  height: 62px;
+
+  flex: 0 0 92px;
+
+  overflow: hidden;
+
+  background: #e8e8e5;
+}
+
+.project-image img {
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  transition: transform .35s ease;
+}
+
+.project-row:hover .project-image img {
+  transform: scale(1.04);
+}
+
+.project-text {
+  min-width: 0;
+}
+
+.project-text h3 {
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  font-size: 14px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.project-text p {
+  max-width: 520px;
+
+  margin: 0 0 4px;
+
+  overflow: hidden;
+
+  color: #777;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.project-text > span {
+  color: #a1a19d;
+
+  font-family: monospace;
+
+  font-size: 8px;
+}
+
+
+/* =====================================
+   YEAR
+===================================== */
+
+.project-year {
+  font-size: 11px;
+
+  color: #555;
+}
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+.status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 5px 8px;
+
+  border: 1px solid #dededb;
+
+  border-radius: 3px;
+
+  background: #fafaf9;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .07em;
+
+  text-transform: uppercase;
+}
+
+.status > span {
+  width: 5px;
+
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #999;
+}
+
+.status.published {
+  color: #55745d;
+}
+
+.status.published > span {
+  background: #55745d;
+}
+
+.status.draft {
+  color: #967440;
+}
+
+.status.draft > span {
+  background: #967440;
+}
+
+
+/* =====================================
+   ACTION BUTTON
+===================================== */
+
+.actions {
+  position: relative;
+
+  display: flex;
+
+  justify-content: flex-end;
+}
+
+.action-button {
+  width: 31px;
+
+  height: 31px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  border: 1px solid #d8d8d5;
+
+  border-radius: 3px;
+
+  background: #fff;
+
+  cursor: pointer;
+
+  transition: .15s ease;
+}
+
+.action-button:hover {
+  border-color: #222;
+
+  background: #222;
+}
+
+.action-button span {
+  width: 3px;
+
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: #555;
+}
+
+.action-button:hover span {
+  background: #fff;
+}
+
+
+/* =====================================
+   ACTION MENU
+===================================== */
+
+.action-menu {
+  position: absolute;
+
+  z-index: 20;
+
+  top: 38px;
+
+  right: 0;
+
+  width: 180px;
+
+  padding: 5px;
+
+  border: 1px solid #d9d9d6;
+
+  background: #fff;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.10);
+}
+
+.action-menu button {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 9px 10px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #333;
+
+  text-align: left;
+
+  font: inherit;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+.action-menu button:hover {
+  background: #f3f3f1;
+}
+
+.action-menu button > span {
+  width: 17px;
+
+  color: #888;
+
+  text-align: center;
+}
+
+.menu-divider {
+  height: 1px;
+
+  margin: 4px 0;
+
+  background: #e5e5e2;
+}
+
+.action-menu .danger-action {
+  color: #8a343c;
+}
+
+.action-menu .danger-action:hover {
+  background: #faf1f2;
+}
+
+
+/* =====================================
+   DELETE MODAL
+===================================== */
+
+.modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(20,20,20,.45);
+
+  backdrop-filter: blur(3px);
+}
+
+.delete-modal {
+  position: relative;
+
+  width: 100%;
+
+  max-width: 470px;
+
+  padding: 34px;
+
+  background: #fff;
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.18);
+}
+
+.modal-close {
+  position: absolute;
+
+  top: 16px;
+
+  right: 16px;
+
+  width: 28px;
+
+  height: 28px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #777;
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+.modal-icon {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  background: #f7e9ea;
+
+  color: #7a3038;
+
+  font-size: 14px;
+
+  font-weight: 700;
+}
+
+.modal-eyebrow {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #888;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .14em;
+}
+
+.delete-modal h2 {
+  margin: 0;
+
+  font-size: 22px;
+
+  font-weight: 600;
+
+  letter-spacing: -.025em;
+}
+
+.modal-description {
+  margin: 8px 0 22px;
+
+  color: #777;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+/* =====================================
+   DELETE OPTIONS
+===================================== */
+
+.delete-options {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.delete-option {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 13px;
+
+  border: 1px solid #dededb;
+
+  background: #fff;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .15s ease;
+}
+
+.delete-option strong,
+.delete-option span {
+  display: block;
+}
+
+.delete-option strong {
+  margin-bottom: 3px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.delete-option span {
+  color: #888;
+
+  font-size: 9px;
+}
+
+.option-arrow {
+  color: #999;
+
+  font-size: 15px !important;
+}
+
+.delete-option.archive:hover {
+  border-color: #777;
+
+  background: #f8f8f6;
+}
+
+.delete-option.permanent:hover {
+  border-color: #8a343c;
+
+  background: #fcf5f5;
+}
+
+.delete-option.permanent strong {
+  color: #8a343c;
+}
+
+.cancel-button {
+  width: 100%;
+
+  margin-top: 14px;
+
+  padding: 10px;
+
+  border: 1px solid #d8d8d5;
+
+  background: #fff;
+
+  color: #555;
+
+  font: inherit;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background: #f4f4f2;
+}
+
+
+/* =====================================
+   LOADING
+===================================== */
+
+.loading {
+  min-height: 220px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  color: #777;
+
+  font-size: 11px;
+}
+
+.spinner {
+  width: 14px;
+
+  height: 14px;
+
+  border: 2px solid #ddd;
+
+  border-top-color: #6f3038;
+
+  border-radius: 50%;
+
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =====================================
+   ERROR
+===================================== */
+
+.error {
+  padding: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border: 1px solid #ddd;
+
+  background: #fff;
+}
+
+.error strong {
+  display: block;
+
+  font-size: 11px;
+}
+
+.error span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #777;
+
+  font-size: 10px;
+}
+
+.error button {
+  margin-left: auto;
+
+  padding: 7px 12px;
+
+  border: 1px solid #222;
+
+  background: #222;
+
+  color: #fff;
+
+  font: inherit;
+
+  font-size: 9px;
+
+  cursor: pointer;
+}
+
+
+/* =====================================
+   EMPTY
+===================================== */
+
+.empty {
+  padding: 70px 20px;
+
+  text-align: center;
+}
+
+.empty-icon {
+  margin: 0 auto 12px;
+
+  font-size: 25px;
+
+  color: #777;
+}
+
+.empty h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  font-weight: 500;
+}
+
+.empty p {
+  margin: 7px 0 18px;
+
+  color: #777;
+
+  font-size: 10px;
+}
+
+.empty button {
+  padding: 9px 14px;
+
+  border: 0;
+
+  background: #222;
+
+  color: #fff;
+
+  font: inherit;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 800px) {
+
+  .projects-page {
+    padding: 25px 18px 50px;
+  }
+
+  .projects-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .add-project {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat {
+    border-right: 0;
+
+    border-bottom: 1px solid #dededb;
+  }
+
+  .stat:last-child {
+    border-bottom: 0;
+  }
+
+  .table-head {
+    display: none;
+  }
+
+  .project-row {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+
+    padding: 16px;
+  }
+
+  .project-year,
+  .status {
+    margin-left: 39px;
+  }
+
+  .actions {
+    justify-content: flex-start;
+
+    margin-left: 39px;
+  }
+
+}

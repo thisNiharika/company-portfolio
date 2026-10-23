@@ -11,87 +11,67 @@ export class ProjectService {
 
   private http = inject(HttpClient);
 
-  private readonly apiUrl =
-    'http://localhost:3000/projects';
+  private apiUrl =
+    'https://company-portfolio-api.onrender.com/projects';
 
+  getProjects(): Observable<Project[]> {
+    return this.http
+      .get<any[]>(this.apiUrl)
+      .pipe(
+        map(projects =>
+          projects.map(project => ({
+            ...project,
+            id: project._id
+          }))
+        )
+      );
+  }
 
-  // =========================
-  // GET ALL PROJECTS
-  // =========================
-
-getProjects(): Observable<Project[]> {
-  return this.http
-    .get<any[]>(this.apiUrl)
-    .pipe(
-      map(projects =>
-        projects.map(project => ({
+  getProjectById(id: string): Observable<Project> {
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(project => ({
           ...project,
           id: project._id
         }))
+      );
+  }
+
+  addProject(project: Omit<Project, 'id'>): Observable<Project> {
+    return this.http
+      .post<any>(this.apiUrl, project)
+      .pipe(
+        map(createdProject => ({
+          ...createdProject,
+          id: createdProject._id
+        }))
+      );
+  }
+
+  updateProject(project: Project): Observable<Project> {
+    return this.http
+      .patch<any>(
+        `${this.apiUrl}/${project.id}`,
+        {
+          year: project.year,
+          serialNo: project.serialNo,
+          title: project.title,
+          description: project.description,
+          coverImage: project.coverImage,
+          slug: project.slug,
+          status: project.status
+        }
       )
-    );
-}
-
-
-  // =========================
-  // GET PROJECT
-  // =========================
-
-  getProjectById(
-    id: string
-  ): Observable<Project> {
-    return this.http.get<Project>(
-      `${this.apiUrl}/${id}`
-    );
+      .pipe(
+        map(updatedProject => ({
+          ...updatedProject,
+          id: updatedProject._id
+        }))
+      );
   }
 
-
-  // =========================
-  // ADD PROJECT
-  // =========================
-
-  addProject(
-    project: Omit<Project, 'id'>
-  ): Observable<Project> {
-
-    return this.http.post<Project>(
-      this.apiUrl,
-      project
-    );
-  }
-
-
-  // =========================
-  // UPDATE PROJECT
-  // =========================
-
-  updateProject(
-    project: Project
-  ): Observable<Project> {
-
-    return this.http.patch<Project>(
-      `${this.apiUrl}/${project.id}`,
-      {
-        year: project.year,
-        serialNo: project.serialNo,
-        title: project.title,
-        description: project.description,
-        coverImage: project.coverImage,
-        slug: project.slug,
-        status: project.status
-      }
-    );
-  }
-
-
-  // =========================
-  // DELETE PROJECT
-  // =========================
-
-  deleteProject(
-    id: string
-  ): Observable<void> {
-
+  deleteProject(id: string): Observable<void> {
     return this.http.delete<void>(
       `${this.apiUrl}/${id}`
     );
