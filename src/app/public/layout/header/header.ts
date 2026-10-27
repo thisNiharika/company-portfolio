@@ -53,20 +53,35 @@ export class Header {
   @ViewChild('activeDots')
   activeDots!: ElementRef<SVGPathElement>;
 
-  private filterTimeline!: gsap.core.Timeline;
+  private filterTimeline?: gsap.core.Timeline;
+
   toggleFilter(event: MouseEvent): void {
     event.stopPropagation();
+
+    if (!this.filterTimeline) {
+      console.warn(
+        'Filter timeline is not initialized. Check the filter SVG references in header.html.'
+      );
+      return;
+    }
+
     this.isFilterOpen = !this.isFilterOpen;
+
     if (this.isFilterOpen) {
       this.filterTimeline.play();
     } else {
       this.filterTimeline.reverse();
     }
   }
+
   @HostListener('document:click')
   closeFilterOutside(): void {
+    if (!this.isFilterOpen) {
+      return;
+    }
+
     this.isFilterOpen = false;
-    this.filterTimeline.reverse();
+    this.filterTimeline?.reverse();
   }
   // ================================ Filter Btn
   // ================================ Left Side
@@ -359,8 +374,25 @@ resetLocations(): void {
   // ================================== Scroll Top
   ngAfterViewInit(): void {
     this.initScrollTopButton();
+
     // ================================ Filter Btn
-    gsap.set(this.activeDots.nativeElement, {
+    const filterShape = this.filterShape?.nativeElement;
+    const filterBarsTarget = this.filterBarsTarget?.nativeElement;
+    const activeDots = this.activeDots?.nativeElement;
+
+    if (!filterShape || !filterBarsTarget || !activeDots) {
+      console.warn(
+        'Filter animation skipped: one or more SVG elements are missing from header.html.',
+        {
+          filterShape: !!filterShape,
+          filterBarsTarget: !!filterBarsTarget,
+          activeDots: !!activeDots
+        }
+      );
+      return;
+    }
+
+    gsap.set(activeDots, {
       opacity: 0,
       scale: 0.4,
       transformOrigin: 'center center'
@@ -371,13 +403,13 @@ resetLocations(): void {
     });
 
     this.filterTimeline
-      .to(this.filterShape.nativeElement, {
+      .to(filterShape, {
         duration: 0.65,
-        morphSVG: this.filterBarsTarget.nativeElement,
+        morphSVG: filterBarsTarget,
         ease: 'power2.inOut'
       })
       .to(
-        this.activeDots.nativeElement,
+        activeDots,
         {
           opacity: 1,
           scale: 1,

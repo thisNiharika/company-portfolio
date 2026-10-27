@@ -18,15 +18,10 @@ import {
   ActivatedRoute
 } from '@angular/router';
 
-import {
-  concatMap,
-  from,
-  of
-} from 'rxjs';
+import { finalize } from 'rxjs';
 
 import { ProjectService } from '../../../core/services/project';
 import { Project } from '../../../core/models/project';
-
 
 @Component({
   selector: 'app-project-form',
@@ -40,45 +35,37 @@ import { Project } from '../../../core/models/project';
 })
 export class ProjectForm implements OnInit {
 
-  private fb = inject(FormBuilder);
-  private projectService = inject(ProjectService);
-  private route = inject(ActivatedRoute);
-  private cdr = inject(ChangeDetectorRef);
-  router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly projectService = inject(ProjectService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  readonly router = inject(Router);
 
   imagePreview = '';
   slugManuallyEdited = false;
   loadingProjects = false;
   isEditMode = false;
   projectId = '';
-
   saving = false;
 
   successMessage = '';
   errorMessage = '';
 
-  /*
-   * S.No. conflict modal
-   */
+  // Retained for compatibility with the existing HTML template.
   showOrderModal = false;
-
   conflictingProject: Project | null = null;
   requestedSerialNo = 0;
 
-  /*
-   * Existing projects
-   */
   projects: Project[] = [];
 
-
-  /*
-   * FORM
-   */
   projectForm = this.fb.group({
-
     year: [
       new Date().getFullYear(),
-      Validators.required
+      [
+        Validators.required,
+        Validators.min(1)
+      ]
     ],
 
     serialNo: [
@@ -113,1555 +100,411 @@ export class ProjectForm implements OnInit {
       'draft' as 'draft' | 'published',
       Validators.required
     ]
-
   });
 
+  ngOnInit(): void {
+    this.projectId =
+      this.route.snapshot.paramMap.get('id') || '';
 
-  // =====================================================
-  // INIT
-  // =====================================================
+    this.isEditMode = !!this.projectId;
 
-    ngOnInit(): void {
-
-      this.projectId =
-        this.route.snapshot.paramMap.get('id') || '';
-
-      if (this.projectId) {
-
-        this.isEditMode = true;
-
-        this.loadProject();
-
-        return;
-      }
-
-      // ADD MODE
-      this.loadingProjects = true;
-
+    if (this.isEditMode) {
+      this.loadProject();
+    } else {
       this.loadProjectsForAdd();
     }
+  }
 
-  // =====================================================
+  // --------------------------------------------------
   // LOAD PROJECT FOR EDIT
-  // =====================================================
+  // --------------------------------------------------
 
   private loadProject(): void {
+    this.loadingProjects = true;
+    this.clearMessages();
 
     this.projectService
       .getProjectById(this.projectId)
+      .pipe(
+        finalize(() => {
+          this.loadingProjects = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
-
         next: (project) => {
-
           this.projectForm.patchValue({
-
-            year: project.year,
-
-            serialNo: project.serialNo,
-
+            year: Number(project.year),
+            serialNo: Number(project.serialNo),
             title: project.title,
-
-            description:
-              project.description,
-
-            coverImage:
-              project.coverImage,
-
-            slug:
-              project.slug,
-
-            status:
-              project.status
-
+            description: project.description,
+            coverImage: project.coverImage,
+            slug: project.slug,
+            status: project.status
           });
 
-          this.imagePreview =
-            project.coverImage;
-
+          this.imagePreview = project.coverImage || '';
           this.slugManuallyEdited = true;
         },
 
         error: (error) => {
-
-          console.error(
-            'Failed to load project:',
-            error
-          );
+          console.error('Failed to load project:', error);
 
           this.errorMessage =
-            'Failed to load project.';
-
+            error?.error?.message ||
+            'Failed to load project. Please try again.';
         }
-
       });
-
   }
 
+  // --------------------------------------------------
+  // LOAD PROJECTS FOR ADD
+  // --------------------------------------------------
 
- private loadProjectsForAdd(): void {
+  private loadProjectsForAdd(): void {
+    this.loadingProjects = true;
 
-  this.loadingProjects = true;
+    this.projectService
+      .getProjects()
+      .pipe(
+        finalize(() => {
+          this.loadingProjects = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (projects) => {
+          this.projects = [...projects];
 
-  this.projectService
-    .getProjects()
-    .subscribe({
+          const nextSerialNo = this.getNextSerialNo();
 
-      next: (projects) => {
+          this.projectForm.patchValue({
+            serialNo: nextSerialNo
+          });
+        },
 
-        console.log(
-          'PROJECTS FOR ADD:',
-          projects
-        );
+        error: (error) => {
+          console.error('Failed to load projects:', error);
 
-        this.projects = [...projects];
+          this.errorMessage =
+            'Could not load existing projects. You can retry by reopening the form.';
+        }
+      });
+  }
 
-        console.table(
-          this.projects.map(project => ({
-            title: project.title,
-            serialNo: project.serialNo,
-            year: project.year
-          }))
-        );
-
-        const nextSerialNo =
-          this.projects.length > 0
-            ? Math.max(
-                ...this.projects.map(
-                  project =>
-                    Number(project.serialNo) || 0
-                )
-              ) + 1
-            : 1;
-
-        console.log(
-          'NEXT S.NO:',
-          nextSerialNo
-        );
-
-        this.projectForm.patchValue({
-          serialNo: nextSerialNo
-        });
-
-        this.loadingProjects = false;
-
-        // Force the UI to update
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to load projects:',
-          error
-        );
-
-        this.loadingProjects = false;
-
-        this.errorMessage =
-          'Failed to load existing projects.';
-
-        this.cdr.detectChanges();
-      }
-
-    });
-}
-
-  // =====================================================
-  // NEXT S.NO.
-  // =====================================================
+  // --------------------------------------------------
+  // NEXT SERIAL NUMBER
+  // --------------------------------------------------
 
   private getNextSerialNo(): number {
-
     if (!this.projects.length) {
       return 1;
     }
 
-    const serialNumbers =
-      this.projects.map(
-        project =>
-          Number(project.serialNo) || 0
-      );
+    const serialNumbers = this.projects
+      .map(project => Number(project.serialNo))
+      .filter(serialNo => Number.isFinite(serialNo) && serialNo > 0);
 
-    return Math.max(
-      ...serialNumbers
-    ) + 1;
+    if (!serialNumbers.length) {
+      return 1;
+    }
 
+    return Math.max(...serialNumbers) + 1;
   }
 
-
-  // =====================================================
-  // FILE UPLOAD
-  // =====================================================
+  // --------------------------------------------------
+  // IMAGE UPLOAD
+  // --------------------------------------------------
 
   onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    const input =
-      event.target as HTMLInputElement;
-
-
-    if (
-      !input.files ||
-      input.files.length === 0
-    ) {
+    if (!file) {
       return;
     }
 
-
-    const file =
-      input.files[0];
-
-
-    if (
-      !file.type.startsWith('image/')
-    ) {
-
-      this.errorMessage =
-        'Please select an image file.';
-
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please select a valid image file.';
+      input.value = '';
       return;
     }
 
+    this.clearMessages();
 
-    const reader =
-      new FileReader();
-
+    const reader = new FileReader();
 
     reader.onload = () => {
+      const imageData = reader.result as string;
 
-      const imageData =
-        reader.result as string;
+      this.imagePreview = imageData;
 
-      this.imagePreview =
-        imageData;
+      this.projectForm.controls.coverImage.setValue(imageData);
+      this.projectForm.controls.coverImage.markAsTouched();
+      this.projectForm.controls.coverImage.updateValueAndValidity();
 
-      this.projectForm.patchValue({
-
-        coverImage:
-          imageData
-
-      });
-
-      this.projectForm.controls
-        .coverImage
-        .markAsTouched();
-
+      this.cdr.detectChanges();
     };
 
+    reader.onerror = () => {
+      this.errorMessage = 'Failed to read the selected image.';
+      this.cdr.detectChanges();
+    };
 
     reader.readAsDataURL(file);
-
   }
 
-
-  // =====================================================
+  // --------------------------------------------------
   // SLUG
-  // =====================================================
+  // --------------------------------------------------
 
   generateSlug(): void {
-
     if (this.slugManuallyEdited) {
       return;
     }
 
-    const title =
-      this.projectForm.controls
-        .title.value;
+    const title = this.projectForm.controls.title.value || '';
 
-    if (!title) {
-      return;
-    }
+    const slug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
 
-    const slug =
-      title
-        .toLowerCase()
-        .trim()
-        .replace(
-          /[^a-z0-9\s-]/g,
-          ''
-        )
-        .replace(
-          /\s+/g,
-          '-'
-        )
-        .replace(
-          /-+/g,
-          '-'
-        );
-
-    this.projectForm.controls
-      .slug
-      .setValue(slug);
-
+    this.projectForm.controls.slug.setValue(slug);
   }
-
 
   onSlugEdit(): void {
-
     this.slugManuallyEdited = true;
-
   }
 
-
-  // =====================================================
+  // --------------------------------------------------
   // SAVE PROJECT
-  // =====================================================
+  // --------------------------------------------------
 
   saveProject(): void {
+    console.log('SAVE BUTTON CLICKED');
 
-    /*
-     * Prevent double submission
-     */
     if (this.saving) {
+      console.warn('Save blocked: request already in progress.');
       return;
     }
 
-
-    /*
-     * Validate form
-     */
     if (this.projectForm.invalid) {
-
       this.projectForm.markAllAsTouched();
 
       this.errorMessage =
-        'Please complete all required fields.';
+        'Please complete all required fields before saving.';
+
+      console.error('Form validation failed:', {
+        values: this.projectForm.getRawValue(),
+        invalidFields: Object.keys(this.projectForm.controls)
+          .filter(
+            key =>
+              this.projectForm.controls[
+                key as keyof typeof this.projectForm.controls
+              ].invalid
+          )
+      });
 
       return;
     }
 
+    const formValue = this.projectForm.getRawValue();
+    const serialNo = Number(formValue.serialNo);
+    const year = Number(formValue.year);
+
+    if (
+      !Number.isInteger(serialNo) ||
+      serialNo < 1
+    ) {
+      this.projectForm.controls.serialNo.setErrors({
+        invalidSerialNo: true
+      });
+
+      this.errorMessage = 'S.No. must be a positive whole number.';
+      return;
+    }
+
+    if (!Number.isInteger(year) || year < 1) {
+      this.errorMessage = 'Please enter a valid year.';
+      return;
+    }
+
+    const projectData: Omit<Project, 'id'> = {
+      year,
+      serialNo,
+      title: (formValue.title || '').trim(),
+      description: (formValue.description || '').trim(),
+      coverImage: formValue.coverImage || '',
+      slug: (formValue.slug || '').trim(),
+      status: formValue.status || 'draft'
+    };
 
     this.clearMessages();
+    this.showOrderModal = false;
+    this.conflictingProject = null;
+    this.saving = true;
 
-
-    const formValue =
-      this.projectForm.getRawValue();
-
-
-    const newSerialNo =
-      Number(formValue.serialNo);
-
-
-    // ===================================================
-    // ADD
-    // ===================================================
-
-    if (!this.isEditMode) {
-
-      const newProject:
-        Omit<Project, 'id'> = {
-
-        year:
-          Number(formValue.year),
-
-        serialNo:
-          newSerialNo,
-
-        title:
-          formValue.title!.trim(),
-
-        description:
-          formValue.description!.trim(),
-
-        coverImage:
-          formValue.coverImage!,
-
-        slug:
-          formValue.slug!.trim(),
-
-        status:
-          formValue.status!
-
-      };
-
-
-      /*
-       * Refresh project list before checking
-       * S.No. so we always use the latest data.
-       */
-      this.projectService
-        .getProjects()
-        .subscribe({
-
-          next: (projects) => {
-
-            this.projects =
-              [...projects];
-
-
-            const conflictingProject =
-              this.projects.find(
-                project =>
-                  Number(project.serialNo) ===
-                  newSerialNo
-              );
-
-
-            /*
-             * S.No. is already being used.
-             */
-            if (conflictingProject) {
-
-              this.requestedSerialNo =
-                newSerialNo;
-
-              this.conflictingProject =
-                conflictingProject;
-
-              this.showOrderModal =
-                true;
-
-              return;
-            }
-
-
-            /*
-             * No conflict.
-             * Create normally.
-             */
-            this.createProject(
-              newProject
-            );
-
-          },
-
-          error: (error) => {
-
-            console.error(
-              'Failed to check S.No.:',
-              error
-            );
-
-            this.errorMessage =
-              'Failed to check project order.';
-
-          }
-
-        });
-
-      return;
+    if (this.isEditMode) {
+      this.updateProject(projectData);
+    } else {
+      this.createProject(projectData);
     }
-
-
-    // ===================================================
-    // EDIT
-    // ===================================================
-
-    this.updateExistingProject(
-      formValue
-    );
-
   }
 
-
-  // =====================================================
-  // CREATE PROJECT
-  // =====================================================
+  // --------------------------------------------------
+  // ADD PROJECT
+  // --------------------------------------------------
 
   private createProject(
-    newProject: Omit<Project, 'id'>
+    projectData: Omit<Project, 'id'>
   ): void {
-
-    this.saving = true;
-
-    this.clearMessages();
-
-
     this.projectService
-      .addProject(newProject)
-      .subscribe({
-
-        next: (createdProject) => {
-
-          console.log(
-            'PROJECT CREATED SUCCESSFULLY:',
-            createdProject
-          );
-
-
-          /*
-           * IMPORTANT:
-           * The API successfully created the project.
-           *
-           * Show success instead of an alert.
-           */
+      .addProject(projectData)
+      .pipe(
+        finalize(() => {
           this.saving = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (createdProject) => {
+          console.log('PROJECT CREATED SUCCESSFULLY:', createdProject);
 
-          this.successMessage =
-            'Project added successfully.';
+          this.successMessage = 'Project added successfully.';
 
-
-          /*
-           * Redirect after showing success.
-           */
           setTimeout(() => {
-
-            this.router.navigate([
-              '/admin/projects'
-            ]);
-
+            this.router.navigate(['/admin/projects']);
           }, 700);
-
         },
 
         error: (error) => {
-
-          console.error(
-            'Failed to create project:',
-            error
-          );
-
-          this.saving = false;
+          console.error('Failed to create project:', error);
 
           this.errorMessage =
-            error?.error?.message ||
-            'Failed to create project.';
-
+            this.getErrorMessage(error, 'Failed to add project.');
         }
-
       });
-
   }
 
+  // --------------------------------------------------
+  // EDIT PROJECT
+  // --------------------------------------------------
 
-  // =====================================================
-  // CONFIRM S.NO. CHANGE
-  // =====================================================
+  private updateProject(
+    projectData: Omit<Project, 'id'>
+  ): void {
+    const updatedProject: Project = {
+      ...projectData,
+      id: this.projectId
+    };
+
+    this.projectService
+      .updateProject(updatedProject)
+      .pipe(
+        finalize(() => {
+          this.saving = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (savedProject) => {
+          console.log('PROJECT UPDATED SUCCESSFULLY:', savedProject);
+
+          this.successMessage = 'Project updated successfully.';
+
+          setTimeout(() => {
+            this.router.navigate(['/admin/projects']);
+          }, 700);
+        },
+
+        error: (error) => {
+          console.error('Failed to update project:', error);
+
+          this.errorMessage =
+            this.getErrorMessage(error, 'Failed to update project.');
+        }
+      });
+  }
+
+  // --------------------------------------------------
+  // LEGACY ORDER-MODAL COMPATIBILITY
+  // The backend now handles shifting S.No. values.
+  // --------------------------------------------------
+
+  onSerialNoChange(): void {
+    this.clearMessages();
+
+    // Do not shift projects from the frontend.
+    // The backend handles insertion and reordering.
+    this.showOrderModal = false;
+    this.conflictingProject = null;
+  }
 
   confirmOrderChange(): void {
+    // Close any stale modal and use the normal save flow.
+    this.showOrderModal = false;
+    this.conflictingProject = null;
 
-    if (!this.conflictingProject) {
-      return;
-    }
-
-
-    const newSerialNo =
-      this.requestedSerialNo;
-
-
-    /*
-     * Projects at or after the requested
-     * position need to move down.
-     *
-     * IMPORTANT:
-     * Highest S.No. is updated first.
-     *
-     * Example:
-     *
-     * 1 A
-     * 2 B
-     * 3 C
-     *
-     * New project wants 2.
-     *
-     * C: 3 -> 4
-     * B: 2 -> 3
-     * New: 2
-     */
-    const projectsToShift =
-      this.projects
-        .filter(
-          project =>
-            Number(project.serialNo) >=
-            newSerialNo
-        )
-        .sort(
-          (a, b) =>
-            Number(b.serialNo) -
-            Number(a.serialNo)
-        );
-
-
-    const formValue =
-      this.projectForm.getRawValue();
-
-
-    const newProject:
-      Omit<Project, 'id'> = {
-
-      year:
-        Number(formValue.year),
-
-      serialNo:
-        newSerialNo,
-
-      title:
-        formValue.title!.trim(),
-
-      description:
-        formValue.description!.trim(),
-
-      coverImage:
-        formValue.coverImage!,
-
-      slug:
-        formValue.slug!.trim(),
-
-      status:
-        formValue.status!
-
-    };
-
-
-    this.showOrderModal =
-      false;
-
-    this.conflictingProject =
-      null;
-
-
-    this.saving = true;
-
-    this.clearMessages();
-
-
-    /*
-     * Shift projects one by one.
-     *
-     * concatMap guarantees that the
-     * updates happen in order.
-     */
-    from(projectsToShift)
-      .pipe(
-
-        concatMap(project => {
-
-          const shiftedProject:
-            Project = {
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) + 1
-
-          };
-
-
-          return this.projectService
-            .updateProject(
-              shiftedProject
-            );
-
-        })
-
-      )
-      .subscribe({
-
-        next: () => {
-
-          /*
-           * Nothing else here.
-           *
-           * Creation happens after ALL
-           * projects have shifted.
-           */
-        },
-
-        complete: () => {
-
-          /*
-           * Now the requested S.No.
-           * is available.
-           */
-          this.projectService
-            .addProject(newProject)
-            .subscribe({
-
-              next: (createdProject) => {
-
-                console.log(
-                  'PROJECT CREATED AFTER ORDER CHANGE:',
-                  createdProject
-                );
-
-
-                this.saving = false;
-
-                this.successMessage =
-                  'Project added successfully.';
-
-
-                setTimeout(() => {
-
-                  this.router.navigate([
-                    '/admin/projects'
-                  ]);
-
-                }, 700);
-
-              },
-
-              error: (error) => {
-
-                console.error(
-                  'Failed to create project after order change:',
-                  error
-                );
-
-                this.saving = false;
-
-                this.errorMessage =
-                  error?.error?.message ||
-                  'Failed to create project.';
-
-              }
-
-            });
-
-        },
-
-        error: (error) => {
-          console.error('Reordering failed:', {
-            status: error.status,
-            message: error.message,
-            response: error.error,
-            url: error.url
-          });
-
-          this.saving = false;
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to change project order.';
-        }
-
-      });
-
+    this.saveProject();
   }
-
-
-  // =====================================================
-  // CANCEL ORDER MODAL
-  // =====================================================
 
   cancelOrderChange(): void {
+    this.showOrderModal = false;
+    this.conflictingProject = null;
 
-    this.showOrderModal =
-      false;
-
-    this.conflictingProject =
-      null;
-
-    /*
-     * Restore the next available S.No.
-     */
-    this.projectForm.patchValue({
-
-      serialNo:
-        this.getNextSerialNo()
-
-    });
-
-  }
-
-
-  // =====================================================
-  // UPDATE PROJECT
-  // =====================================================
-
-  private updateExistingProject(
-    formValue: any
-  ): void {
-
-    this.saving = true;
-
-    this.clearMessages();
-
-
-    this.projectService
-      .getProjectById(this.projectId)
-      .subscribe({
-
-        next: (existingProject) => {
-
-          const oldSerialNo =
-            Number(existingProject.serialNo);
-
-          const newSerialNo =
-            Number(formValue.serialNo);
-
-
-          /*
-           * S.No. has not changed.
-           */
-          if (
-            oldSerialNo ===
-            newSerialNo
-          ) {
-
-            this.sendUpdate(
-              existingProject
-            );
-
-            return;
-          }
-
-
-          /*
-           * S.No. has changed.
-           *
-           * Get latest projects before
-           * checking for conflict.
-           */
-          this.projectService
-            .getProjects()
-            .subscribe({
-
-              next: (projects) => {
-
-                this.projects =
-                  [...projects];
-
-
-                const conflictingProject =
-                  projects.find(
-                    project =>
-                      project.id !==
-                      this.projectId &&
-                      Number(project.serialNo) ===
-                      newSerialNo
-                  );
-
-
-                /*
-                 * Conflict exists.
-                 */
-                if (conflictingProject) {
-
-                  this.saving = false;
-
-                  this.requestedSerialNo =
-                    newSerialNo;
-
-                  this.conflictingProject =
-                    conflictingProject;
-
-                  this.showOrderModal =
-                    true;
-
-                  return;
-                }
-
-
-                /*
-                 * No conflict.
-                 */
-                this.sendUpdate(
-                  existingProject
-                );
-
-              },
-
-              error: (error) => {
-
-                console.error(
-                  'Failed to check S.No.:',
-                  error
-                );
-
-                this.saving = false;
-
-                this.errorMessage =
-                  'Failed to check project order.';
-
-              }
-
-            });
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Failed to load project:',
-            error
-          );
-
-          this.saving = false;
-
-          this.errorMessage =
-            'Failed to load project.';
-
-        }
-
+    if (!this.isEditMode) {
+      this.projectForm.patchValue({
+        serialNo: this.getNextSerialNo()
       });
-
+    }
   }
 
+  // --------------------------------------------------
+  // ERROR HANDLING
+  // --------------------------------------------------
 
-  // =====================================================
-  // SEND UPDATE
-  // =====================================================
+  private getErrorMessage(
+    error: any,
+    fallback: string
+  ): string {
+    const message = error?.error?.message;
 
-  private sendUpdate(
-    existingProject: Project
-  ): void {
-
-    const formValue =
-      this.projectForm.getRawValue();
-
-
-    const oldSerialNo =
-      Number(existingProject.serialNo);
-
-    const newSerialNo =
-      Number(formValue.serialNo);
-
-
-    /*
-     * If S.No. changed, reorder the other
-     * projects first.
-     */
-    if (
-      oldSerialNo !==
-      newSerialNo
-    ) {
-
-      this.reorderForEdit(
-        existingProject,
-        newSerialNo
-      );
-
-      return;
+    if (Array.isArray(message)) {
+      return message.join(', ');
     }
 
-
-    /*
-     * Normal update.
-     */
-    const updatedProject:
-      Project = {
-
-      ...existingProject,
-
-      year:
-        Number(formValue.year),
-
-      serialNo:
-        newSerialNo,
-
-      title:
-        formValue.title!.trim(),
-
-      description:
-        formValue.description!.trim(),
-
-      coverImage:
-        formValue.coverImage!,
-
-      slug:
-        formValue.slug!.trim(),
-
-      status:
-        formValue.status!
-
-    };
-
-
-    this.projectService
-      .updateProject(updatedProject)
-      .subscribe({
-
-        next: () => {
-
-          this.saving = false;
-
-          this.successMessage =
-            'Project updated successfully.';
-
-
-          setTimeout(() => {
-
-            this.router.navigate([
-              '/admin/projects'
-            ]);
-
-          }, 700);
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Failed to update project:',
-            error
-          );
-
-          this.saving = false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update project.';
-
-        }
-
-      });
-
-  }
-
-
-  // =====================================================
-  // REORDER WHEN EDITING
-  // =====================================================
-private getTemporarySerialNo(): number {
-
-  const highest =
-    this.projects.length
-      ? Math.max(
-          ...this.projects.map(
-            project =>
-              Number(project.serialNo) || 0
-          )
-        )
-      : 0;
-
-  return highest + 100000;
-}
-
-private finaliseMovedProject(
-  existingProject: Project,
-  newSerialNo: number,
-  formValue: any
-): void {
-  this.projectService.updateProject({
-    ...existingProject,
-    year: formValue.year,
-    serialNo: newSerialNo,
-    title: formValue.title,
-    description: formValue.description,
-    coverImage: formValue.coverImage || '',
-    slug: formValue.slug,
-    status: formValue.status
-  }).subscribe({
-    next: (updatedProject) => {
-      this.saving = false;
-      this.successMessage = 'Project order updated successfully.';
-      console.log('FINAL PROJECT UPDATE SUCCESS:', updatedProject);
-    },
-    error: (error) => {
-      console.error('FINAL PROJECT UPDATE FAILED:', error);
-      this.saving = false;
-      this.errorMessage = 'Failed to finalize project order.';
+    if (typeof message === 'string' && message.trim()) {
+      return message;
     }
-  });
-}
 
-private sendNormalUpdate(
-  existingProject: Project
-): void {
+    if (error?.status === 0) {
+      return 'Could not connect to the server. Please try again.';
+    }
 
-  const formValue =
-    this.projectForm.getRawValue();
-
-  const updatedProject: Project = {
-
-    ...existingProject,
-
-    year:
-      Number(formValue.year),
-
-    serialNo:
-      Number(formValue.serialNo),
-
-    title:
-      formValue.title!.trim(),
-
-    description:
-      formValue.description!.trim(),
-
-    coverImage:
-      formValue.coverImage!,
-
-    slug:
-      formValue.slug!.trim(),
-
-    status:
-      formValue.status!
-
-  };
-
-  this.projectService
-    .updateProject(updatedProject)
-    .subscribe({
-
-      next: () => {
-
-        this.saving = false;
-
-        this.successMessage =
-          'Project updated successfully.';
-
-        setTimeout(() => {
-
-          this.router.navigate([
-            '/admin/projects'
-          ]);
-
-        }, 700);
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to update project:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to update project.';
-
-      }
-
-    });
-}
-
-
-
-private moveProjectUp(
-  existingProject: Project,
-  newSerialNo: number,
-  oldSerialNo: number,
-  formValue: any
-): void {
-
-  const affectedProjects =
-    this.projects
-      .filter(
-        project =>
-          project.id !== existingProject.id &&
-          Number(project.serialNo) >= newSerialNo &&
-          Number(project.serialNo) < oldSerialNo
-      )
-      .sort(
-        (a, b) =>
-          Number(b.serialNo) -
-          Number(a.serialNo)
-      );
-
-
-  /*
-   * Example:
-   *
-   * A = 1
-   * B = 2
-   * C = 3
-   *
-   * C moves to 1
-   *
-   * B -> 3
-   * A -> 2
-   *
-   * Update from highest to lowest.
-   */
-  from(affectedProjects)
-    .pipe(
-
-      concatMap(project => {
-
-        return this.projectService
-          .updateProject({
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) + 1
-
-          });
-
-      })
-
-    )
-    .subscribe({
-
-      complete: () => {
-
-        this.finaliseMovedProject(
-          existingProject,
-          newSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to move projects:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-
-    complete: () => {
-  console.log('REORDER SEQUENCE COMPLETED');
-
-  this.finaliseMovedProject(
-    existingProject,
-    newSerialNo,
-    formValue
-  );
-}
-}
-
-private moveProjectDown(
-  existingProject: Project,
-  newSerialNo: number,
-  oldSerialNo: number,
-  formValue: any
-): void {
-
-  const affectedProjects =
-    this.projects
-      .filter(
-        project =>
-          project.id !== existingProject.id &&
-          Number(project.serialNo) > oldSerialNo &&
-          Number(project.serialNo) <= newSerialNo
-      )
-      .sort(
-        (a, b) =>
-          Number(a.serialNo) -
-          Number(b.serialNo)
-      );
-
-
-  /*
-   * Example:
-   *
-   * A = 1
-   * B = 2
-   * C = 3
-   *
-   * A moves to 3
-   *
-   * B -> 1
-   * C -> 2
-   *
-   * Update from lowest to highest.
-   */
-  from(affectedProjects)
-    .pipe(
-
-      concatMap(project => {
-
-        return this.projectService
-          .updateProject({
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) - 1
-
-          });
-
-      })
-
-    )
-    .subscribe({
-
-      complete: () => {
-
-        this.finaliseMovedProject(
-          existingProject,
-          newSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to move projects:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-
-    complete: () => {
-  console.log('REORDER SEQUENCE COMPLETED');
-
-  this.finaliseMovedProject(
-    existingProject,
-    newSerialNo,
-    formValue
-  );
-}
-}
-
-
-private reorderForEdit(
-  existingProject: Project,
-  newSerialNo: number
-): void {
-
-  const oldSerialNo =
-    Number(existingProject.serialNo);
-
-  if (oldSerialNo === newSerialNo) {
-    this.sendNormalUpdate(existingProject);
-    return;
+    return fallback;
   }
 
-  const formValue =
-    this.projectForm.getRawValue();
-
-  this.saving = true;
-  this.clearMessages();
-
-  /*
-   * Temporarily move the edited project
-   * outside the normal S.No. sequence.
-   *
-   * This is necessary because serialNo is
-   * unique in MongoDB.
-   */
-  const temporarySerialNo =
-    this.getTemporarySerialNo();
-
-
-  this.projectService
-    .updateProject({
-
-      ...existingProject,
-
-      serialNo: temporarySerialNo
-
-    })
-    .subscribe({
-
-      next: () => {
-
-        /*
-         * MOVING UP
-         *
-         * Example:
-         *
-         * 1 A
-         * 2 B
-         * 3 C
-         *
-         * C -> 1
-         *
-         * B: 2 -> 3
-         * A: 1 -> 2
-         *
-         * Because the edited project is already
-         * temporarily removed, there is no
-         * unique-number collision.
-         */
-        if (newSerialNo < oldSerialNo) {
-
-          this.moveProjectUp(
-            existingProject,
-            newSerialNo,
-            oldSerialNo,
-            formValue
-          );
-
-          return;
-        }
-
-
-        /*
-         * MOVING DOWN
-         *
-         * Example:
-         *
-         * 1 A
-         * 2 B
-         * 3 C
-         *
-         * A -> 3
-         *
-         * C: 3 -> 2
-         * B: 2 -> 1
-         */
-        this.moveProjectDown(
-          existingProject,
-          newSerialNo,
-          oldSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to temporarily move project:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-}
-
-  // =====================================================
-  // UPDATE MOVED PROJECT
-  // =====================================================
-
-  private updateMovedProject(
-    existingProject: Project,
-    newSerialNo: number
-  ): void {
-
-    const formValue =
-      this.projectForm.getRawValue();
-
-
-    const updatedProject:
-      Project = {
-
-      ...existingProject,
-
-      year:
-        Number(formValue.year),
-
-      serialNo:
-        newSerialNo,
-
-      title:
-        formValue.title!.trim(),
-
-      description:
-        formValue.description!.trim(),
-
-      coverImage:
-        formValue.coverImage!,
-
-      slug:
-        formValue.slug!.trim(),
-
-      status:
-        formValue.status!
-
-    };
-
-
-    this.projectService
-      .updateProject(updatedProject)
-      .subscribe({
-
-        next: () => {
-
-          this.saving = false;
-
-          this.successMessage =
-            'Project updated successfully.';
-
-
-          setTimeout(() => {
-
-            this.router.navigate([
-              '/admin/projects'
-            ]);
-
-          }, 700);
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Failed to update moved project:',
-            error
-          );
-
-          this.saving = false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            'Failed to update project.';
-
-        }
-
-      });
-
-  }
-
-
-  // =====================================================
-  // CLOSE / CANCEL
-  // =====================================================
+  // --------------------------------------------------
+  // CANCEL
+  // --------------------------------------------------
 
   cancel(): void {
-
     if (this.saving) {
       return;
     }
 
-    this.router.navigate([
-      '/admin/projects'
-    ]);
-
+    this.router.navigate(['/admin/projects']);
   }
 
-
-  // =====================================================
+  // --------------------------------------------------
   // CLEAR MESSAGES
-  // =====================================================
+  // --------------------------------------------------
 
   private clearMessages(): void {
-
     this.successMessage = '';
     this.errorMessage = '';
-
   }
-  onSerialNoChange(): void {
-  if (this.isEditMode) {
-    return;
-  }
-
-  this.clearMessages();
-
-  const serialNo =
-    Number(this.projectForm.controls.serialNo.value);
-
-  if (!serialNo || serialNo < 1) {
-    return;
-  }
-
-  const existingProject =
-    this.projects.find(
-      project =>
-        Number(project.serialNo) === serialNo
-    );
-
-  if (!existingProject) {
-    return;
-  }
-
-  this.requestedSerialNo = serialNo;
-  this.conflictingProject = existingProject;
-  this.showOrderModal = true;
-}
-
-
-
 }

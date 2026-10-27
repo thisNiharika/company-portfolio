@@ -25,11 +25,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./public/p-design/p-design').then(m => m.PDesign)
   },
-  {
-    path: 'portfolio-details',
-    loadComponent: () =>
-      import('./public/project-details/project-details').then(m => m.ProjectDetails)
-  },
+{
+  path: 'projects/:slug',
+  loadComponent: () =>
+    import('./public/project-details/project-details')
+      .then(m => m.ProjectDetails)
+},
 
   // ADMIN
   {

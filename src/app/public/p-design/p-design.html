@@ -1,3 +1,4 @@
+
 <div class="portfolioPage" #portfolioPage>
 
   @for (
@@ -33,14 +34,24 @@
       </div>
 
       <div class="cardList">
-        @for ( card of group.cards; track $index; let cardIndex = $index ) {
+        @for (
+          card of group.cards;
+          track $index;
+          let cardIndex = $index
+        ) {
           <article class="card_items">
 
             <!-- Route animation wrapper -->
-            <div class="card_route_entry animate-fade-up" [class.route-animate]="yearIndex === 0" [class.animate-portfolio-card]="yearIndex === 0" [style.--route-delay]="(520 + cardIndex * 120) + 'ms'" [style.--route-duration]="'800ms'">
+            <div
+              class="card_route_entry animate-fade-up"
+              [class.route-animate]="yearIndex === 0"
+              [class.animate-portfolio-card]="yearIndex === 0"
+              [style.--route-delay]="(520 + cardIndex * 120) + 'ms'"
+              [style.--route-duration]="'800ms'">
+
               <div class="ci_content">
                 <div class="cic_top">
-                  <span>{{ card.category }}</span>
+                  <span>{{ card.year }}</span>
                   <h2>{{ card.title }}</h2>
                   <p>{{ card.description }}</p>
                 </div>
@@ -48,8 +59,8 @@
                 <div class="cic_bottom d-flex justify-content-end">
                   <a
                     class="arrow_card"
-                    [attr.href]="card.link"
-                    (click)="goTo(card.link, $event)"
+                    [attr.href]="'/projects/' + card.slug"
+                    (click)="goTo('/projects/' + card.slug, $event)"
                     [attr.aria-label]="'View ' + card.title">
 
                     <img
@@ -60,11 +71,17 @@
               </div>
             </div>
 
-            <!-- Image wrapper ke bahar hi rahegi -->
-            @if (card.image) {
-              <div class="ci_img animate-fade-up" [class.route-animate]="yearIndex === 0" [class.animate-portfolio-image]="yearIndex === 0" [style.--route-delay]="(620 + cardIndex * 120) + 'ms'" [style.--route-duration]="'900ms'">
+            <!-- Image wrapper remains unchanged -->
+            @if (card.coverImage) {
+              <div
+                class="ci_img animate-fade-up"
+                [class.route-animate]="yearIndex === 0"
+                [class.animate-portfolio-image]="yearIndex === 0"
+                [style.--route-delay]="(620 + cardIndex * 120) + 'ms'"
+                [style.--route-duration]="'900ms'">
+
                 <img
-                  [src]="card.image"
+                  [src]="card.coverImage"
                   [alt]="card.title"
                   [attr.loading]="yearIndex === 0 ? 'eager' : 'lazy'"
                   [attr.fetchpriority]="yearIndex === 0 ? 'high' : 'auto'">
