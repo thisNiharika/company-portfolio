@@ -1,3 +1,12 @@
+<button
+      #completionButton
+      type="button"
+      class="canvas-complete-button"
+      aria-hidden="true"
+      tabindex="-1"
+      (click)="goTo('/portfolio', $event)">
+      {{ buttonText }}
+    </button>
 <section class="canvas-video-section" #canvasVideoSection>
   <div class="canvas-video-sticky">
     <canvas
@@ -20,14 +29,6 @@
         class="canvas-progress-bar">
       </div>
     </div>
-    <button
-      #completionButton
-      type="button"
-      class="canvas-complete-button"
-      aria-hidden="true"
-      tabindex="-1"
-      (click)="goTo('/portfolio', $event)">
-      {{ buttonText }}
-    </button>
+    
   </div>
 </section>

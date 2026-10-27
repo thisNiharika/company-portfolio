@@ -38,10 +38,18 @@
     cursor: pointer;
     position: relative;
     z-index: 2;
+    transition: all 0.5s ease-in-out;
 }
 .h_filter img{
     height: clamp(15px, 0.94vw, 18px);
     filter: brightness(0) saturate(100%) invert(45%) sepia(0%) saturate(3053%) hue-rotate(201deg) brightness(86%) contrast(91%);
+}
+.h_filter svg{
+    height: clamp(15px, 0.94vw, 18px);
+}
+.h_filter:hover, .h_filter.active{
+    background-color: #F0F7FF;
+    border-color: var(--color318BF2);
 }
 .h_filter_dropdown{
     position: absolute;
@@ -63,6 +71,7 @@
         top 0.45s cubic-bezier(.22, 1, .36, 1),
         border-radius 0.35s ease,
         visibility 0s linear 0.45s;
+    box-shadow: 0 12px 39px rgb(0 0 0 / 16%);
 }
 .h_filter_dropdown.show {
   top: clamp(52px, 3.33vw, 64px);
@@ -176,6 +185,14 @@
 .hdfrt_top button.btn_reset:hover img{
     filter: var(--filterHover);
 }
+.hdfrt_top button.btn_reset:disabled{
+    opacity: 0.8;
+    pointer-events: none;
+    color: #999;
+}
+.hdfrt_top button.btn_reset:disabled img{
+        filter: brightness(0) saturate(100%) invert(63%) sepia(0%) saturate(0%) hue-rotate(347deg) brightness(98%) contrast(87%);
+}
 .hdfrt_bottom {
     height: calc(100% - clamp(36px, 2.4vw, 46px));
 }
@@ -203,8 +220,9 @@
     line-height: 1;
     text-align: center;
     cursor: pointer;
+    transition: all 0.3s ease-in-out;
 }
-.hdfrt_bottom ul.year_list li.active{
+.hdfrt_bottom ul.year_list li.active, .hdfrt_bottom ul.year_list li:hover{
     background: #F0F7FF;
     border-color: var(--color318BF2);
 }
@@ -268,6 +286,11 @@
 .applyFilters:hover{
     border-color: var(--colorHover);
     background: var(--colorHover);
+}
+.applyFilters:disabled{
+    background: #999;
+    opacity: 0.85;
+    border: #999;
 }
 .hb_client_search {
     display: flex;
@@ -356,8 +379,8 @@
 .client_list ul li .agency-item input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     margin: 0;
     border: 1px solid #999;
     border-radius: 0;
@@ -416,6 +439,9 @@
     line-height: 0.9;
     outline: none;
 }
+.h_search input:focus{
+    border-color: var(--color318BF2);
+}
 .h_search .search_icon{
     position: absolute;
     left: clamp(16px, 1.15vw, 22px);
@@ -426,6 +452,66 @@
     filter: brightness(0) saturate(100%) invert(39%) sepia(1%) saturate(786%) hue-rotate(341deg) brightness(101%) contrast(93%);
 }
 
+.scroll-top-btn {
+  position: fixed;
+  right: clamp(20px, 1.56vw, 30px);
+  bottom: clamp(20px, 1.56vw, 30px);
+  z-index: 1000;
+  width: clamp(40px, 2.92vw, 56px);
+  height: clamp(40px, 2.92vw, 56px);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--colorHover);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+}
+.scroll-top-btn:hover {
+    bottom: clamp(30px, 2.08vw, 40px);
+}
+.scroll-top-progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scroll-top-track,
+.scroll-top-progress-circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.scroll-top-track {
+  stroke: rgb(255 255 255 / 30%);
+}
+
+.scroll-top-progress-circle {
+  stroke: var(--colorfff);
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translate(0px, 0px);
+}
+
+.scroll-top-btn span {
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  line-height: 1;
+}
+.humburger .hb_menu {
+transition: all 0.3s ease-in-out;
+}
+.humburger .hb_menu:hover{
+filter: brightness(0) saturate(100%) invert(49%) sepia(71%) saturate(2872%) hue-rotate(193deg) brightness(96%) contrast(98%);
+}
 @media screen and (max-width: 1400px) {
     .hdfrt_bottom .techList ul.year_list{
         padding-right: clamp(40px, 3.93vw, 55px);
