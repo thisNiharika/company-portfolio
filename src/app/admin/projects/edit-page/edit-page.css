@@ -1,0 +1,55 @@
+/* Edit Page-only styles. Existing public project detail styles remain unchanged. */
+.edit-page-shell { width: 100%; }
+.edit-page-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.edit-page-preview, .inline-editor-tools button, .inline-editor-fields button,
+.associate-modal button, .branding-editor button { cursor:pointer; }
+.inline-editor-tools { display:flex; align-items:center; gap:8px; margin:12px 0; flex-wrap:wrap; }
+.inline-editor-tools button, .edit-page-preview, .inline-editor-fields button,
+.associate-modal button { border:1px solid #d4d4d4; border-radius:6px; padding:7px 11px; background:#fff; color:#222; }
+.inline-editor-tools button:disabled, .associate-modal button:disabled { opacity:.55; cursor:not-allowed; }
+.inline-editor-fields { display:grid; gap:12px; width:100%; margin:14px 0; padding:16px; border:1px solid #e3e3e3; border-radius:8px; background:#fafafa; }
+.inline-editor-fields label { display:grid; gap:6px; font-size:14px; }
+.inline-editor-fields input:not([type=file]):not([type=color]), .inline-editor-fields textarea,
+.associate-modal input[type=search] { width:100%; min-width:0; box-sizing:border-box; padding:9px 10px; border:1px solid #ccc; border-radius:5px; font:inherit; }
+.inline-editor-fields textarea { min-height:90px; resize:vertical; }
+.rich-editor { min-height:90px; padding:10px; border:1px solid #ccc; border-radius:5px; background:white; }
+.rich-editor:focus { outline:2px solid #a6c8ff; }
+.rich-editor-toolbar { display:flex; gap:6px; }
+.rich-editor-toolbar button { min-width:34px; padding:5px 8px; }
+.image-editor-row, .branding-color-row { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:8px 0; }
+.image-editor-row img { width:80px; height:55px; object-fit:cover; border-radius:4px; }
+.inline-save-error, .edit-page-error { color:#9f2424; background:#fff1f1; padding:12px; border-radius:6px; }
+.inline-save-success { color:#17633b; background:#effaf3; padding:12px; border-radius:6px; }
+.edit-page-state { padding:24px; }
+.edit-content-section { position:relative; }
+.context_slider { display:flex; align-items:center; gap:16px; overflow-x:auto; scroll-behavior:smooth; cursor:grab; }
+.context_slider.is-dragging { cursor:grabbing; user-select:none; }
+.context_slider .item { flex:0 0 auto; max-width:80%; }
+.context_slider .item img { display:block; max-width:100%; height:auto; }
+.context_slider .cs_btn { flex:0 0 auto; display:flex; gap:8px; }
+.impact-cards, .related-projects-list, .branding-colors { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; margin:18px 0; }
+.impact-cards article, .related-projects-list article, .branding-colors > div { padding:14px; border:1px solid #e4e4e4; border-radius:8px; }
+.related-projects-list img { display:block; width:100%; max-height:190px; object-fit:cover; border-radius:5px; }
+.certification-images { display:flex; flex-wrap:wrap; gap:14px; }
+.certification-images img { max-width:min(100%,300px); max-height:220px; object-fit:contain; }
+.branding-editor { padding:24px 0; }
+.branding-editor header { margin-bottom:18px; }
+.branding-colors > div { display:grid; gap:8px; }
+.branding-colors span { width:100%; height:50px; border:1px solid #ddd; border-radius:5px; }
+.branding-color-row { border:1px solid #e5e5e5; border-radius:6px; padding:10px; }
+.branding-color-row label { flex:1 1 140px; }
+.branding-color-row input[type=color] { width:45px; height:38px; border:0; background:transparent; }
+.associate-modal-backdrop { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.55); }
+.associate-modal { width:min(620px,100%); max-height:85vh; overflow:auto; padding:20px; border-radius:10px; background:#fff; color:#222; box-shadow:0 18px 60px rgba(0,0,0,.2); }
+.associate-modal header, .associate-modal footer { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.associate-modal input[type=search] { margin:12px 0; }
+.associate-project-options { display:grid; gap:8px; max-height:45vh; overflow:auto; }
+.associate-project-options label { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #e5e5e5; border-radius:6px; }
+.associate-project-options small { margin-left:auto; color:#666; }
+@media (max-width:700px) {
+  .edit-page-toolbar { align-items:stretch; }
+  .edit-page-toolbar > * { max-width:100%; }
+  .pdb_banner { display:block; }
+  .pdb_left, .pdb_right { width:100%; }
+  .associate-modal { padding:14px; }
+}

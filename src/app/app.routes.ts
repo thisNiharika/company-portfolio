@@ -32,6 +32,7 @@ export const routes: Routes = [
       .then(m => m.ProjectDetails)
 },
 
+
   // ADMIN
   {
     path: 'admin/login',
@@ -72,7 +73,12 @@ export const routes: Routes = [
     import('./admin/projects/project-form/project-form')
       .then(m => m.ProjectForm)
 },
-
+{
+  path: 'admin/projects/:id/edit-page',
+  loadComponent: () =>
+    import('./admin/projects/edit-page/edit-page')
+      .then(m => m.EditPageComponent)
+},
   {
     path: '**',
     redirectTo: 'home'

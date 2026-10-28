@@ -250,5 +250,15 @@ export class ProjectListComponent implements OnInit {
       });
 
   }
+editProjectPage(project: Project): void {
+  this.openMenuId = null;
+
+  this.router.navigate([
+    '/admin/projects',
+    project.id,
+    'edit-page'
+  ]);
+}
+
 
 }

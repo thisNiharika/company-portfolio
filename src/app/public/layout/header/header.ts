@@ -44,14 +44,72 @@ export class Header {
   constructor(public router: Router) {}
   // ================================ Filter Btn
   isFilterOpen = false;
-  @ViewChild('filterShape')
-  filterShape!: ElementRef<SVGPathElement>;
 
-  @ViewChild('filterBarsTarget')
-  filterBarsTarget!: ElementRef<SVGPathElement>;
+  private filterShape?: ElementRef<SVGPathElement>;
+private filterBarsTarget?: ElementRef<SVGPathElement>;
+private activeDots?: ElementRef<SVGPathElement>;
 
-  @ViewChild('activeDots')
-  activeDots!: ElementRef<SVGPathElement>;
+@ViewChild('filterShape')
+set filterShapeRef(value: ElementRef<SVGPathElement> | undefined) {
+  this.filterShape = value;
+  this.initFilterAnimation();
+}
+
+@ViewChild('filterBarsTarget')
+set filterBarsTargetRef(value: ElementRef<SVGPathElement> | undefined) {
+  this.filterBarsTarget = value;
+  this.initFilterAnimation();
+}
+
+@ViewChild('activeDots')
+set activeDotsRef(value: ElementRef<SVGPathElement> | undefined) {
+  this.activeDots = value;
+  this.initFilterAnimation();
+}
+
+private initFilterAnimation(): void {
+  const filterShape = this.filterShape?.nativeElement;
+  const filterBarsTarget = this.filterBarsTarget?.nativeElement;
+  const activeDots = this.activeDots?.nativeElement;
+
+  // The filter SVG is conditionally rendered on /portfolio.
+  // Wait until all three references exist.
+  if (!filterShape || !filterBarsTarget || !activeDots) {
+    this.filterTimeline?.kill();
+    this.filterTimeline = undefined;
+    return;
+  }
+
+  // Prevent duplicate timelines when the route changes.
+  this.filterTimeline?.kill();
+
+  gsap.set(activeDots, {
+    opacity: 0,
+    scale: 0.4,
+    transformOrigin: 'center center'
+  });
+
+  this.filterTimeline = gsap.timeline({
+    paused: true
+  });
+
+  this.filterTimeline
+    .to(filterShape, {
+      duration: 0.65,
+      morphSVG: filterBarsTarget,
+      ease: 'power2.inOut'
+    })
+    .to(
+      activeDots,
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.35,
+        ease: 'back.out(1.8)'
+      },
+      0.25
+    );
+}
 
   private filterTimeline?: gsap.core.Timeline;
 
