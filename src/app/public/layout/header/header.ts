@@ -1,9 +1,12 @@
-import { Component, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, HostListener, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import { RouteTransitionService } from '../../../core/services/route-transition.service';
 import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
+import { NavigationEnd } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
+import { PortfolioFilterService } from '../../../core/services/portfolio-filter.service';
 gsap.registerPlugin(MorphSVGPlugin);
 gsap.registerPlugin(ScrollTrigger);
 interface Technology {
@@ -24,7 +27,7 @@ type FilterType =
   styleUrl: './header.css',
 })
 
-export class Header {
+export class Header implements AfterViewInit, OnDestroy {
   readonly routeTransition = inject(RouteTransitionService);
   goTo(
     url: string,
@@ -42,6 +45,16 @@ export class Header {
   }
 
   constructor(public router: Router) {}
+
+  private readonly portfolioFilterService = inject(PortfolioFilterService);
+  private readonly ngZone = inject(NgZone);
+  private routerEventsSubscription?: Subscription;
+  private projectsSubscription?: Subscription;
+  private applyButton?: HTMLButtonElement;
+  private applyButtonListener?: () => void;
+  private globalSearchInput?: HTMLInputElement;
+  private globalSearchListener?: (event: Event) => void;
+  private globalSearch = '';
   // ================================ Filter Btn
   isFilterOpen = false;
 
@@ -150,10 +163,7 @@ private initFilterAnimation(): void {
   // ================================ Left Side
 
   // ============================== Year List
-  years: number[] = [
-    2026, 2025, 2024, 2023, 2022, 2021,
-    2020, 2019, 2018, 2017, 2016
-  ];
+  years: number[] = [];
 
   selectedYears: number[] = [];
 
@@ -172,12 +182,7 @@ private initFilterAnimation(): void {
   // ============================== Year List
   
   // ============================== Domain List
-  domains: string[] = [
-    'Digital',
-    'Health',
-    'Education',
-    'Environment'
-  ];
+  domains: string[] = [];
 
   selectedDomains: string[] = [];
 
@@ -199,17 +204,7 @@ private initFilterAnimation(): void {
 // Client List Start
 // =======================================
 
-agencies: string[] = [
-  'UNICEF',
-  'WHO',
-  'UNAIDS',
-  'UNFPA',
-  'UNDP',
-  'UN Women',
-  'Giz',
-  'ADB',
-  'SADC'
-];
+agencies: string[] = [];
 
 selectedAgencies: string[] = [];
 sortedAgencies: string[] = [...this.agencies];
@@ -268,16 +263,7 @@ resetClients(): void {
 // Geo Scope List Start
 // =======================================
 
-locations: string[] = [
-  'Angola',
-  'Benin',
-  'Botswana',
-  'Burkina Faso',
-  'Burundi',
-  'Cameroon',
-  'Cabo Verde',
-  'Central African Republic'
-];
+locations: string[] = [];
 
 selectedLocation: string[] = [];
 sortedLocations: string[] = [...this.locations];
@@ -337,38 +323,7 @@ resetLocations(): void {
   // Technology List End
   // =======================================
   
-  techs: Technology[] = [
-    {
-      name: 'HTML 5',
-      image: 'assets/images/technology/html5.svg',
-      alt: 'HTML 5'
-    },
-    {
-      name: 'Angular JS',
-      image: 'assets/images/technology/angularjs.svg',
-      alt: 'Angular JS'
-    },
-    {
-      name: 'React',
-      image: 'assets/images/technology/reactjs.svg',
-      alt: 'React Js'
-    },
-    {
-      name: 'Vue JS',
-      image: 'assets/images/technology/vuejs.svg',
-      alt: 'Vue JS'
-    },
-    {
-      name: 'TypeScript',
-      image: 'assets/images/technology/typescript.svg',
-      alt: 'TypeScript'
-    },
-    {
-      name: 'SVELTE',
-      image: 'assets/images/technology/svelte.svg',
-      alt: 'Svelte'
-    }
-  ];
+  techs: Technology[] = [];
 
   selectedTech: string[] = [];
 
@@ -427,57 +382,180 @@ resetLocations(): void {
     this.resetClients();
     this.resetLocations();
     this.resetTech();
+
+    this.globalSearch = '';
+    if (this.globalSearchInput) {
+      this.globalSearchInput.value = '';
+    }
+
+    this.portfolioFilterService.clearFilters();
   }
 
   // ================================== Scroll Top
   ngAfterViewInit(): void {
     this.initScrollTopButton();
+    this.loadPortfolioFilterOptions();
 
-    // ================================ Filter Btn
-    const filterShape = this.filterShape?.nativeElement;
-    const filterBarsTarget = this.filterBarsTarget?.nativeElement;
-    const activeDots = this.activeDots?.nativeElement;
+    // The filter UI is rendered only on /portfolio. Re-bind after route changes.
+    this.routerEventsSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        requestAnimationFrame(() => this.bindPortfolioFilterDom());
+      });
 
-    if (!filterShape || !filterBarsTarget || !activeDots) {
-      console.warn(
-        'Filter animation skipped: one or more SVG elements are missing from header.html.',
-        {
-          filterShape: !!filterShape,
-          filterBarsTarget: !!filterBarsTarget,
-          activeDots: !!activeDots
+    requestAnimationFrame(() => this.bindPortfolioFilterDom());
+  }
+
+  private loadPortfolioFilterOptions(): void {
+    this.projectsSubscription = this.portfolioFilterService
+      .loadProjects()
+      .subscribe({
+        next: projects => {
+          const publishedProjects = projects.filter(project =>
+            this.portfolioFilterService.isPublished(project)
+          );
+
+          this.years = this.portfolioFilterService.getUniqueYears(publishedProjects);
+          this.domains = this.portfolioFilterService.getUniqueDomains(publishedProjects);
+          this.agencies = this.portfolioFilterService.getUniqueClients(publishedProjects);
+          this.sortedAgencies = [...this.agencies];
+          this.locations = this.portfolioFilterService.getUniqueLocations(publishedProjects);
+          this.sortedLocations = [...this.locations];
+
+          const technologyNames =
+            this.portfolioFilterService.getUniqueTechnologies(publishedProjects);
+
+          this.techs = technologyNames.map(name => ({
+            name,
+            image: this.getTechnologyImage(name),
+            alt: name
+          }));
+
+          // Keep selected values valid if the database options have changed.
+          this.selectedYears = this.selectedYears.filter(value => this.years.includes(value));
+          this.selectedDomains = this.selectedDomains.filter(value => this.domains.includes(value));
+          this.selectedAgencies = this.selectedAgencies.filter(value => this.agencies.includes(value));
+          this.selectedLocation = this.selectedLocation.filter(value => this.locations.includes(value));
+          this.selectedTech = this.selectedTech.filter(value =>
+            this.techs.some(item => item.name === value)
+          );
+        },
+        error: error => {
+          console.error('Unable to load portfolio filter options:', error);
         }
-      );
+      });
+  }
+
+  private getTechnologyImage(name: string): string {
+    const value = name.toLowerCase();
+
+    if (value.includes('html')) return 'assets/images/technology/html5.svg';
+    if (value.includes('angular')) return 'assets/images/technology/angularjs.svg';
+    if (value.includes('react')) return 'assets/images/technology/reactjs.svg';
+    if (value.includes('vue')) return 'assets/images/technology/vuejs.svg';
+    if (value.includes('typescript')) return 'assets/images/technology/typescript.svg';
+    if (value.includes('svelte')) return 'assets/images/technology/svelte.svg';
+
+    // Keep the existing image slot valid for technologies without a dedicated icon.
+    return 'assets/images/technology/typescript.svg';
+  }
+
+  /**
+   * header.html is intentionally left untouched.
+   * Its Apply button has no Angular click binding and is marked disabled,
+   * so this attaches the action to the existing button from TypeScript.
+   */
+  private bindPortfolioFilterDom(): void {
+    const isPortfolioRoute =
+      this.router.url.split('?')[0].split('#')[0] === '/portfolio';
+
+    if (!isPortfolioRoute) {
+      this.detachPortfolioFilterDom();
       return;
     }
 
-    gsap.set(activeDots, {
-      opacity: 0,
-      scale: 0.4,
-      transformOrigin: 'center center'
-    });
+    const button = document.querySelector<HTMLButtonElement>(
+      '.headerFilter .applyFilters'
+    );
 
-    this.filterTimeline = gsap.timeline({
-      paused: true
-    });
+    if (button && button !== this.applyButton) {
+      this.detachApplyButton();
+      this.applyButton = button;
+      this.applyButton.disabled = false;
+      this.applyButton.removeAttribute('disabled');
+      this.applyButtonListener = () => this.ngZone.run(() => this.applySelectedFilters());
+      this.applyButton.addEventListener('click', this.applyButtonListener);
+    } else if (button) {
+      button.disabled = false;
+      button.removeAttribute('disabled');
+    }
 
-    this.filterTimeline
-      .to(filterShape, {
-        duration: 0.65,
-        morphSVG: filterBarsTarget,
-        ease: 'power2.inOut'
-      })
-      .to(
-        activeDots,
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.35,
-          ease: 'back.out(1.8)'
-        },
-        0.25
-      );
-    // ================================ Filter Btn
+    const searchInput = document.querySelector<HTMLInputElement>(
+      '.headerFilter .h_filter_box > .h_search input'
+    );
+
+    if (searchInput && searchInput !== this.globalSearchInput) {
+      this.detachGlobalSearch();
+      this.globalSearchInput = searchInput;
+      this.globalSearchInput.value = this.globalSearch;
+
+      this.globalSearchListener = (event: Event) => {
+        const input = event.target as HTMLInputElement;
+        this.ngZone.run(() => {
+          this.globalSearch = input.value;
+          this.portfolioFilterService.setSearch(this.globalSearch);
+        });
+      };
+
+      this.globalSearchInput.addEventListener('input', this.globalSearchListener);
+    }
   }
+
+  private applySelectedFilters(): void {
+    this.portfolioFilterService.applyFilters({
+      years: this.selectedYears,
+      domains: this.selectedDomains,
+      clients: this.selectedAgencies,
+      locations: this.selectedLocation,
+      technologies: this.selectedTech,
+      search: this.globalSearch
+    });
+
+    this.isFilterOpen = false;
+    this.filterTimeline?.reverse();
+  }
+
+  private detachApplyButton(): void {
+    if (this.applyButton && this.applyButtonListener) {
+      this.applyButton.removeEventListener('click', this.applyButtonListener);
+    }
+
+    this.applyButton = undefined;
+    this.applyButtonListener = undefined;
+  }
+
+  private detachGlobalSearch(): void {
+    if (this.globalSearchInput && this.globalSearchListener) {
+      this.globalSearchInput.removeEventListener('input', this.globalSearchListener);
+    }
+
+    this.globalSearchInput = undefined;
+    this.globalSearchListener = undefined;
+  }
+
+  private detachPortfolioFilterDom(): void {
+    this.detachApplyButton();
+    this.detachGlobalSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.routerEventsSubscription?.unsubscribe();
+    this.projectsSubscription?.unsubscribe();
+    this.detachPortfolioFilterDom();
+    this.filterTimeline?.kill();
+    this.scrollTopTween?.kill();
+  }
+
   @ViewChild('scrollTopButton')
   scrollTopButton!: ElementRef<HTMLButtonElement>;
 

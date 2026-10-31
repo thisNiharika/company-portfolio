@@ -19,52 +19,67 @@
     <div class="pd_bottom">
         <div class="pdb_banner">
             <div class="pdb_left route-animate animate-fade-left" style="--route-delay: 450ms; --route-duration: 800ms;">
-                <img class="client_logo img-fluid" src="assets/images/clients/national-conference-of-chief-secretaries.svg"
-                    alt="National Conference of Chief Secretaries">
-                <h3>National Conference of Chief Secretaries</h3>
+                @if (page.overview.clientLogo) {
+                <img class="client_logo img-fluid" [src]="page.overview.clientLogo"
+                    [alt]="project?.title || ''">
+                }
+                <h3>{{ project?.title || '' }}</h3>
+                @if (page.overview.client) {
                 <div class="client_details">
                     <span>Client</span>
-                    <p>NITI Aayog, UNDP</p>
+                    <p>{{ page.overview.client }}</p>
                 </div>
+                }
+                @if (page.overview.duration) {
                 <div class="client_details">
                     <span>Duration</span>
-                    <p>6 Months</p>
+                    <p>{{ page.overview.duration }}</p>
                 </div>
+                }
+                @if (page.overview.geoScope) {
                 <div class="client_details">
                     <span>Geo Scope</span>
-                    <p>Pan-India</p>
+                    <p>{{ page.overview.geoScope }}</p>
                 </div>
+                }
+                @if (page.overview.domain) {
                 <div class="client_details">
-                    <span>DOmain</span>
-                    <p>National Governance & Digital Transformation Initiative</p>
+                    <span>Domain</span>
+                    <p>{{ page.overview.domain }}</p>
                 </div>
+                }
+                @if (page.overview.productScale) {
                 <div class="client_details">
                     <span>Product Scale</span>
-                    <p>National / Multi-State / Government Leadership</p>
+                    <p>{{ page.overview.productScale }}</p>
                 </div>
+                }
             </div>
             <div class="pdb_right route-animate animate-fade-right" style="--route-delay: 450ms; --route-duration: 800ms;">
                 <div class="pdb_right_img">
-                    <img class="img-fluid w-100" src="assets/images/project_details_banner.jpg"
-                        alt="National Conference of Chief Secretaries">
+                    @if (project?.coverImage) {
+                    <img class="img-fluid w-100" [src]="project?.coverImage || ''"
+                        [alt]="project?.title || ''">
+                    }
                 </div>
             </div>
         </div>
+        @if (page.context.enabled !== false && hasSectionContent(page.context)) {
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>01</h2>
-                <h3>The <span>Context</span></h3>
+                <h2>{{ getSectionNumber('context') }}</h2>
+                <h3>{{ page.context.headingFirst }} <span>{{ page.context.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Where Governance Meets Collaboration</h4>
-                <p>The National Conference of Chief Secretaries brings together the highest levels of administrative
-                    leadership to deliberate on national priorities, strengthen Centre–State collaboration and accelerate
-                    the implementation of shared development agendas.</p>
-                <p>Our role was to transform this institutional ecosystem into a powerful digital experience, making
-                    critical information, knowledge and outcomes more accessible, structured and connected.</p>
+                @if (page.context.subtitle) { <h4>{{ page.context.subtitle }}</h4> }
+                @for (paragraph of page.context.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
             </div>
         </div>
+        }
     </div>
+    @if (page.context.enabled !== false && hasSectionContent(page.context) && slides.length) {
     <div class="w-100 overflow-hidden">
         <div class="context_slider" #slider [class.is-dragging]="isDragging" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
             @for (slide of slides; track $index) {
@@ -84,299 +99,252 @@
             </div>
         </div>
     </div>
+    }
+    @if (page.challenge.enabled !== false && hasSectionContent(page.challenge)) {
     <div class="theChallenge">
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>02</h2>
-                <h3>The <span>Challenge</span></h3>
+                <h2>{{ getSectionNumber('challenge') }}</h2>
+                <h3>{{ page.challenge.headingFirst }} <span>{{ page.challenge.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Connecting a Complex Governance Landscape</h4>
-                <p>Multiple stakeholders. Diverse information. National-scale coordination.</p>
-                <p>The platform needed to bring together conference proceedings, policy discussions, knowledge resources, programmes and institutional information within a single, intuitive digital environment.</p>
-                <p>The challenge was not simply to organise information, but to make a complex governance ecosystem understandable, discoverable and accessible.</p>
+                @if (page.challenge.subtitle) { <h4>{{ page.challenge.subtitle }}</h4> }
+                @for (paragraph of page.challenge.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
             </div>
         </div>
     </div>
+    }
+    @if (page.approach.enabled !== false && hasSectionContent(page.approach)) {
     <div class="ourApproach">
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>03</h2>
-                <h3>Our <span>Approach</span></h3>
+                <h2>{{ getSectionNumber('approach') }}</h2>
+                <h3>{{ page.approach.headingFirst }} <span>{{ page.approach.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Designing for the Complexity of Governance</h4>
-                <p>We approached the platform as a digital knowledge and collaboration ecosystem, rather than a conventional event website.</p>
+                @if (page.approach.subtitle) { <h4>{{ page.approach.subtitle }}</h4> }
+                @for (paragraph of page.approach.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
+                @if (page.approach.items.length) {
                 <div class="approachFocused">
-                    <h3>Our approach focused on:</h3>
                     <ul>
+                        @for (item of page.approach.items; track $index) {
                         <li>
-                            <h5>Simplifying Complexity</h5>
-                            <p>Transforming extensive institutional information into clear and intuitive experiences.</p>
+                            @if (item.title) { <h5>{{ item.title }}</h5> }
+                            @if (item.description) { <p [innerHTML]="item.description"></p> }
                         </li>
-                        <li>
-                            <h5>Connecting Information</h5>
-                            <p>Creating relationships between conferences, themes, initiatives, resources and outcomes.</p>
-                        </li>
-                        <li>
-                            <h5>Designing for Scale</h5>
-                            <p>Building an experience capable of evolving with future conferences, programmes and governance initiatives.</p>
-                        </li>
-                        <li>
-                            <h5>Enabling Discovery</h5>
-                            <p>Making critical government knowledge easier to find, navigate and consume.</p>
-                        </li>
+                        }
                     </ul>
-                </div>       
+                </div>
+                }
             </div>
             <!-- <img class="approach_img" src="assets/images/approach.jpg" alt=""> -->
         </div>
     </div>
+    }
+    @if (page.transformation.enabled !== false && hasSectionContent(page.transformation)) {
     <div class="theTransformation">
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>04</h2>
-                <h3>The <span>Transformation</span></h3>
+                <h2>{{ getSectionNumber('transformation') }}</h2>
+                <h3>{{ page.transformation.headingFirst }} <span>{{ page.transformation.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para mb-0">
-                <h4>A Digital Home for Collaborative Governance</h4>
-                <p>We transformed the existing digital experience into a comprehensive governance and knowledge-sharing platform, bringing critical information and institutional resources together within a unified ecosystem.</p>
+                @if (page.transformation.subtitle) { <h4>{{ page.transformation.subtitle }}</h4> }
+                @for (paragraph of page.transformation.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
+                @if (page.transformation.items.length) {
                 <div class="approachFocused">
-                    <h3>The platform enables:</h3>
                     <ul>
-                        <li>Conference & programme discovery</li>
-                        <li>Structured content discovery</li>
-                        <li>Knowledge and resource access</li>
-                        <li>Stakeholder engagement</li>
-                        <li>Institutional information</li>
-                        <li>Digital dissemination of outcomes</li>
-                        <li>Policy & initiative visibility</li>
+                        @for (item of page.transformation.items; track $index) {
+                        <li>{{ item.description }}</li>
+                        }
                     </ul>
-                </div>       
+                </div>
+                }
             </div>
         </div>
     </div>
+    }
+    @if (page.impact.enabled !== false && hasSectionContent(page.impact)) {
     <div class="ourApproach impactGlance">
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>05</h2>
-                <h3>Impact at a <span>Glance</span></h3>
+                <h2>{{ getSectionNumber('impact') }}</h2>
+                <h3>{{ page.impact.headingFirst }} <span>{{ page.impact.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Building the Digital Infrastructure for Institutional Knowledge</h4>
-                <p>The transformation created a stronger digital foundation for the National Conference of Chief Secretaries, enabling centralised knowledge access, improved information discoverability and a more connected digital experience across the governance ecosystem.</p>
+                @if (page.impact.subtitle) { <h4>{{ page.impact.subtitle }}</h4> }
+                @for (paragraph of page.impact.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
             </div>
         </div>
     </div>
+    @if (page.impact.items.length) {
     <div class="igList">
         <ul>
+            @for (item of page.impact.items; track $index) {
             <li>
-                <h5>Centralized Knowledge Access</h5>
-                <p>Consolidated conference resources, documents and institutional knowledge into a unified digital platform.</p>
+                @if (item.title) { <h5>{{ item.title }}</h5> }
+                @if (item.description) { <p [innerHTML]="item.description"></p> }
             </li>
-            <li>
-                <h5>Improved Information Discoverability</h5>
-                <p>Structured content architecture enabling faster access to critical information and resources.</p>
-            </li>
-            <li>
-                <h5>Enhanced Stakeholder Collaboration</h5>
-                <p>Created a shared digital environment supporting engagement across government stakeholders.</p>
-            </li>
-            <li>
-                <h5>Scalable Digital Foundation</h5>
-                <p>Established an extensible platform capable of supporting future conferences and governance initiatives.</p>
-            </li>
-            <li>
-                <h5>Unified Digital Experience</h5>
-                <p>Standardized information presentation across diverse content categories and stakeholder groups.</p>
-            </li>
+            }
         </ul>
     </div>
+    }
+    }
+    @if (page.certifications.enabled !== false && hasSectionContent(page.certifications)) {
     <div class="certifications">
         <div class="the_context">
             <div class="the_context_heading">
-                <h2>06</h2>
-                <h3>Recognition and <span>Certifications</span></h3>
+                <h2>{{ getSectionNumber('certifications') }}</h2>
+                <h3>{{ page.certifications.headingFirst }} <span>{{ page.certifications.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4><i>“Recognized for delivering a scalable and impactful digital platform that strengthened knowledge sharing and collaborative governance across stakeholders.”</i></h4>            
+                @if (page.certifications.subtitle) { <h4>{{ page.certifications.subtitle }}</h4> }
+                @if (page.certifications.quote) { <h4><i>{{ page.certifications.quote }}</i></h4> }
+                @for (paragraph of page.certifications.paragraphs; track $index) {
+                <p [innerHTML]="paragraph"></p>
+                }
             </div>
+            @if (page.certifications.images.length) {
             <div class="certifications_img">
+                @for (image of page.certifications.images; track $index) {
                 <div class="ci_item">
-                    <img class="img-fluid" src="assets/images/certifications_1.jpg" alt="">
+                    <img class="img-fluid" [src]="image.src" [alt]="image.alt || project?.title || ''">
                 </div>
-                <div class="ci_item">
-                    <img class="img-fluid" src="assets/images/certifications_2.jpg" alt="">
-                </div>
+                }
             </div>
+            }
         </div>
     </div>
+    }
 </div>
 }
 @if (activeTab === 'Branding') {
 <div class="pd_branding" [class.is-active]="activeTab === 'Branding'">
+    @if (hasBrandingBlock(page.branding.overviewSection)) {
     <div class="pd_bottom">
         <div class="the_context">
             <div class="the_context_heading">
                 <h2>01</h2>
-                <h3>Brand <span>Overview</span></h3>
+                <h3>{{ page.branding.overviewSection.headingFirst }} <span>{{ page.branding.overviewSection.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Crafting a Visual Identity for Collaborative Governance</h4>
-                <p>The National Conference of Chief Secretaries required a visual identity that reflected authority, collaboration, national significance and modern governance. Our objective was to create a cohesive design language that would resonate across digital platforms, communication materials and stakeholder touchpoints.</p>
+                @if (page.branding.overviewSection.subtitle) { <h4>{{ page.branding.overviewSection.subtitle }}</h4> }
+                @if (page.branding.overviewSection.description) { <p [innerHTML]="page.branding.overviewSection.description"></p> }
             </div>
         </div>
     </div>
+    }
+    @if (hasBrandingBlock(page.branding.typography) || page.branding.typography.primaryFontHeading || page.branding.typography.secondaryFontHeading) {
     <div class="pd_bottom">
         <div class="the_context">
             <div class="the_context_heading">
                 <h2>02</h2>
-                <h3>Brand <span>Typography</span></h3>
+                <h3>{{ page.branding.typography.headingFirst }} <span>{{ page.branding.typography.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Typography with Purpose</h4>
-                <p>The typography system combines Mulish and Inter, with each typeface assigned a specific role within the digital experience. Mulish establishes the brand's visual personality, while Inter is optimized for displaying numerical and data-driven information with clarity and consistency.</p>
+                @if (page.branding.typography.subtitle) { <h4>{{ page.branding.typography.subtitle }}</h4> }
+                @if (page.branding.typography.description) { <p [innerHTML]="page.branding.typography.description"></p> }
             </div>
             <div class="typography">
+                @if (page.branding.typography.primaryFontHeading || page.branding.typography.primaryFontDescription) {
                 <div class="typo_item">
                     <div class="typo_fontFamily mulishFont">
                         <div>
                             <span>Primary Font</span>
-                            <h2>MULISH</h2>
+                            <h2>{{ page.branding.typography.primaryFontHeading }}</h2>
                         </div>
                     </div>
                     <div class="typo_content">
-                        <h4>Primary Typeface · Brand Expression</h4>
-                        <p>Mulish provides a clean and approachable personality for the brand. Its distinctive character helps create a clear visual hierarchy across headings, titles, and key communication.</p>
+                        <h4>{{ page.branding.typography.primaryFontHeading }}</h4>
+                        <p [innerHTML]="page.branding.typography.primaryFontDescription"></p>
                     </div>
                 </div>
+                }
+                @if (page.branding.typography.secondaryFontHeading || page.branding.typography.secondaryFontDescription) {
                 <div class="typo_item">
                     <div class="typo_fontFamily interFont">
                         <div>
-                            <span>Primary Font</span>
-                            <h2>INTER</h2>
+                            <span>Secondary Font</span>
+                            <h2>{{ page.branding.typography.secondaryFontHeading }}</h2>
                         </div>
                     </div>
                     <div class="typo_content">
-                        <h4>Data Typeface · Numerical Clarity</h4>
-                        <p>Inter was primarily selected for numerical and data-driven content. Its clean forms and highly legible numerals make complex statistics easier to scan, compare, and understand across dashboards, indexes, and data visualizations.</p>
+                        <h4>{{ page.branding.typography.secondaryFontHeading }}</h4>
+                        <p [innerHTML]="page.branding.typography.secondaryFontDescription"></p>
                     </div>
                 </div>
+                }
             </div>
         </div>
     </div>
+    }
 
+    @if (hasBrandingBlock(page.branding.colorPalette) || page.branding.colorPalette.themes.length) {
     <div class="ourApproach">
         <div class="the_context">
             <div class="the_context_heading">
                 <h2>03</h2>
-                <h3>Color <span>Palette</span></h3>
+                <h3>{{ page.branding.colorPalette.headingFirst }} <span>{{ page.branding.colorPalette.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>A Flexible Color System for Consistent Brand Experiences</h4>
-                <p>The color palette was structured into three levels to maintain a consistent brand identity while allowing flexibility across different products, themes, and visual contexts.</p>                  
+                @if (page.branding.colorPalette.subtitle) { <h4>{{ page.branding.colorPalette.subtitle }}</h4> }
+                @if (page.branding.colorPalette.description) { <p [innerHTML]="page.branding.colorPalette.description"></p> }
             </div>
             <div class="typography">
-                <div class="typo_content">
-                    <h4>Core Brand Identity</h4>
-                    <p>The primary colors form the foundation of the visual language and are used throughout the main design system. They establish the core brand presence across interfaces, key components, navigation, and primary interactions.</p>
+                @for (theme of page.branding.colorPalette.themes; track $index) {
+                <div class="typo_content" [class.mt-100]="$index > 0">
+                    <h4>{{ theme.headingFirst }} {{ theme.headingSecond }}</h4>
+                    @if (theme.subtitle) { <p>{{ theme.subtitle }}</p> }
+                    @if (theme.description) { <p [innerHTML]="theme.description"></p> }
                 </div>
                 <div class="palette">
-                    <h5>PRIMARY COLORS</h5>
+                    <h5>{{ paletteTitle(theme.type) }}</h5>
                     <ul>
-                        <li class="dark_blue">
-                            <p>DARK BLUE</p>
+                        @for (color of theme.colors; track $index) {
+                        <li [style.background-color]="color.hex">
+                            <p>{{ color.name || color.hex }}</p>
                         </li>
-                        <li class="yellow">
-                            <p>YELLOW</p>
-                        </li>
-                        <li class="bright_orange">
-                            <p>BRIGHT ORANGE</p>
-                        </li>
-                        <li class="white">
-                            <p>WHITE</p>
-                        </li>
-                        <li class="bright_green">
-                            <p>BRIGHT GREEN</p>
-                        </li>
-                        <li class="black">
-                            <p>BLACK</p>
-                        </li>
+                        }
                     </ul>
                 </div>
-
-                <div class="typo_content mt-100">
-                    <h4>Theme & Visual Alignment</h4>
-                    <p>Secondary colors extend the primary palette to support different themes, categories, and content areas. They allow individual sections or experiences to have their own visual character while remaining aligned with the overall brand system.</p>
-                </div>
-                <div class="palette">
-                    <h5>SECONDARY COLORS</h5>
-                    <ul>
-                        <li style="background-color: #FFB6B6;">
-                            <p>#FFB6B6</p>
-                        </li>
-                        <li style="background-color: #FFD4B6;">
-                            <p>#FFD4B6</p>
-                        </li>
-                        <li style="background-color: #B6FFC6;">
-                            <p>#B6FFC6</p>
-                        </li>
-                        <li style="background-color: #B6CAFF;">
-                            <p>#B6CAFF</p>
-                        </li>
-                        <li style="background-color: #B6FFFB;">
-                            <p>#B6FFFB</p>
-                        </li>
-                        <li style="background-color: #FFB6EF;">
-                            <p>#FFB6EF</p>
-                        </li>
-
-                        <li style="background-color: #FFEEEE;">
-                            <p>#FFEEEE</p>
-                        </li>
-                        <li style="background-color: #B24545;">
-                            <p>#B24545</p>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="typo_content mt-100">
-                    <h4>Data & Visual Enrichment</h4>
-                    <p>Tertiary colors are used selectively to introduce additional visual distinction where the primary and secondary palettes are not sufficient. They are particularly useful for data visualization, charts, indicators, highlights, and supporting information.</p>
-                </div>
-                <div class="palette">
-                    <h5>TERCIARY COLORS</h5>
-                    <ul>
-                        <li style="background-color: #209BCF; color: #fff;">
-                            <p>DARK SKY BLUE</p>
-                        </li>
-                        <li style="background-color: #2BBAA0; color: #fff;">
-                            <p>SEA GREEN</p>
-                        </li>                        
-                    </ul>
-                </div>
+                }
             </div>
         </div>
     </div>
+    }
 
+    @if (hasBrandingBlock(page.branding.logoDesignSection) || page.branding.logoDesignSection.images.length) {
     <div class="logoDesign">
         <div class="the_context">
             <div class="the_context_heading">
                 <h2>04</h2>
-                <h3>Logo <span>Design</span></h3>
+                <h3>{{ page.branding.logoDesignSection.headingFirst }} <span>{{ page.branding.logoDesignSection.headingSecond }}</span></h3>
             </div>
             <div class="the_context_para">
-                <h4>Clarity Through Institutional Simplicity</h4>
-                <p>The logo was designed to establish a clear and authoritative identity for the National Conference of Chief Secretaries, while maintaining a strong connection with the Government of India.</p>
+                @if (page.branding.logoDesignSection.subtitle) { <h4>{{ page.branding.logoDesignSection.subtitle }}</h4> }
+                @if (page.branding.logoDesignSection.description) { <p [innerHTML]="page.branding.logoDesignSection.description"></p> }
+                @if (page.branding.logoDesignSection.images.length) {
                 <div class="ld_img text-center">
-                    <img src="assets/images/logo_design.svg" alt="">
+                    @for (image of page.branding.logoDesignSection.images; track $index) {
+                    <img [src]="image.src" [alt]="image.alt || project?.title || ''">
+                    }
                 </div>
-                <p>The logo follows a simple, authoritative approach based on the client's requirement for clear product identification. The conference name is given strong visual prominence, while the Indian State Emblem establishes its official association with the Government of India. The restrained typography and color palette create a professional identity that remains clear across digital and official communication.</p>
+                }
             </div>
         </div>
     </div>
+    }
 </div>
 }
+@if (relatedSliderCards.length) {
 <div class="ourApproach">
     <div class="the_context">
         <div class="the_context_heading">
@@ -399,7 +367,7 @@
                     <div class="ci_content">
 
                         <div class="cic_top">
-                        <span>{{ card.category }}</span>
+                        @if (card.category) { <span>{{ card.category }}</span> }
                         <h2>{{ card.title }}</h2>
                         <p>{{ card.description }}</p>
                         </div>
@@ -464,3 +432,4 @@
         </div>        
     </div>
 </div>
+}

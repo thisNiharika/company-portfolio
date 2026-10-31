@@ -6,9 +6,12 @@ import {
   inject,
   ViewChild,
   OnDestroy,
+  OnInit,
   ChangeDetectorRef
 } from '@angular/core';
 import { RouteTransitionService } from '../../core/services/route-transition.service';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 interface RelatedCard {
@@ -18,8 +21,87 @@ interface RelatedCard {
   image?: string;
   link: string;
 }
-interface RelatedProjects {
-  cards: RelatedCard[];
+
+interface PublicProject {
+  id?: string;
+  _id?: string;
+  title: string;
+  description: string;
+  year?: number;
+  coverImage?: string;
+  slug: string;
+  status?: 'draft' | 'published';
+}
+
+interface PageImage {
+  src: string;
+  alt?: string;
+}
+
+interface EditableItem {
+  title?: string;
+  description: string;
+}
+
+interface EditableSection {
+  headingFirst: string;
+  headingSecond: string;
+  subtitle?: string;
+  paragraphs: string[];
+  items: EditableItem[];
+  images: PageImage[];
+  quote?: string;
+  enabled?: boolean;
+}
+
+interface BrandingTextBlock {
+  headingFirst: string;
+  headingSecond: string;
+  subtitle: string;
+  description: string;
+}
+
+interface BrandingColor {
+  hex: string;
+  name: string;
+}
+
+interface BrandingTheme extends BrandingTextBlock {
+  type: 'primary' | 'secondary' | 'tertiary';
+  colors: BrandingColor[];
+}
+
+interface DetailPageContent {
+  overview: {
+    clientLogo: string;
+    client: string;
+    duration: string;
+    geoScope: string;
+    domain: string;
+    productScale: string;
+  };
+  context: EditableSection;
+  challenge: EditableSection;
+  approach: EditableSection;
+  transformation: EditableSection;
+  impact: EditableSection;
+  certifications: EditableSection;
+  relatedProjectIds: string[];
+  branding: {
+    overviewSection: BrandingTextBlock;
+    typography: BrandingTextBlock & {
+      primaryFontHeading: string;
+      primaryFontDescription: string;
+      secondaryFontHeading: string;
+      secondaryFontDescription: string;
+    };
+    colorPalette: BrandingTextBlock & { themes: BrandingTheme[] };
+    logoDesignSection: BrandingTextBlock & { images: PageImage[] };
+    overview?: string;
+    colors?: BrandingColor[];
+    theme?: string;
+    logoDesign?: string;
+  };
 }
 
 gsap.registerPlugin(ScrollTrigger);
@@ -29,12 +111,32 @@ gsap.registerPlugin(ScrollTrigger);
   templateUrl: './project-details.html',
   styleUrl: './project-details.css',
 })
-export class ProjectDetails implements AfterViewInit, OnDestroy {
+export class ProjectDetails implements OnInit, AfterViewInit, OnDestroy {
   
   private readonly changeDetector = inject(ChangeDetectorRef);
   readonly routeTransition = inject(RouteTransitionService);
   private readonly pageElement = inject(ElementRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'https://company-portfolio-api.onrender.com/projects';
   private scrollContext: any;
+
+  private readonly overviewSectionOrder: Array<
+    'context' | 'challenge' | 'approach' | 'transformation' | 'impact' | 'certifications'
+  > = [
+    'context',
+    'challenge',
+    'approach',
+    'transformation',
+    'impact',
+    'certifications'
+  ];
+
+  project: PublicProject | null = null;
+  page: DetailPageContent = this.createEmptyPage();
+  loading = true;
+  error = '';
+  private allProjects: PublicProject[] = [];
   goTo(
     url: string,
     event: MouseEvent,
@@ -61,6 +163,252 @@ export class ProjectDetails implements AfterViewInit, OnDestroy {
 
   tabList = ['Overview', 'Branding'];
   activeTab = 'Overview';
+
+  ngOnInit(): void {
+    // paramMap also emits when a related-project link changes the slug
+    // while Angular reuses this same detail component.
+    this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug');
+
+      if (!slug) {
+        this.error = 'Project slug is missing from the route.';
+        this.loading = false;
+        console.error(this.error);
+        return;
+      }
+
+      this.loadProjectBySlug(slug);
+    });
+  }
+
+  private loadProjectBySlug(slug: string): void {
+    this.loading = true;
+    this.error = '';
+    this.project = null;
+    this.page = this.createEmptyPage();
+    this.stopAutoplay();
+    this.stopRelatedAutoplay();
+    this.changeDetector.detectChanges();
+
+    this.http.get<PublicProject[]>(this.apiUrl).subscribe({
+      next: (projects) => {
+        this.allProjects = (projects ?? []).map((item: any) => ({
+          ...item,
+          id: String(item.id ?? item._id ?? '')
+        }));
+
+        const selectedProject = this.allProjects.find(
+          item => item.slug === slug
+        );
+
+        if (!selectedProject) {
+          this.error = `Project not found for slug: ${slug}`;
+          this.loading = false;
+          console.error(this.error);
+          this.changeDetector.detectChanges();
+          return;
+        }
+
+        this.project = selectedProject;
+        const projectId = String(selectedProject.id ?? selectedProject._id ?? '');
+
+        if (!projectId) {
+          this.error = 'The selected project does not have a valid database ID.';
+          this.loading = false;
+          console.error(this.error);
+          this.changeDetector.detectChanges();
+          return;
+        }
+
+        this.http.get<Partial<DetailPageContent>>(
+          `${this.apiUrl}/${encodeURIComponent(projectId)}/detail-page`
+        ).subscribe({
+          next: (savedPage) => {
+            // The API returns the detail-page document directly.
+            // Support a nested detailPage response too, without adding demo content.
+            const data = ((savedPage as any)?.detailPage ?? savedPage ?? {}) as Partial<DetailPageContent>;
+            this.page = this.mergeSavedPage(this.createEmptyPage(), data);
+            this.loading = false;
+            this.changeDetector.detectChanges();
+            this.initializeLoadedPage();
+          },
+          error: (error) => {
+            this.error = error?.error?.message || 'Unable to load saved project details.';
+            this.loading = false;
+            console.error('Project detail-page request failed:', error);
+            this.changeDetector.detectChanges();
+            this.initializeLoadedPage();
+          }
+        });
+      },
+      error: (error) => {
+        this.error = error?.error?.message || 'Unable to load projects.';
+        this.loading = false;
+        console.error('Projects request failed:', error);
+        this.changeDetector.detectChanges();
+      }
+    });
+  }
+
+  private createEmptyPage(): DetailPageContent {
+    const emptySection = (): EditableSection => ({
+      headingFirst: '',
+      headingSecond: '',
+      subtitle: '',
+      paragraphs: [],
+      items: [],
+      images: [],
+      quote: ''
+    });
+    const emptyTextBlock = (): BrandingTextBlock => ({
+      headingFirst: '',
+      headingSecond: '',
+      subtitle: '',
+      description: ''
+    });
+
+    return {
+      overview: {
+        clientLogo: '',
+        client: '',
+        duration: '',
+        geoScope: '',
+        domain: '',
+        productScale: ''
+      },
+      context: emptySection(),
+      challenge: emptySection(),
+      approach: emptySection(),
+      transformation: emptySection(),
+      impact: emptySection(),
+      certifications: emptySection(),
+      relatedProjectIds: [],
+      branding: {
+        overviewSection: emptyTextBlock(),
+        typography: {
+          ...emptyTextBlock(),
+          primaryFontHeading: '',
+          primaryFontDescription: '',
+          secondaryFontHeading: '',
+          secondaryFontDescription: ''
+        },
+        colorPalette: { ...emptyTextBlock(), themes: [] },
+        logoDesignSection: { ...emptyTextBlock(), images: [] },
+        overview: '',
+        colors: [],
+        theme: '',
+        logoDesign: ''
+      }
+    };
+  }
+
+  private mergeSavedPage(
+    base: DetailPageContent,
+    saved: Partial<DetailPageContent>
+  ): DetailPageContent {
+    const mergeSection = (
+      original: EditableSection,
+      update?: Partial<EditableSection>
+    ): EditableSection => ({
+      ...original,
+      ...(update ?? {}),
+      paragraphs: update?.paragraphs ?? original.paragraphs,
+      items: update?.items ?? original.items,
+      images: update?.images ?? original.images
+    });
+
+    const branding = saved.branding ?? {} as DetailPageContent['branding'];
+
+    return {
+      ...base,
+      ...saved,
+      overview: { ...base.overview, ...(saved.overview ?? {}) },
+      context: mergeSection(base.context, saved.context),
+      challenge: mergeSection(base.challenge, saved.challenge),
+      approach: mergeSection(base.approach, saved.approach),
+      transformation: mergeSection(base.transformation, saved.transformation),
+      impact: mergeSection(base.impact, saved.impact),
+      certifications: mergeSection(base.certifications, saved.certifications),
+      relatedProjectIds: saved.relatedProjectIds ?? base.relatedProjectIds,
+      branding: {
+        ...base.branding,
+        ...branding,
+        overviewSection: {
+          ...base.branding.overviewSection,
+          ...(branding.overviewSection ?? {})
+        },
+        typography: {
+          ...base.branding.typography,
+          ...(branding.typography ?? {})
+        },
+        colorPalette: {
+          ...base.branding.colorPalette,
+          ...(branding.colorPalette ?? {}),
+          themes: branding.colorPalette?.themes ?? []
+        },
+        logoDesignSection: {
+          ...base.branding.logoDesignSection,
+          ...(branding.logoDesignSection ?? {}),
+          images: branding.logoDesignSection?.images ?? []
+        }
+      }
+    };
+  }
+
+  private initializeLoadedPage(): void {
+    this.changeDetector.detectChanges();
+
+    requestAnimationFrame(() => {
+      this.moveBackground();
+      this.animateSlides(true);
+      this.startAutoplay();
+      this.initializeRelatedSlider();
+      this.startRelatedAutoplay();
+      this.initPageScrollAnimation();
+      ScrollTrigger.refresh();
+    });
+  }
+
+  get slides(): PageImage[] {
+    return (this.page.context.images ?? []).filter(image => !!image?.src);
+  }
+
+  paletteTitle(type: string): string {
+    return `${String(type ?? '').toUpperCase()} COLORS`;
+  }
+
+  getSectionNumber(
+    sectionKey: 'context' | 'challenge' | 'approach' | 'transformation' | 'impact' | 'certifications'
+  ): string {
+    const visibleSections = this.overviewSectionOrder.filter(key => {
+      const section = this.page[key];
+      return section.enabled !== false && this.hasSectionContent(section);
+    });
+
+    const position = visibleSections.indexOf(sectionKey);
+    return position < 0 ? '' : String(position + 1).padStart(2, '0');
+  }
+
+  hasSectionContent(section: EditableSection): boolean {
+    return !!(
+      section.headingFirst?.trim() ||
+      section.headingSecond?.trim() ||
+      section.subtitle?.trim() ||
+      section.quote?.trim() ||
+      (section.paragraphs ?? []).some(value => !!value?.trim()) ||
+      (section.items ?? []).some(item => !!(item.title?.trim() || item.description?.trim())) ||
+      (section.images ?? []).some(image => !!image?.src?.trim())
+    );
+  }
+
+  hasBrandingBlock(block: BrandingTextBlock): boolean {
+    return !!(
+      block.headingFirst?.trim() ||
+      block.headingSecond?.trim() ||
+      block.subtitle?.trim() ||
+      block.description?.trim()
+    );
+  }
 
   ngAfterViewInit(): void {
     requestAnimationFrame(() => {
@@ -790,25 +1138,6 @@ if (certificationBlock) {
   }
 
   // ============================================= Slider
-  
-slides = [
-  {
-    src: 'assets/images/slider_1.jpg',
-    alt: 'Slide 1'
-  },
-  {
-    src: 'assets/images/slider_2.jpg',
-    alt: 'Slide 2'
-  },
-  {
-    src: 'assets/images/slider_2.jpg',
-    alt: 'Slide 3'
-  },
-  {
-    src: 'assets/images/slider_1.jpg',
-    alt: 'Slide 4'
-  }
-];
 
 activeIndex = 0;
 isDragging = false;
@@ -1319,7 +1648,16 @@ private stopAutoplay(): void {
     ReturnType<typeof setInterval> | undefined;
 
   private get relatedCards(): RelatedCard[] {
-    return this.portfolioYears.flatMap(related => related.cards);
+    return (this.page.relatedProjectIds ?? [])
+      .map(id => this.allProjects.find(project => String(project.id ?? project._id) === String(id)))
+      .filter((project): project is PublicProject => !!project)
+      .map(project => ({
+        category: project.year ? String(project.year) : '',
+        title: project.title,
+        description: project.description,
+        image: project.coverImage || '',
+        link: project.slug ? `/projects/${encodeURIComponent(project.slug)}` : '/portfolio'
+      }));
   }
   get isRelatedSliderEnabled(): boolean {
     return this.relatedCards.length > 2;
@@ -1650,29 +1988,4 @@ private stopAutoplay(): void {
     ScrollTrigger.refresh();
   }
 
-  // =======================================
-  readonly portfolioYears: RelatedProjects[] = [
-    {
-      cards: [
-        {
-          category: 'Kyrgyzstan | UNFPA, UN Women',
-          title: 'Gender Data Portal',
-          description:
-            'The Gender Data Portal is an interactive, user-friendly digital platform designed as a comprehensive hub for gender statistics in Kyrgyzstan.',
-          image: 'assets/images/portfolio/gender-data-portal.jpg',
-          link: '/portfolio-details'
-        },
-        {
-          category: 'India | NITI Aayog, UNDP',
-          title: 'National Conference of Chief Secretaries',
-          description:
-            'The National Conference of Chief Secretaries is a flagship initiative of the Government of India, led by NITI Aayog.',
-          image:
-            'assets/images/portfolio/national-conferenc-of-chief-secretaries.jpg',
-          link: '/portfolio-details'
-        }
-      ]
-    }
-  ];
-  
 }
