@@ -1,205 +1,723 @@
-<div class="edit-page-shell">
-  <div class="pd_top edit-page-toolbar">
-    <button type="button" class="arrow_back" (click)="goBack()">
-      <img src="assets/images/arrow_right.svg" alt=""> Back to projects
-    </button>
-    <div class="pd_tab">
-      <ul>
-        <li [class.active]="activeTab === 'Overview'" (click)="selectTab('Overview')">Overview</li>
-        <li [class.active]="activeTab === 'Branding'" (click)="selectTab('Branding')">Branding</li>
-      </ul>
+<div class="edit-page-shell" [class.is-saving]="!!savingSection" [attr.aria-busy]="!!savingSection">
+  @if (savingSection) {
+  <div class="edit-save-overlay" role="status" aria-live="polite" aria-atomic="true">
+    <div class="edit-save-dialog">
+      <span class="edit-save-spinner" aria-hidden="true"></span>
+      <p class="edit-save-eyebrow">PLEASE WAIT</p>
+      <h2>{{ savingSection === 'related' ? 'Updating related projects' : 'Saving your changes' }}</h2>
+      <p class="edit-save-description">Your changes are being saved securely. Keep this page open for a moment.</p>
+      <div class="edit-save-progress" aria-hidden="true"><span></span></div>
     </div>
-    <button type="button" class="edit-page-preview" (click)="openPreview()" [disabled]="!project">Preview page ↗</button>
   </div>
+  }
+  <div class="edit-page-interaction-layer" [attr.inert]="savingSection ? '' : null">
+    <div class="pd_top edit-page-toolbar">
+      <button type="button" class="arrow_back" (click)="goBack()">
+        <img src="assets/images/arrow_right.svg" alt=""> Back to projects
+      </button>
+      <div class="pd_tab">
+        <ul>
+          <li [class.active]="activeTab === 'Overview'" (click)="selectTab('Overview')">Overview</li>
+          <li [class.active]="activeTab === 'Branding'" (click)="selectTab('Branding')">Branding</li>
+        </ul>
+      </div>
+      <button type="button" class="edit-page-preview" (click)="openPreview()" [disabled]="!project">Preview page
+        ↗</button>
+    </div>
 
-  @if (loading) {
+    @if (loading) {
     <div class="edit-page-state" role="status">Loading project details…</div>
-  } @else if (error) {
+    } @else if (error) {
     <div class="edit-page-state edit-page-error" role="alert">
       <p>{{ error }}</p><button type="button" (click)="goBack()">Back to projects</button>
     </div>
-  } @else if (project) {
+    } @else if (project) {
     @if (saveError) { <p class="inline-save-error" role="alert">{{ saveError }}</p> }
     @if (saveSuccess) { <p class="inline-save-success" role="status">{{ saveSuccess }}</p> }
 
     @if (activeTab === 'Overview') {
-      <div class="pd_overview">
-        <div class="pd_bottom">
-          <div class="pdb_banner">
-            <div class="pdb_left">
-              <img class="client_logo img-fluid" [src]="page.overview.clientLogo" alt="Client logo">
-              @if (editingSection === 'overview') {
-                <div class="inline-editor-fields">
-                  <label>Client logo <input type="file" accept="image/*" (change)="selectImage($event, 'overview', 'clientLogo')"></label>
-                  <label>Client <input [(ngModel)]="draft.overview.client"></label>
-                  <label>Duration <input [(ngModel)]="draft.overview.duration"></label>
-                  <label>Geo Scope <input [(ngModel)]="draft.overview.geoScope"></label>
-                  <label>Domain <input [(ngModel)]="draft.overview.domain"></label>
-                  <label>Product Scale <input [(ngModel)]="draft.overview.productScale"></label>
-                  <div class="inline-editor-tools">
-                    <button type="button" (click)="saveSection('overview')" [disabled]="savingSection === 'overview'">✓ Save</button>
-                    <button type="button" (click)="cancelEdit()">✕ Cancel</button>
-                  </div>
-                </div>
-              } @else {
-                <h3>{{ project.title }}</h3>
-                <div class="inline-editor-tools"><button type="button" (click)="startEdit('overview')" aria-label="Edit client details">✎ Edit client details</button></div>
-                <div class="client_details"><span>Client</span><p>{{ page.overview.client }}</p></div>
-                <div class="client_details"><span>Duration</span><p>{{ page.overview.duration }}</p></div>
-                <div class="client_details"><span>Geo Scope</span><p>{{ page.overview.geoScope }}</p></div>
-                <div class="client_details"><span>Domain</span><p>{{ page.overview.domain }}</p></div>
-                <div class="client_details"><span>Product Scale</span><p>{{ page.overview.productScale }}</p></div>
+    <div class="pd_overview">
+      <div class="pd_bottom">
+        <div class="pdb_banner">
+          <div class="pdb_left">
+            @if (page.overview.clientLogo) {
+            <img class="client_logo img-fluid" [src]="page.overview.clientLogo" alt="Client logo">
+            }
+            @if (editingSection === 'overview') {
+            <div class="inline-editor-fields">
+              <label>Client logo <input type="file" accept="image/*"
+                  (change)="selectImage($event, 'overview', 'clientLogo')"></label>
+              <label>Client <input [(ngModel)]="draft.overview.client" placeholder="Enter client name"></label>
+              <label>Duration <input [(ngModel)]="draft.overview.duration" placeholder="Enter project duration"></label>
+              <label>Geo Scope <input [(ngModel)]="draft.overview.geoScope"
+                  placeholder="Enter geographic scope"></label>
+              <label>Domain (optional) <input [(ngModel)]="draft.overview.domain"
+                  placeholder="Leave blank if not applicable"></label>
+              <label>Product Scale <input [(ngModel)]="draft.overview.productScale"
+                  placeholder="Enter product scale"></label>
+              <div class="inline-editor-tools">
+                <button type="button" (click)="saveSection('overview')" [disabled]="savingSection === 'overview'">✓
+                  Save</button>
+                <button type="button" (click)="cancelEdit()">✕ Cancel</button>
+              </div>
+            </div>
+            } @else {
+            <h3>{{ project.title }}</h3>
+            <div class="inline-editor-tools"><button type="button" (click)="startEdit('overview')"
+                aria-label="Edit client details">✎ Edit client details</button></div>
+            @if (page.overview.client) { <div class="client_details"><span>Client</span>
+              <p>{{ page.overview.client }}</p>
+            </div> }
+            @if (page.overview.duration) { <div class="client_details"><span>Duration</span>
+              <p>{{ page.overview.duration }}</p>
+            </div> }
+            @if (page.overview.geoScope) { <div class="client_details"><span>Geo Scope</span>
+              <p>{{ page.overview.geoScope }}</p>
+            </div> }
+            @if (page.overview.domain) { <div class="client_details"><span>Domain</span>
+              <p>{{ page.overview.domain }}</p>
+            </div> }
+            @if (page.overview.productScale) { <div class="client_details"><span>Product Scale</span>
+              <p>{{ page.overview.productScale }}</p>
+            </div> }
+            @if (!page.overview.client && !page.overview.duration && !page.overview.geoScope && !page.overview.domain &&
+            !page.overview.productScale) {
+
+            }
+            }
+          </div>
+          <!-- <div class="pdb_right">
+              <div class="pdb_right_img"><img class="img-fluid w-100" [src]="project.coverImage || 'assets/images/project_details_banner.jpg'" [alt]="project.title"></div>
+            </div> -->
+        </div>
+
+        @if (page.context.enabled !== false) {
+        <section class="the_context edit-content-section" style="position:relative;">
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+            <div class="section-edit-tools">
+              @if (editingSection !== 'context') { <button type="button" (click)="startEdit('context')"
+                aria-label="Edit context">✎</button> }
+              @else { <button type="button" (click)="saveSection('context')"
+                [disabled]="savingSection === 'context'">✓</button><button type="button"
+                (click)="cancelEdit()">✕</button>
               }
             </div>
-            <div class="pdb_right">
-              <div class="pdb_right_img"><img class="img-fluid w-100" [src]="project.coverImage || 'assets/images/project_details_banner.jpg'" [alt]="project.title"></div>
-            </div>
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the context section from the public page" aria-label="Remove context section"
+              (click)="removeSection('context')">Remove section</button>
           </div>
+          <div class="the_context_heading">
+            <h2>01</h2>
+            <h3>{{ displayPage.context.headingFirst || 'The' }} <span>{{ displayPage.context.headingSecond || 'Context'
+                }}</span></h3>
 
-          <section class="the_context edit-content-section">
+            @if (editingSection === 'context') {
+            <div class="inline-editor-fields">
+
+              <div class="section-heading-fields"><label>Heading <input [(ngModel)]="draft.context.headingFirst"
+                    placeholder="Enter heading"></label><label>Highlighted heading <input
+                    [(ngModel)]="draft.context.headingSecond" placeholder="Enter highlighted heading"></label></div>
+              <label>Subtitle <input [(ngModel)]="draft.context.subtitle" placeholder="Enter subtitle"></label>
+              @for (paragraph of draft.context.paragraphs; track $index; let i = $index) {
+              <label>Paragraph {{ i + 1 }}</label>
+              <div class="rich-editor-toolbar"><button type="button"
+                  (click)="formatRichText('context', i, 'bold')"><b>B</b></button><button type="button"
+                  (click)="formatRichText('context', i, 'italic')"><i>I</i></button><button type="button"
+                  (click)="formatRichText('context', i, 'underline')"><u>U</u></button></div>
+              <div class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true"
+                data-placeholder="Description" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph"
+                (input)="updateRichText($event, 'context', i)"></div>
+              }
+              <label>Add images <input type="file" accept="image/*" multiple
+                  (change)="selectMultipleImages($event, 'context', 'images')"></label>
+              @for (image of draft.context.images; track $index; let i = $index) {
+              <div class="image-editor-row"><img [src]="image.src" width="80"
+                  [alt]="image.alt || 'Context image'"><button type="button"
+                  (click)="moveItem('context','images',i,-1)">↑</button><button type="button"
+                  (click)="moveItem('context','images',i,1)">↓</button><button type="button"
+                  (click)="removeItem('context','images',i)">Remove</button></div>
+              }
+            </div>
+            }
+          </div>
+          <div class="the_context_para">
+            <h4>{{ displayPage.context.subtitle }}</h4>
+            @for (paragraph of displayPage.context.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p>
+            }
+          </div>
+        </section>
+        } @else { <button type="button" class="restore-content-section" (click)="restoreSection('context')">Restore
+          Context section</button> }
+
+        @if (page.challenge.enabled !== false) {
+        <section class="theChallenge edit-content-section" style="position:relative;">
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+            <div class="section-edit-tools">@if (editingSection !== 'challenge') { <button type="button"
+                (click)="startEdit('challenge')">✎</button> } @else { <button type="button"
+                (click)="saveSection('challenge')" [disabled]="savingSection === 'challenge'">✓</button><button
+                type="button" (click)="cancelEdit()">✕</button> }</div>
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the challenge section from the public page" aria-label="Remove challenge section"
+              (click)="removeSection('challenge')">Remove section</button>
+          </div>
+          <div class="the_context">
             <div class="the_context_heading">
-              <h2>01</h2><h3>{{ page.context.headingFirst }} <span>{{ page.context.headingSecond }}</span></h3>
-              <div class="inline-editor-tools">
-                @if (editingSection !== 'context') { <button type="button" (click)="startEdit('context')" aria-label="Edit context">✎</button> }
-                @else { <button type="button" (click)="saveSection('context')" [disabled]="savingSection === 'context'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }
+              <h2>02</h2>
+              <h3>{{ displayPage.challenge.headingFirst || 'The' }} <span>{{ displayPage.challenge.headingSecond ||
+                  'Challenge' }}</span></h3>
+
+              @if (editingSection === 'challenge') {
+              <div class="inline-editor-fields">
+                <div class="section-heading-fields"><label>Heading <input [(ngModel)]="draft.challenge.headingFirst"
+                      placeholder="Heading"></label><label>Highlighted heading <input
+                      [(ngModel)]="draft.challenge.headingSecond" placeholder="Highlighted heading"></label></div>
+                <label>Subtitle <input [(ngModel)]="draft.challenge.subtitle" placeholder="Subtitle"></label>
+                @for (paragraph of draft.challenge.paragraphs; track $index; let i = $index) { <label>Paragraph {{ i + 1
+                  }}</label>
+                <div class="rich-editor-toolbar"><button type="button"
+                    (click)="formatRichText('challenge',i,'bold')"><b>B</b></button><button type="button"
+                    (click)="formatRichText('challenge',i,'italic')"><i>I</i></button><button type="button"
+                    (click)="formatRichText('challenge',i,'underline')"><u>U</u></button></div>
+                <div class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true"
+                  data-placeholder="Description" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph"
+                  (input)="updateRichText($event,'challenge',i)"></div> }
               </div>
-              @if (editingSection === 'context') {
-                <div class="inline-editor-fields">
-                  <label>Heading <input [(ngModel)]="draft.context.headingFirst"></label>
-                  <label>Highlighted heading <input [(ngModel)]="draft.context.headingSecond"></label>
-                  <label>Subtitle <input [(ngModel)]="draft.context.subtitle"></label>
-                  @for (paragraph of draft.context.paragraphs; track $index; let i = $index) {
-                    <label>Paragraph {{ i + 1 }}</label>
-                    <div class="rich-editor-toolbar"><button type="button" (click)="formatRichText('context', i, 'bold')"><b>B</b></button><button type="button" (click)="formatRichText('context', i, 'italic')"><i>I</i></button><button type="button" (click)="formatRichText('context', i, 'underline')"><u>U</u></button></div>
-                    <div class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph" (input)="updateRichText($event, 'context', i)"></div>
-                  }
-                  <label>Add slider images <input type="file" accept="image/*" multiple (change)="selectMultipleImages($event, 'context', 'images')"></label>
-                  @for (image of draft.context.images; track $index; let i = $index) {
-                    <div class="image-editor-row"><img [src]="image.src" width="80" [alt]="image.alt || 'Context image'"><button type="button" (click)="moveItem('context','images',i,-1)">↑</button><button type="button" (click)="moveItem('context','images',i,1)">↓</button><button type="button" (click)="removeItem('context','images',i)">Remove</button></div>
-                  }
-                </div>
               }
             </div>
             <div class="the_context_para">
-              <h4>{{ page.context.subtitle }}</h4>
-              @for (paragraph of page.context.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }
-            </div>
-          </section>
-          <div class="w-100 overflow-hidden">
-            <div class="context_slider" [class.is-dragging]="isDragging" (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)" (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)">
-              @for (slide of page.context.images; track $index; let i = $index) {
-                <div class="item" [class.active]="activeIndex === i" (click)="onSlideItemClick(i,$event)"><img [src]="slide.src" [alt]="slide.alt || 'Context image'"></div>
-              }
-              <div class="cs_btn"><button type="button" class="slider_btn slider_prev" (pointerdown)="$event.stopPropagation()" (click)="previousSlide()"><img src="assets/images/arrow_line.svg" alt="Previous"></button><button type="button" class="slider_btn slider_next" (pointerdown)="$event.stopPropagation()" (click)="nextSlide()"><img src="assets/images/arrow_line.svg" alt="Next"></button></div>
+              <h4>{{ displayPage.challenge.subtitle }}</h4>@for (paragraph of displayPage.challenge.paragraphs; track
+              $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }
             </div>
           </div>
+        </section>
 
-          <section class="theChallenge edit-content-section">
-            <div class="the_context">
-              <div class="the_context_heading"><h2>02</h2><h3>{{ page.challenge.headingFirst }} <span>{{ page.challenge.headingSecond }}</span></h3>
-                <div class="inline-editor-tools">@if (editingSection !== 'challenge') { <button type="button" (click)="startEdit('challenge')">✎</button> } @else { <button type="button" (click)="saveSection('challenge')" [disabled]="savingSection === 'challenge'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }</div>
-                @if (editingSection === 'challenge') {
-                  <div class="inline-editor-fields"><label>Heading <input [(ngModel)]="draft.challenge.headingFirst"></label><label>Highlighted heading <input [(ngModel)]="draft.challenge.headingSecond"></label><label>Subtitle <input [(ngModel)]="draft.challenge.subtitle"></label>
-                    @for (paragraph of draft.challenge.paragraphs; track $index; let i = $index) { <label>Paragraph {{ i + 1 }}</label><div class="rich-editor-toolbar"><button type="button" (click)="formatRichText('challenge',i,'bold')"><b>B</b></button><button type="button" (click)="formatRichText('challenge',i,'italic')"><i>I</i></button><button type="button" (click)="formatRichText('challenge',i,'underline')"><u>U</u></button></div><div class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph" (input)="updateRichText($event,'challenge',i)"></div> }
-                  </div>
-                }
-              </div>
-              <div class="the_context_para"><h4>{{ page.challenge.subtitle }}</h4>@for (paragraph of page.challenge.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }</div>
-            </div>
-          </section>
+        } @else { <button type="button" class="restore-content-section" (click)="restoreSection('challenge')">Restore
+          Challenge section</button> }
 
-          <section class="ourApproach edit-content-section"><div class="the_context">
-            <div class="the_context_heading"><h2>03</h2><h3>{{ page.approach.headingFirst }} <span>{{ page.approach.headingSecond }}</span></h3>
-              <div class="inline-editor-tools">@if (editingSection !== 'approach') { <button type="button" (click)="startEdit('approach')">✎</button> } @else { <button type="button" (click)="saveSection('approach')" [disabled]="savingSection === 'approach'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }</div>
-              @if (editingSection === 'approach') { <div class="inline-editor-fields"><label>Heading <input [(ngModel)]="draft.approach.headingFirst"></label><label>Highlighted heading <input [(ngModel)]="draft.approach.headingSecond"></label><label>Subtitle <input [(ngModel)]="draft.approach.subtitle"></label>
-                @for (paragraph of draft.approach.paragraphs; track $index; let i = $index) { <label>Intro paragraph {{ i + 1 }}</label><div class="rich-editor-toolbar"><button type="button" (click)="formatRichText('approach',i,'bold')">B</button><button type="button" (click)="formatRichText('approach',i,'italic')">I</button><button type="button" (click)="formatRichText('approach',i,'underline')">U</button></div><div class="rich-editor" contenteditable="true" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph" (input)="updateRichText($event,'approach',i)"></div> }
-                @for (item of draft.approach.items; track $index; let i = $index) { <div class="inline-list-editor"><label>Item heading <input [(ngModel)]="item.title"></label><label>Item description <textarea [(ngModel)]="item.description"></textarea></label><button type="button" (click)="moveItem('approach','items',i,-1)">↑</button><button type="button" (click)="moveItem('approach','items',i,1)">↓</button><button type="button" (click)="removeItem('approach','items',i)">Remove</button></div> }
+        @if (page.approach.enabled !== false) {
+        <section class="ourApproach edit-content-section" style="position:relative;">
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+            <div class="section-edit-tools">@if (editingSection !== 'approach') { <button type="button"
+                (click)="startEdit('approach')">✎</button> } @else { <button type="button"
+                (click)="saveSection('approach')" [disabled]="savingSection === 'approach'">✓</button><button
+                type="button" (click)="cancelEdit()">✕</button> }</div>
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the approach section from the public page" aria-label="Remove approach section"
+              (click)="removeSection('approach')">Remove section</button>
+          </div>
+          <div class="the_context">
+            <div class="the_context_heading">
+              <h2>03</h2>
+              <h3>{{ displayPage.approach.headingFirst || 'Our' }} <span>{{ displayPage.approach.headingSecond ||
+                  'Approach' }}</span></h3>
+
+              @if (editingSection === 'approach') { <div class="inline-editor-fields">
+                <div class="section-heading-fields"><label>Heading <input [(ngModel)]="draft.approach.headingFirst"
+                      placeholder="Heading"></label><label>Highlighted heading <input
+                      [(ngModel)]="draft.approach.headingSecond" placeholder="Highlighted heading"></label></div>
+                <label>Subtitle <input [(ngModel)]="draft.approach.subtitle" placeholder="Subtitle"></label>
+                @for (paragraph of draft.approach.paragraphs; track $index; let i = $index) { <label>Intro paragraph {{
+                  i
+                  + 1 }}</label>
+                <div class="rich-editor-toolbar"><button type="button"
+                    (click)="formatRichText('approach',i,'bold')">B</button><button type="button"
+                    (click)="formatRichText('approach',i,'italic')">I</button><button type="button"
+                    (click)="formatRichText('approach',i,'underline')">U</button></div>
+                <div class="rich-editor" contenteditable="true" data-placeholder="Description"
+                  (focus)="setRichTextTarget($event)" [innerHTML]="paragraph"
+                  (input)="updateRichText($event,'approach',i)"></div> }
+                @for (item of draft.approach.items; track $index; let i = $index) { <div class="inline-list-editor">
+                  <label>Item heading <input [(ngModel)]="item.title"></label><label>Item description <textarea
+                      [(ngModel)]="item.description"></textarea></label><button type="button"
+                    (click)="moveItem('approach','items',i,-1)">↑</button><button type="button"
+                    (click)="moveItem('approach','items',i,1)">↓</button><button type="button"
+                    (click)="removeItem('approach','items',i)">Remove</button>
+                </div> }
                 <button type="button" (click)="addItem('approach','items')">+ Add approach item</button>
               </div> }
             </div>
-            <div class="the_context_para"><h4>{{ page.approach.subtitle }}</h4>@for (paragraph of page.approach.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }<ol>@for (item of page.approach.items; track $index) { <li><h5>{{ item.title }}</h5><p [innerHTML]="item.description"></p></li> }</ol></div>
-          </div></section>
-
-          <section class="theTransformation edit-content-section"><div class="the_context">
-            <div class="the_context_heading"><h2>04</h2><h3>{{ page.transformation.headingFirst }} <span>{{ page.transformation.headingSecond }}</span></h3>
-              <div class="inline-editor-tools">@if (editingSection !== 'transformation') { <button type="button" (click)="startEdit('transformation')">✎</button> } @else { <button type="button" (click)="saveSection('transformation')" [disabled]="savingSection === 'transformation'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }</div>
-              @if (editingSection === 'transformation') { <div class="inline-editor-fields"><label>Heading <input [(ngModel)]="draft.transformation.headingFirst"></label><label>Highlighted heading <input [(ngModel)]="draft.transformation.headingSecond"></label><label>Subtitle <input [(ngModel)]="draft.transformation.subtitle"></label>
-                @for (paragraph of draft.transformation.paragraphs; track $index; let i = $index) { <label>Paragraph {{ i + 1 }}</label><div class="rich-editor-toolbar"><button type="button" (click)="formatRichText('transformation',i,'bold')">B</button><button type="button" (click)="formatRichText('transformation',i,'italic')">I</button><button type="button" (click)="formatRichText('transformation',i,'underline')">U</button></div><div class="rich-editor" contenteditable="true" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph" (input)="updateRichText($event,'transformation',i)"></div> }
-                @for (item of draft.transformation.items; track $index; let i = $index) { <div class="inline-list-editor"><label>List item <input [(ngModel)]="item.description"></label><button type="button" (click)="moveItem('transformation','items',i,-1)">↑</button><button type="button" (click)="moveItem('transformation','items',i,1)">↓</button><button type="button" (click)="removeItem('transformation','items',i)">Remove</button></div> }
-                <button type="button" (click)="addItem('transformation','items')">+ Add platform benefit</button>
-              </div> }
+            <div class="the_context_para">
+              <h4>{{ displayPage.approach.subtitle }}</h4>@for (paragraph of displayPage.approach.paragraphs; track
+              $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }<ol>@for (item of displayPage.approach.items; track
+                $index) { <li>
+                  <h5>{{ item.title }}</h5>
+                  <p [innerHTML]="item.description"></p>
+                </li> }</ol>
             </div>
-            <div class="the_context_para"><h4>{{ page.transformation.subtitle }}</h4>@for (paragraph of page.transformation.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }<ul>@for (item of page.transformation.items; track $index) { <li>{{ item.description }}</li> }</ul></div>
-          </div></section>
+          </div>
+        </section>
 
-          <section class="theImpact edit-content-section"><div class="the_context">
-            <div class="the_context_heading"><h2>05</h2><h3>{{ page.impact.headingFirst }} <span>{{ page.impact.headingSecond }}</span></h3>
-              <div class="inline-editor-tools">@if (editingSection !== 'impact') { <button type="button" (click)="startEdit('impact')">✎</button> } @else { <button type="button" (click)="saveSection('impact')" [disabled]="savingSection === 'impact'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }</div>
-              @if (editingSection === 'impact') { <div class="inline-editor-fields"><label>Heading <input [(ngModel)]="draft.impact.headingFirst"></label><label>Highlighted heading <input [(ngModel)]="draft.impact.headingSecond"></label><label>Subtitle <input [(ngModel)]="draft.impact.subtitle"></label>
-                @for (paragraph of draft.impact.paragraphs; track $index; let i = $index) { <label>Impact paragraph {{ i + 1 }}</label><div class="rich-editor-toolbar"><button type="button" (click)="formatRichText('impact',i,'bold')">B</button><button type="button" (click)="formatRichText('impact',i,'italic')">I</button><button type="button" (click)="formatRichText('impact',i,'underline')">U</button></div><div class="rich-editor" contenteditable="true" (focus)="setRichTextTarget($event)" [innerHTML]="paragraph" (input)="updateRichText($event,'impact',i)"></div> }
-                @for (item of draft.impact.items; track $index; let i = $index) { <div class="inline-list-editor"><label>Card heading <input [(ngModel)]="item.title"></label><label>Card description <textarea [(ngModel)]="item.description"></textarea></label><button type="button" (click)="moveItem('impact','items',i,-1)">↑</button><button type="button" (click)="moveItem('impact','items',i,1)">↓</button><button type="button" (click)="removeItem('impact','items',i)">Remove</button></div> }
+        } @else { <button type="button" class="restore-content-section" (click)="restoreSection('approach')">Restore
+          Approach section</button> }
+
+        @if (page.transformation.enabled !== false) {
+        <section class="theTransformation edit-content-section" style="position:relative;">
+
+          <!-- Section actions: top-right -->
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+
+            <div class="section-edit-tools">
+              @if (editingSection !== 'transformation') {
+              <button type="button" (click)="startEdit('transformation')">
+                ✎
+              </button>
+              } @else {
+              <button type="button" (click)="saveSection('transformation')"
+                [disabled]="savingSection === 'transformation'">
+                ✓
+              </button>
+              <button type="button" (click)="cancelEdit()">✕</button>
+              }
+            </div>
+
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the transformation section from the public page" aria-label="Remove transformation section"
+              (click)="removeSection('transformation')">
+              Remove section
+            </button>
+          </div>
+
+          <div class="the_context">
+
+            <div class="the_context_heading">
+
+              <h2>04</h2>
+
+              <h3>
+                {{ displayPage.transformation.headingFirst || 'The' }}
+                <span>{{ displayPage.transformation.headingSecond || 'Transformation' }}</span>
+              </h3>
+
+              @if (editingSection === 'transformation') {
+
+              <div class="inline-editor-fields">
+
+                <div class="section-heading-fields">
+                  <label>
+                    Heading
+                    <input [(ngModel)]="draft.transformation.headingFirst" placeholder="Heading">
+                  </label>
+
+                  <label>
+                    Highlighted heading
+                    <input [(ngModel)]="draft.transformation.headingSecond" placeholder="Highlighted heading">
+                  </label>
+                </div>
+
+                <label>
+                  Subtitle
+                  <input [(ngModel)]="draft.transformation.subtitle" placeholder="Subtitle">
+                </label>
+
+                <!-- Description paragraphs -->
+                @for (paragraph of draft.transformation.paragraphs; track $index; let i = $index) {
+
+                <label>Paragraph {{ i + 1 }}</label>
+
+                <div class="rich-editor-toolbar">
+                  <button type="button" (click)="formatRichText('transformation',i,'bold')">
+                    B
+                  </button>
+
+                  <button type="button" (click)="formatRichText('transformation',i,'italic')">
+                    I
+                  </button>
+
+                  <button type="button" (click)="formatRichText('transformation',i,'underline')">
+                    U
+                  </button>
+                </div>
+
+                <div class="rich-editor" contenteditable="true" data-placeholder="Description"
+                  (focus)="setRichTextTarget($event)" [innerHTML]="paragraph"
+                  (input)="updateRichText($event,'transformation',i)">
+                </div>
+                }
+
+                <!-- Platform benefits -->
+                @for (item of draft.transformation.items; track $index; let i = $index) {
+
+                <div class="inline-list-editor">
+
+                  <label class="inline-list-field">
+                    List item
+
+                    <input type="text" [(ngModel)]="item.description" [name]="'transformationItem' + i"
+                      placeholder="Enter platform benefit">
+                  </label>
+
+                  <div class="inline-list-actions">
+
+                    <button type="button" class="list-action-btn" title="Move up" aria-label="Move item up"
+                      [disabled]="i === 0" (click)="moveItem('transformation','items',i,-1)">
+                      ↑
+                    </button>
+
+                    <button type="button" class="list-action-btn" title="Move down" aria-label="Move item down"
+                      [disabled]="i === draft.transformation.items.length - 1"
+                      (click)="moveItem('transformation','items',i,1)">
+                      ↓
+                    </button>
+
+                    <button type="button" class="list-remove-btn" (click)="removeItem('transformation','items',i)">
+                      Remove
+                    </button>
+
+                  </div>
+                </div>
+                }
+
+                <button type="button" class="add-transformation-item" (click)="addItem('transformation','items')">
+                  + Add platform benefit
+                </button>
+
+              </div>
+              }
+
+            </div>
+
+            <!-- Public content preview -->
+            <div class="the_context_para">
+
+              <h4>{{ displayPage.transformation.subtitle }}</h4>
+
+              @for (paragraph of displayPage.transformation.paragraphs; track $index) {
+              <p [innerHTML]="safeHtml(paragraph)"></p>
+              }
+
+              @if (displayPage.transformation.items.length) {
+              <ul>
+                @for (item of displayPage.transformation.items; track $index) {
+                <li>{{ item.description }}</li>
+                }
+              </ul>
+              }
+
+            </div>
+
+          </div>
+        </section>
+
+        } @else {
+        <button type="button" class="restore-content-section" (click)="restoreSection('transformation')">
+          Restore Transformation section
+        </button>
+        }
+
+        @if (page.impact.enabled !== false) {
+        <section class="theImpact edit-content-section" style="position:relative;">
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+            <div class="section-edit-tools">@if (editingSection !== 'impact') { <button type="button"
+                (click)="startEdit('impact')">✎</button> } @else { <button type="button" (click)="saveSection('impact')"
+                [disabled]="savingSection === 'impact'">✓</button><button type="button"
+                (click)="cancelEdit()">✕</button> }</div>
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the impact section from the public page" aria-label="Remove impact section"
+              (click)="removeSection('impact')">Remove section</button>
+          </div>
+          <div class="the_context">
+            <div class="the_context_heading">
+              <h2>05</h2>
+              <h3>{{ displayPage.impact.headingFirst || 'Impact at a' }} <span>{{ displayPage.impact.headingSecond ||
+                  'Glance' }}</span></h3>
+
+              @if (editingSection === 'impact') { <div class="inline-editor-fields">
+                <div class="section-heading-fields"><label>Heading <input [(ngModel)]="draft.impact.headingFirst"
+                      placeholder="Heading"></label><label>Highlighted heading <input
+                      [(ngModel)]="draft.impact.headingSecond" placeholder="Highlighted heading"></label></div>
+                <label>Subtitle <input [(ngModel)]="draft.impact.subtitle" placeholder="Subtitle"></label>
+                @for (paragraph of draft.impact.paragraphs; track $index; let i = $index) { <label>Impact paragraph {{ i
+                  +
+                  1 }}</label>
+                <div class="rich-editor-toolbar"><button type="button"
+                    (click)="formatRichText('impact',i,'bold')">B</button><button type="button"
+                    (click)="formatRichText('impact',i,'italic')">I</button><button type="button"
+                    (click)="formatRichText('impact',i,'underline')">U</button></div>
+                <div class="rich-editor" contenteditable="true" data-placeholder="Description"
+                  (focus)="setRichTextTarget($event)" [innerHTML]="paragraph"
+                  (input)="updateRichText($event,'impact',i)"></div> }
+                @for (item of draft.impact.items; track $index; let i = $index) { <div class="inline-list-editor">
+                  <label>Card heading <input [(ngModel)]="item.title"></label><label>Card description <textarea
+                      [(ngModel)]="item.description"></textarea></label>
+                      <div><button type="button"
+                    (click)="moveItem('impact','items',i,-1)">↑</button><button type="button"
+                    (click)="moveItem('impact','items',i,1)">↓</button></div><button type="button"
+                    (click)="removeItem('impact','items',i)">Remove</button>
+                </div> }
                 <button type="button" (click)="addItem('impact','items')">+ Add impact card</button>
               </div> }
             </div>
-            <div class="the_context_para"><h4>{{ page.impact.subtitle }}</h4>@for (paragraph of page.impact.paragraphs; track $index) { <p [innerHTML]="safeHtml(paragraph)"></p> }<div class="impact-cards">@for (item of page.impact.items; track $index) { <article><h5>{{ item.title }}</h5><p [innerHTML]="item.description"></p></article> }</div></div>
-          </div></section>
+            <div class="the_context_para">
+              <h4>{{ displayPage.impact.subtitle }}</h4>@for (paragraph of displayPage.impact.paragraphs; track $index)
+              { <p [innerHTML]="safeHtml(paragraph)"></p> }<div class="impact-cards">@for (item of
+                displayPage.impact.items; track
+                $index) { <article>
+                  <h5>{{ item.title }}</h5>
+                  <p [innerHTML]="item.description"></p>
+                </article> }</div>
+            </div>
+          </div>
+        </section>
 
-          <section class="certifications edit-content-section"><div class="the_context">
-            <div class="the_context_heading"><h2>06</h2><h3>{{ page.certifications.headingFirst }} <span>{{ page.certifications.headingSecond }}</span></h3>
-              <div class="inline-editor-tools">@if (editingSection !== 'certifications') { <button type="button" (click)="startEdit('certifications')">✎</button> } @else { <button type="button" (click)="saveSection('certifications')" [disabled]="savingSection === 'certifications'">✓</button><button type="button" (click)="cancelEdit()">✕</button> }</div>
-              @if (editingSection === 'certifications') { <div class="inline-editor-fields"><label>Heading <input [(ngModel)]="draft.certifications.headingFirst"></label><label>Highlighted heading <input [(ngModel)]="draft.certifications.headingSecond"></label><label>Recognition quote <textarea [(ngModel)]="draft.certifications.quote"></textarea></label><label>Images (maximum 2) <input type="file" accept="image/*" multiple (change)="selectMultipleImages($event,'certifications','images')"></label>
-                @for (image of draft.certifications.images; track $index; let i = $index) { <div class="image-editor-row"><img [src]="image.src" width="80" [alt]="image.alt || 'Recognition image'"><button type="button" (click)="removeItem('certifications','images',i)">Remove</button></div> }
+        } @else { <button type="button" class="restore-content-section" (click)="restoreSection('impact')">Restore
+          Impact section</button> }
+
+        @if (page.certifications.enabled !== false) {
+        <section class="certifications edit-content-section" style="position:relative;">
+          <div class="section-action-top-right"
+            style="position:absolute;top:14px;right:18px;z-index:10;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+            <div class="section-edit-tools">@if (editingSection !== 'certifications') { <button type="button"
+                (click)="startEdit('certifications')">✎</button> } @else { <button type="button"
+                (click)="saveSection('certifications')"
+                [disabled]="savingSection === 'certifications'">✓</button><button type="button"
+                (click)="cancelEdit()">✕</button> }</div>
+            <button type="button" class="remove-content-section"
+              style="display:inline-flex;width:auto;min-width:112px;height:auto;min-height:34px;margin:0;padding:7px 12px;white-space:nowrap;align-items:center;justify-content:center;flex:0 0 auto;"
+              title="Remove the certifications section from the public page" aria-label="Remove certifications section"
+              (click)="removeSection('certifications')">Remove section</button>
+          </div>
+          <div class="the_context">
+            <div class="the_context_heading">
+              <h2>06</h2>
+              <h3>{{ displayPage.certifications.headingFirst || 'Recognition and' }} <span>{{
+                  displayPage.certifications.headingSecond || 'Certifications' }}</span></h3>
+
+              @if (editingSection === 'certifications') { <div class="inline-editor-fields">
+                <div class="section-heading-fields"><label>Heading <input
+                      [(ngModel)]="draft.certifications.headingFirst" placeholder="Heading"
+                      placeholder="Heading"></label><label>Highlighted heading <input
+                      [(ngModel)]="draft.certifications.headingSecond" placeholder="Highlighted heading"
+                      placeholder="Highlighted heading"></label></div><label>Recognition quote <textarea
+                    [(ngModel)]="draft.certifications.quote"
+                    placeholder="Recognition or certification description"></textarea></label><label>Images (maximum 2)
+                  <input type="file" accept="image/*" multiple
+                    (change)="selectMultipleImages($event,'certifications','images')"></label>
+                @for (image of draft.certifications.images; track $index; let i = $index) { <div
+                  class="image-editor-row">
+                  <img [src]="image.src" width="80" [alt]="image.alt || 'Recognition image'"><button type="button"
+                    (click)="removeItem('certifications','images',i)">Remove</button>
+                </div> }
               </div> }
             </div>
-            <div class="the_context_para">@if (page.certifications.quote) { <blockquote>{{ page.certifications.quote }}</blockquote> }<div class="certification-images">@for (image of page.certifications.images; track $index) { <img [src]="image.src" [alt]="image.alt || 'Recognition and certification'"> }</div></div>
-          </div></section>
+            <div class="the_context_para">@if (displayPage.certifications.quote) { <blockquote>{{
+                displayPage.certifications.quote }}
+              </blockquote> }<div class="certification-images">@for (image of displayPage.certifications.images; track
+                $index) {
+                <img [src]="image.src" [alt]="image.alt || 'Recognition and certification'"> }
+              </div>
+            </div>
+          </div>
+        </section>
 
-          <section class="related-projects-section">
-            <div class="inline-editor-tools"><h3>Related Projects</h3><button type="button" (click)="openAssociateProjects()">＋ Associate projects</button></div>
-            <div class="related-projects-list">@for (related of relatedProjectCards; track related.id) { <article><img [src]="related.coverImage || 'assets/images/project_details_banner.jpg'" [alt]="related.title"><h4>{{ related.title }}</h4><p>{{ related.description }}</p></article> } @empty { <p>No related projects selected yet.</p> }</div>
-          </section>
-        </div>
+        } @else { <button type="button" class="restore-content-section"
+          (click)="restoreSection('certifications')">Restore Certifications section</button> }
+
+        <section class="related-projects-section">
+          <div class="inline-editor-tools">
+            <h3>Related Projects</h3><button type="button" (click)="openAssociateProjects()">＋ Associate
+              projects</button>
+          </div>
+          <div class="related-projects-list">@for (related of relatedProjectCards; track related.id) { <article><img
+                [src]="related.coverImage || 'assets/images/project_details_banner.jpg'" [alt]="related.title">
+              <h4>{{ related.title }}</h4>
+              <p>{{ related.description }}</p>
+            </article> } @empty { <p>No related projects selected yet.</p> }</div>
+        </section>
       </div>
+    </div>
     }
 
     @if (activeTab === 'Branding') {
-      <section class="branding-editor">
-        <header><h2>Project branding</h2><p>Optional project-specific brand guidance. Empty fields will not be shown in the public page.</p></header>
-        <div class="inline-editor-tools">@if (editingSection !== 'branding') { <button type="button" (click)="startEdit('branding')">✎ Edit branding</button> } @else { <button type="button" (click)="saveSection('branding')" [disabled]="savingSection === 'branding'">✓ Save branding</button><button type="button" (click)="cancelEdit()">✕ Cancel</button> }</div>
-        @if (editingSection === 'branding') {
-          <div class="inline-editor-fields">
-            <label>Brand overview <textarea [(ngModel)]="draft.branding.overview"></textarea></label>
-            <label>Typography <textarea [(ngModel)]="draft.branding.typography"></textarea></label>
-            <h3>Color palette</h3>
-            @for (color of draft.branding.colors; track $index; let i = $index) { <div class="branding-color-row"><input type="color" [(ngModel)]="color.hex" [name]="'color'+i"><label>HEX <input [(ngModel)]="color.hex" [name]="'hex'+i"></label><label>Color name <input [(ngModel)]="color.name" [name]="'colorName'+i"></label><button type="button" (click)="draft.branding.colors.splice(i,1)">Remove</button></div> }
-            <button type="button" (click)="draft.branding.colors.push({hex:'#000000',name:''})">+ Add color</button>
-            <label>Theme & visual alignment <textarea [(ngModel)]="draft.branding.theme"></textarea></label>
-            <label>Logo design notes <textarea [(ngModel)]="draft.branding.logoDesign"></textarea></label>
+    <section class="branding-editor premium-branding-editor">
+      <div class="branding-editor-topbar">
+        <header class="branding-editor-heading">
+          <span class="branding-eyebrow">PROJECT CONTENT</span>
+          <h2>Branding & visual identity</h2>
+          <p>Define the visual system used across this project.</p>
+        </header>
+        <div class="inline-editor-tools branding-editor-actions">
+          @if (editingSection !== 'branding') { <button type="button" class="branding-primary-action"
+            (click)="startEdit('branding')">✎ Edit branding</button> }
+          @else { <button type="button" class="branding-primary-action" (click)="saveSection('branding')"
+            [disabled]="savingSection === 'branding'">✓ Save branding</button><button type="button"
+            class="branding-secondary-action" (click)="cancelEdit()">Cancel</button> }
+        </div>
+      </div>
+      @if (editingSection === 'branding') {
+      <div class="branding-form">
+        <section class="branding-form-section">
+          <h3>Brand Overview</h3>
+          <div class="branding-heading-row"><label>Heading <input
+                [(ngModel)]="draft.branding.overviewSection.headingFirst"
+                placeholder="Brand overview heading"></label><label>Highlighted heading <input
+                [(ngModel)]="draft.branding.overviewSection.headingSecond" placeholder="Highlighted heading"></label>
           </div>
-        } @else {
-          @if (page.branding.overview) { <h3>Brand Overview</h3><p>{{ page.branding.overview }}</p> }
-          @if (page.branding.typography) { <h3>Typography</h3><p>{{ page.branding.typography }}</p> }
-          @if (page.branding.colors.length) { <h3>Color Palette</h3><div class="branding-colors">@for (color of page.branding.colors; track $index) { <div><span [style.background]="color.hex"></span><b>{{ color.name || color.hex }}</b><small>{{ color.hex }}</small></div> }</div> }
-          @if (page.branding.theme) { <h3>Theme & Visual Alignment</h3><p>{{ page.branding.theme }}</p> }
-          @if (page.branding.logoDesign) { <h3>Logo Design</h3><p>{{ page.branding.logoDesign }}</p> }
-        }
-      </section>
+          <label>Subtitle <input [(ngModel)]="draft.branding.overviewSection.subtitle"
+              placeholder="Brand overview subtitle"></label>
+          <label>Description <textarea [(ngModel)]="draft.branding.overviewSection.description"
+              placeholder="Describe the brand, its purpose, and its identity"></textarea></label>
+        </section>
+        <section class="branding-form-section">
+          <h3>Typography</h3>
+          <div class="branding-heading-row"><label>Heading <input [(ngModel)]="draft.branding.typography.headingFirst"
+                placeholder="Typography heading"></label><label>Highlighted heading <input
+                [(ngModel)]="draft.branding.typography.headingSecond" placeholder="Highlighted heading"></label></div>
+          <label>Subtitle <input [(ngModel)]="draft.branding.typography.subtitle"
+              placeholder="Typography subtitle"></label>
+          <label>Description <textarea [(ngModel)]="draft.branding.typography.description"
+              placeholder="Describe the typography system"></textarea></label>
+          <div class="branding-heading-row"><label>Primary font heading <input
+                [(ngModel)]="draft.branding.typography.primaryFontHeading"
+                placeholder="Primary font name"></label><label>Primary font description <textarea
+                [(ngModel)]="draft.branding.typography.primaryFontDescription"
+                placeholder="Describe its use and characteristics"></textarea></label></div>
+          <div class="branding-heading-row"><label>Secondary font heading <input
+                [(ngModel)]="draft.branding.typography.secondaryFontHeading"
+                placeholder="Secondary font name"></label><label>Secondary font description <textarea
+                [(ngModel)]="draft.branding.typography.secondaryFontDescription"
+                placeholder="Describe its use and characteristics"></textarea></label></div>
+        </section>
+        <section class="branding-form-section">
+          <h3>Color Palette</h3>
+          <div class="branding-heading-row"><label>Heading <input [(ngModel)]="draft.branding.colorPalette.headingFirst"
+                placeholder="Color palette heading"></label><label>Highlighted heading <input
+                [(ngModel)]="draft.branding.colorPalette.headingSecond" placeholder="Highlighted heading"></label></div>
+          <label>Subtitle <input [(ngModel)]="draft.branding.colorPalette.subtitle"
+              placeholder="Color palette subtitle"></label>
+          <label>Description <textarea [(ngModel)]="draft.branding.colorPalette.description"
+              placeholder="Describe the palette and how the colors are used"></textarea></label>
+          @for (theme of draft.branding.colorPalette.themes; track $index; let i = $index) {
+          <div class="branding-theme-card">
+            <div class="branding-theme-top">
+              <h4>{{ theme.type === 'primary' ? 'Primary Color Palette' : theme.type === 'secondary' ? 'Secondary Color
+                Palette' : 'Tertiary Color Palette' }}</h4><button type="button"
+                (click)="draft.branding.colorPalette.themes.splice(i,1)">Remove palette</button>
+            </div>
+            <div class="branding-heading-row"><label>Heading <input [(ngModel)]="theme.headingFirst"
+                  placeholder="Palette heading"></label><label>Subheading <input [(ngModel)]="theme.headingSecond"
+                  placeholder="Palette subheading"></label></div>
+            <label>Subtitle <input [(ngModel)]="theme.subtitle" placeholder="Palette subtitle"></label>
+            <label>Description <textarea [(ngModel)]="theme.description"
+                placeholder="Describe this palette"></textarea></label>
+            @for (color of theme.colors; track $index; let j = $index) {
+            <div class="branding-color-row"><input type="color" [(ngModel)]="color.hex"
+                [name]="'palette'+i+'color'+j"><label>Color name <input [(ngModel)]="color.name"
+                  [name]="'palette'+i+'name'+j" placeholder="Color name"></label><label>HEX <input
+                  [(ngModel)]="color.hex" [name]="'palette'+i+'hex'+j" placeholder="#000000"></label><button
+                type="button" (click)="theme.colors.splice(j,1)">Remove color</button></div>
+            }
+            <button type="button" (click)="addBrandThemeColor(theme)">+ Add color</button>
+          </div>
+          }
+          <div class="branding-palette-actions"><button type="button" (click)="addBrandTheme('primary')"
+              [disabled]="draft.branding.colorPalette.themes.some(t => t.type === 'primary')">+ Primary color
+              palette</button><button type="button" (click)="addBrandTheme('secondary')"
+              [disabled]="draft.branding.colorPalette.themes.some(t => t.type === 'secondary')">+ Secondary color
+              palette</button><button type="button" (click)="addBrandTheme('tertiary')">+ Tertiary color
+              palette</button></div>
+        </section>
+        <section class="branding-form-section">
+          <h3>Logo Design</h3>
+          <div class="branding-heading-row"><label>Heading <input
+                [(ngModel)]="draft.branding.logoDesignSection.headingFirst"
+                placeholder="Logo design heading"></label><label>Highlighted heading <input
+                [(ngModel)]="draft.branding.logoDesignSection.headingSecond" placeholder="Highlighted heading"></label>
+          </div>
+          <label>Subtitle <input [(ngModel)]="draft.branding.logoDesignSection.subtitle"
+              placeholder="Logo design subtitle"></label>
+          <label>Description <textarea [(ngModel)]="draft.branding.logoDesignSection.description"
+              placeholder="Describe the logo concept and usage"></textarea></label>
+          <label>Add logo images <input type="file" accept="image/*" multiple
+              (change)="selectBrandLogoImages($event)"></label>
+          @for (image of draft.branding.logoDesignSection.images; track $index; let i = $index) { <div
+            class="image-editor-row"><img [src]="image.src" width="100" [alt]="image.alt || 'Logo design'"><button
+              type="button" (click)="draft.branding.logoDesignSection.images.splice(i,1)">Remove</button></div> }
+        </section>
+      </div>
+      } @else {
+      @if (page.branding.overviewSection.description || page.branding.overviewSection.headingFirst ||
+      page.branding.overviewSection.headingSecond) { <section>
+        <h3>{{ page.branding.overviewSection.headingFirst }} <span>{{ page.branding.overviewSection.headingSecond
+            }}</span></h3>
+        <h4>{{ page.branding.overviewSection.subtitle }}</h4>
+        <p>{{ page.branding.overviewSection.description }}</p>
+      </section> }
+      @if (page.branding.typography.description || page.branding.typography.primaryFontHeading ||
+      page.branding.typography.secondaryFontHeading) { <section>
+        <h3>{{ page.branding.typography.headingFirst }} <span>{{ page.branding.typography.headingSecond }}</span></h3>
+        <h4>{{ page.branding.typography.subtitle }}</h4>
+        <p>{{ page.branding.typography.description }}</p>
+        <h4>{{ page.branding.typography.primaryFontHeading }}</h4>
+        <p>{{ page.branding.typography.primaryFontDescription }}</p>
+        <h4>{{ page.branding.typography.secondaryFontHeading }}</h4>
+        <p>{{ page.branding.typography.secondaryFontDescription }}</p>
+      </section> }
+      @if (page.branding.colorPalette.themes.length || page.branding.colorPalette.description) { <section>
+        <h3>{{ page.branding.colorPalette.headingFirst }} <span>{{ page.branding.colorPalette.headingSecond }}</span>
+        </h3>
+        <h4>{{ page.branding.colorPalette.subtitle }}</h4>
+        <p>{{ page.branding.colorPalette.description }}</p>@for (theme of page.branding.colorPalette.themes; track
+        $index) { <h4>{{ theme.headingFirst }} {{ theme.headingSecond }}</h4>
+        <p>{{ theme.subtitle }}</p>
+        <p>{{ theme.description }}</p>
+        <div class="branding-colors">@for (color of theme.colors; track $index) { <div><span
+              [style.background]="color.hex"></span><b>{{ color.name || color.hex }}</b><small>{{ color.hex }}</small>
+          </div> }</div> }
+      </section> }
+      @if (page.branding.logoDesignSection.description || page.branding.logoDesignSection.images.length) { <section>
+        <h3>{{ page.branding.logoDesignSection.headingFirst }} <span>{{ page.branding.logoDesignSection.headingSecond
+            }}</span></h3>
+        <h4>{{ page.branding.logoDesignSection.subtitle }}</h4>
+        <p>{{ page.branding.logoDesignSection.description }}</p>
+        <div class="certification-images">@for (image of page.branding.logoDesignSection.images; track $index) { <img
+            [src]="image.src" [alt]="image.alt || 'Logo design'"> }</div>
+      </section> }
+      }
+    </section>
     }
-  }
+    }
 
-  @if (showAssociateProjects) {
+    @if (showAssociateProjects) {
     <div class="associate-modal-backdrop" role="presentation" (click)="closeAssociateProjects()">
-      <section class="associate-modal" role="dialog" aria-modal="true" aria-labelledby="associate-title" (click)="$event.stopPropagation()">
-        <header><h2 id="associate-title">Associate related projects</h2><button type="button" (click)="closeAssociateProjects()" aria-label="Close">✕</button></header>
+      <section class="associate-modal" role="dialog" aria-modal="true" aria-labelledby="associate-title"
+        (click)="$event.stopPropagation()">
+        <header>
+          <h2 id="associate-title">Associate related projects</h2><button type="button"
+            (click)="closeAssociateProjects()" aria-label="Close">✕</button>
+        </header>
         <input type="search" [(ngModel)]="projectSearch" placeholder="Search projects by title">
         <div class="associate-project-options">
           @for (candidate of filteredProjects; track candidate.id) {
-            <label><input type="checkbox" [checked]="isAssociated(candidate.id)" (change)="toggleAssociated(candidate.id,$event)"><span>{{ candidate.title }}</span><small>{{ candidate.year }}</small></label>
+          <label><input type="checkbox" [checked]="isAssociated(candidate.id)"
+              (change)="toggleAssociated(candidate.id,$event)"><span>{{ candidate.title }}</span><small>{{
+              candidate.year
+              }}</small></label>
           } @empty { <p>No projects found.</p> }
         </div>
         @if (sectionErrors['related']) { <p role="alert">{{ sectionErrors['related'] }}</p> }
-        <footer><button type="button" (click)="closeAssociateProjects()">Cancel</button><button type="button" (click)="saveRelatedProjects()" [disabled]="savingSection === 'related'">Save related projects</button></footer>
+        <footer>
+
+          <button type="button" (click)="closeAssociateProjects()">Cancel</button>
+
+
+          <button type="button" (click)="saveRelatedProjects()"
+            [disabled]="savingSection === 'related' || !hasRelatedProjectChanges">
+            {{ savingSection === 'related' ? 'Saving...' : 'Save' }}
+          </button>
+
+        </footer>
       </section>
     </div>
-  }
+    }
+  </div>
 </div>

@@ -34,56 +34,64 @@ export class App {
   readonly isHeaderHidden =
     signal<boolean>(true);
 
-  private readonly headerHiddenRoutes: string[] = [
-    '/',
-    '/home'
-  ];
 
-  constructor() {
-    this.router.events
-      .pipe(
-        filter(
-          (event): event is NavigationEnd =>
-            event instanceof NavigationEnd
-        ),
-        takeUntilDestroyed()
-      )
-      .subscribe((event) => {
-        this.updateHeaderVisibility(
-          event.urlAfterRedirects
-        );
-        this.routeReady.set(true);
-      });
-  }
+private readonly headerHiddenRoutes: string[] = [
+  '/',
+  '/home'
+];
 
-  private updateHeaderVisibility(
-    url: string
-  ): void {
-    const currentPath =
-      this.normalizeRoute(url);
+constructor() {
+  // Set the correct visibility for the initial URL.
+  this.updateHeaderVisibility(this.router.url);
 
-    const shouldHide =
-      this.headerHiddenRoutes.some(
-        (hiddenRoute) =>
-          currentPath === hiddenRoute ||
-          currentPath.startsWith(
-            hiddenRoute + '/'
-          )
+  this.router.events
+    .pipe(
+      filter(
+        (event): event is NavigationEnd =>
+          event instanceof NavigationEnd
+      ),
+      takeUntilDestroyed()
+    )
+    .subscribe((event) => {
+      this.updateHeaderVisibility(
+        event.urlAfterRedirects
       );
 
-    this.isHeaderHidden.set(
-      shouldHide
+      this.routeReady.set(true);
+    });
+}
+
+private updateHeaderVisibility(url: string): void {
+  const currentPath = this.normalizeRoute(url);
+
+  // Hide the header for all admin routes.
+  const isAdminRoute =
+    currentPath === '/admin' ||
+    currentPath.startsWith('/admin/');
+
+  // Preserve the existing hidden routes.
+  const isExistingHiddenRoute =
+    this.headerHiddenRoutes.some(
+      (hiddenRoute) =>
+        currentPath === hiddenRoute ||
+        (
+          hiddenRoute !== '/' &&
+          currentPath.startsWith(hiddenRoute + '/')
+        )
     );
-  }
 
-  private normalizeRoute(
-    url: string
-  ): string {
-    const path = url
-      .split('?')[0]
-      .split('#')[0]
-      .replace(/\/+$/, '');
+  this.isHeaderHidden.set(
+    isAdminRoute || isExistingHiddenRoute
+  );
+}
 
-    return path || '/';
-  }
+private normalizeRoute(url: string): string {
+  const path = url
+    .split('?')[0]
+    .split('#')[0]
+    .replace(/\/+$/, '');
+
+  return path || '/';
+}
+
 }

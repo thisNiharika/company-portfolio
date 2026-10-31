@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,14 +16,34 @@ interface EditableSection {
   items: EditableItem[];
   images: PageImage[];
   quote?: string;
+  enabled?: boolean;
+}
+interface BrandingTextBlock {
+  headingFirst: string;
+  headingSecond: string;
+  subtitle: string;
+  description: string;
+}
+interface BrandingTheme extends BrandingTextBlock {
+  type: 'primary' | 'secondary' | 'tertiary';
+  colors: BrandingColor[];
 }
 interface BrandingColor { hex: string; name: string; }
 interface BrandingContent {
-  overview: string;
-  typography: string;
-  colors: BrandingColor[];
-  theme: string;
-  logoDesign: string;
+  overviewSection: BrandingTextBlock;
+  typography: BrandingTextBlock & {
+    primaryFontHeading: string;
+    primaryFontDescription: string;
+    secondaryFontHeading: string;
+    secondaryFontDescription: string;
+  };
+  colorPalette: BrandingTextBlock & { themes: BrandingTheme[] };
+  logoDesignSection: BrandingTextBlock & { images: PageImage[] };
+  /* Legacy keys retained so previously saved branding data can still be read. */
+  overview?: string;
+  colors?: BrandingColor[];
+  theme?: string;
+  logoDesign?: string;
 }
 interface PageContent {
   overview: { clientLogo: string; client: string; duration: string; geoScope: string; domain: string; productScale: string; };
@@ -54,6 +74,7 @@ export class EditPageComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly apiUrl = 'https://company-portfolio-api.onrender.com/projects';
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('slider') slider?: ElementRef<HTMLElement>;
 
@@ -112,105 +133,91 @@ export class EditPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createDefaultPage(): PageContent {
-    return {
-      overview: {
-        clientLogo: 'assets/images/clients/national-conference-of-chief-secretaries.svg',
-        client: 'NITI Aayog, UNDP',
-        duration: '6 Months',
-        geoScope: 'Pan-India',
-        domain: 'National Governance & Digital Transformation Initiative',
-        productScale: 'National / Multi-State / Government Leadership'
+/** The editor renders saved data only. Guidance belongs in input placeholders, never in the saved model. */
+get displayPage(): PageContent {
+  return this.page;
+}
+
+private createDefaultPage(): PageContent {
+  const emptySection = (): EditableSection => ({
+    headingFirst: '',
+    headingSecond: '',
+    subtitle: '',
+    paragraphs: [],
+    items: [],
+    images: [],
+    quote: ''
+  });
+
+  return {
+    overview: {
+      clientLogo: '',
+      client: '',
+      duration: '',
+      geoScope: '',
+      domain: '',
+      productScale: ''
+    },
+
+    context: emptySection(),
+    challenge: emptySection(),
+    approach: emptySection(),
+    transformation: emptySection(),
+    impact: emptySection(),
+    certifications: emptySection(),
+
+    relatedProjectIds: [],
+
+    branding: {
+      overviewSection: { headingFirst: '', headingSecond: '', subtitle: '', description: '' },
+      typography: {
+        headingFirst: '', headingSecond: '', subtitle: '', description: '',
+        primaryFontHeading: '', primaryFontDescription: '',
+        secondaryFontHeading: '', secondaryFontDescription: ''
       },
-      context: {
-        headingFirst: 'The', headingSecond: 'Context', subtitle: 'Where Governance Meets Collaboration',
-        paragraphs: [
-          'The National Conference of Chief Secretaries brings together the highest levels of administrative leadership to deliberate on national priorities, strengthen Centre–State collaboration and accelerate the implementation of shared development agendas.',
-          'Our role was to transform this institutional ecosystem into a powerful digital experience, making critical information, knowledge and outcomes more accessible, structured and connected.'
-        ],
-        items: [],
-        images: [
-          { src: 'assets/images/slider_1.jpg', alt: 'Conference platform image 1' },
-          { src: 'assets/images/slider_2.jpg', alt: 'Conference platform image 2' },
-          { src: 'assets/images/slider_2.jpg', alt: 'Conference platform image 3' },
-          { src: 'assets/images/slider_1.jpg', alt: 'Conference platform image 4' }
-        ]
-      },
-      challenge: {
-        headingFirst: 'The', headingSecond: 'Challenge', subtitle: 'Connecting a Complex Governance Landscape',
-        paragraphs: [
-          'Multiple stakeholders. Diverse information. National-scale coordination.',
-          'The platform needed to bring together conference proceedings, policy discussions, knowledge resources, programmes and institutional information within a single, intuitive digital environment.',
-          'The challenge was not simply to organise information, but to make a complex governance ecosystem understandable, discoverable and accessible.'
-        ], items: [], images: []
-      },
-      approach: {
-        headingFirst: 'Our', headingSecond: 'Approach', subtitle: 'Designing for the Complexity of Governance',
-        paragraphs: ['We approached the platform as a digital knowledge and collaboration ecosystem, rather than a conventional event website.'],
-        items: [
-          { title: 'Simplifying Complexity', description: 'Transforming extensive institutional information into clear and intuitive experiences.' },
-          { title: 'Connecting Information and', description: 'Creating relationships between conferences, themes, initiatives, resources and outcomes.' },
-          { title: 'Designing for Scale and', description: 'Building an experience capable of evolving with future conferences, programmes and governance initiatives.' }
-        ], images: []
-      },
-      transformation: {
-        headingFirst: 'The', headingSecond: 'Transformation', subtitle: 'A Digital Home for Collaborative Governance',
-        paragraphs: ['We transformed the existing digital experience into a comprehensive governance and knowledge-sharing platform, bringing critical information and institutional resources together within a unified ecosystem.', 'The platform enables:'],
-        items: [
-          { description: 'Centralised access to institutional knowledge and resources.' },
-          { description: 'Clear connections between conferences, themes, programmes and outcomes.' },
-          { description: 'A scalable digital experience for future governance initiatives.' }
-        ], images: []
-      },
-      impact: {
-        headingFirst: 'Impact at a', headingSecond: 'Glance', subtitle: 'Building the Digital Infrastructure for Institutional Knowledge',
-        paragraphs: ['The transformation created a stronger digital foundation for the National Conference of Chief Secretaries, enabling centralised knowledge access, improved information discoverability and a more connected digital experience across the governance ecosystem.'],
-        items: [], images: []
-      },
-      certifications: {
-        headingFirst: 'Recognition and', headingSecond: 'Certifications', paragraphs: [], items: [], images: [],
-        quote: 'Recognized for delivering a scalable and impactful digital platform that strengthened knowledge sharing and collaborative governance across stakeholders.'
-      },
-      relatedProjectIds: [],
-      branding: { overview: '', typography: '', colors: [], theme: '', logoDesign: '' }
-    };
-  }
+      colorPalette: { headingFirst: '', headingSecond: '', subtitle: '', description: '', themes: [] },
+      logoDesignSection: { headingFirst: '', headingSecond: '', subtitle: '', description: '', images: [] },
+      overview: '', colors: [], theme: '', logoDesign: ''
+    }
+  };
+}
 
 
-private loadPageContent(projectId: string): void {
-  this.http
-    .get<Partial<PageContent>>(
-      `${this.apiUrl}/${encodeURIComponent(projectId)}/detail-page`
-    )
-    .pipe(
-      catchError(err => {
-        console.error(
-          'Edit Page content request failed:',
-          err.status,
-          err.error
-        );
+  private loadPageContent(projectId: string): void {
+    this.http
+      .get<Partial<PageContent>>(
+        `${this.apiUrl}/${encodeURIComponent(projectId)}/detail-page`
+      )
+      .pipe(
+        catchError(err => {
+          console.error(
+            'Edit Page content request failed:',
+            err.status,
+            err.error
+          );
 
-        this.error =
-          err?.status === 404
-            ? 'The detail-page API is unavailable. Check the deployed backend route.'
-            : err?.error?.message ||
+          this.error =
+            err?.status === 404
+              ? 'The detail-page API is unavailable. Check the deployed backend route.'
+              : err?.error?.message ||
               'Unable to load saved page content.';
 
-        return of(null);
-      }),
-      finalize(() => {
-        this.loading = false;
-      })
-    )
-    .subscribe(saved => {
-      this.page = this.mergePage(
-        this.createDefaultPage(),
-        saved ?? {}
-      );
+          return of(null);
+        }),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe(saved => {
+        this.page = this.mergePage(
+          this.createDefaultPage(),
+          saved ?? {}
+        );
 
-      this.draft = this.clone(this.page);
-    });
-}
+        this.draft = this.clone(this.page);
+      });
+  }
 
 
   private loadAvailableProjects(): void {
@@ -238,7 +245,14 @@ private loadPageContent(projectId: string): void {
       impact: mergeSection(base.impact, saved.impact),
       certifications: mergeSection(base.certifications, saved.certifications),
       relatedProjectIds: saved.relatedProjectIds ?? base.relatedProjectIds,
-      branding: { ...base.branding, ...(saved.branding ?? {}), colors: saved.branding?.colors ?? base.branding.colors }
+      branding: {
+        ...base.branding, ...(saved.branding ?? {}),
+        overviewSection: { ...base.branding.overviewSection, ...((saved.branding as any)?.overviewSection ?? {}) },
+        typography: { ...base.branding.typography, ...((saved.branding as any)?.typography && typeof (saved.branding as any).typography === 'object' ? (saved.branding as any).typography : {}) },
+        colorPalette: { ...base.branding.colorPalette, ...((saved.branding as any)?.colorPalette ?? {}), themes: (saved.branding as any)?.colorPalette?.themes ?? [] },
+        logoDesignSection: { ...base.branding.logoDesignSection, ...((saved.branding as any)?.logoDesignSection ?? {}), images: (saved.branding as any)?.logoDesignSection?.images ?? [] },
+        colors: (saved.branding as any)?.colors ?? base.branding.colors
+      }
     };
   }
 
@@ -247,6 +261,10 @@ private loadPageContent(projectId: string): void {
   startEdit(section: string): void {
     this.saveError = ''; this.saveSuccess = ''; this.sectionErrors = {};
     this.draft = this.clone(this.page);
+    if (['context', 'challenge', 'approach', 'transformation', 'impact'].includes(section)) {
+      const target = (this.draft as any)[section] as EditableSection;
+      if (!target.paragraphs.length) target.paragraphs = [''];
+    }
     this.editingSection = section;
   }
 
@@ -260,13 +278,29 @@ private loadPageContent(projectId: string): void {
     const id = this.project?.id;
     if (!id) { this.saveError = 'Project ID is missing. Changes were not saved.'; return; }
     if (this.savingSection) return;
+    if (['context', 'challenge', 'approach', 'transformation', 'impact', 'certifications'].includes(section)) {
+      const content = (this.draft as any)[section] as EditableSection;
+      content.paragraphs = (content.paragraphs ?? []).filter((value: string) => !!value?.replace(/<[^>]*>/g, '').trim());
+      const hasContent = !!(content.headingFirst?.trim() || content.headingSecond?.trim() || content.subtitle?.trim() || content.quote?.trim() ||
+        content.paragraphs.length || content.items.some(item => !!(item.title?.trim() || item.description?.trim())) || content.images.some(image => !!image.src?.trim()));
+      // Preserve an explicit restore action even when the section is currently empty.
+      // Only infer visibility from content when the section has no saved enabled flag.
+      if (content.enabled === undefined) {
+        content.enabled = hasContent;
+      }
+    }
     const payload = section === 'related'
       ? { relatedProjectIds: [...this.selectedRelatedProjectIds] }
       : { [section]: this.clone((this.draft as any)[section]) };
     this.savingSection = section;
     this.saveError = ''; this.saveSuccess = ''; this.sectionErrors[section] = '';
     this.http.patch<any>(`${this.apiUrl}/${encodeURIComponent(id)}/detail-page/${encodeURIComponent(section)}`, payload)
-      .pipe(finalize(() => this.savingSection = null))
+      .pipe(
+  finalize(() => {
+    this.savingSection = null;
+    this.cdr.detectChanges();
+  })
+)
       .subscribe({
         next: response => {
           if (section === 'related') this.page.relatedProjectIds = [...this.selectedRelatedProjectIds];
@@ -353,20 +387,90 @@ private loadPageContent(projectId: string): void {
     this.saveError = '';
   }
 
+
   closeAssociateProjects(): void {
+    this.selectedRelatedProjectIds = [
+      ...this.page.relatedProjectIds
+    ];
+
     this.showAssociateProjects = false;
-    this.selectedRelatedProjectIds = [...this.page.relatedProjectIds];
+    this.saveError = '';
   }
 
   isAssociated(id: string): boolean { return this.selectedRelatedProjectIds.includes(id); }
 
+
   toggleAssociated(id: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    if (checked && !this.selectedRelatedProjectIds.includes(id)) this.selectedRelatedProjectIds.push(id);
-    if (!checked) this.selectedRelatedProjectIds = this.selectedRelatedProjectIds.filter(item => item !== id);
+
+    if (checked) {
+      if (!this.selectedRelatedProjectIds.includes(id)) {
+        this.selectedRelatedProjectIds = [
+          ...this.selectedRelatedProjectIds,
+          id
+        ];
+      }
+    } else {
+      this.selectedRelatedProjectIds =
+        this.selectedRelatedProjectIds.filter(
+          projectId => projectId !== id
+        );
+    }
+
+    this.saveError = '';
+    this.saveSuccess = '';
   }
 
-  saveRelatedProjects(): void { this.saveSection('related'); }
+
+  get hasRelatedProjectChanges(): boolean {
+    const saved = this.page.relatedProjectIds;
+    const selected = this.selectedRelatedProjectIds;
+
+    return (
+      saved.length !== selected.length ||
+      saved.some(id => !selected.includes(id))
+    );
+  }
+
+
+
+
+saveRelatedProjects(): void {
+  this.saveSection('related');
+}
+
+  removeSection(section: 'context' | 'challenge' | 'approach' | 'transformation' | 'impact' | 'certifications'): void {
+    this.draft = this.clone(this.page);
+    (this.draft[section] as EditableSection).enabled = false;
+    this.editingSection = section;
+    this.saveSection(section);
+  }
+
+  restoreSection(section: 'context' | 'challenge' | 'approach' | 'transformation' | 'impact' | 'certifications'): void {
+    this.draft = this.clone(this.page);
+    (this.draft[section] as EditableSection).enabled = true;
+    // Save immediately so the section returns to the public page and remains restored after reload.
+    this.saveSection(section);
+  }
+
+  addBrandTheme(type: 'primary' | 'secondary' | 'tertiary'): void {
+    this.draft.branding.colorPalette.themes.push({
+      type, headingFirst: '', headingSecond: '', subtitle: '', description: '', colors: []
+    });
+  }
+
+  addBrandThemeColor(theme: BrandingTheme): void {
+    theme.colors.push({ hex: '#000000', name: '' });
+  }
+
+  selectBrandLogoImages(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []).filter(file => file.type.startsWith('image/'));
+    Promise.all(files.map(file => this.readImage(file))).then(sources => {
+      this.draft.branding.logoDesignSection.images.push(...sources.map((src, i) => ({ src, alt: files[i]?.name ?? 'Logo design' })));
+    }).catch(() => this.saveError = 'Unable to read one or more selected images.')
+      .finally(() => input.value = '');
+  }
 
   openPreview(): void {
     if (!this.project) return;
