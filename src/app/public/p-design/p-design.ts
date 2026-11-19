@@ -64,9 +64,12 @@ export class PDesign implements OnInit, AfterViewInit, OnDestroy {
 
   readonly activeYear = signal<number>(new Date().getFullYear());
 
-  private allProjects: PortfolioProjectRecord[] = [];
-  private currentFilters: PortfolioFilterState =
-    this.portfolioFilterService.currentFilters;
+  // Signals ensure the template refreshes as soon as async API/filter data changes,
+  // including in zoneless Angular applications.
+  private readonly allProjects = signal<PortfolioProjectRecord[]>([]);
+  private readonly currentFilters = signal<PortfolioFilterState>(
+    this.portfolioFilterService.currentFilters
+  );
 
   private projectsSubscription?: Subscription;
   private filtersSubscription?: Subscription;
@@ -81,11 +84,13 @@ export class PDesign implements OnInit, AfterViewInit, OnDestroy {
    * but builds the cards from the published MongoDB projects and active filters.
    */
   get portfolioYears(): PortfolioYearGroup[] {
-    const visibleProjects = this.allProjects
-      .filter(project =>
-        this.portfolioFilterService.isPublished(project) &&
-        this.portfolioFilterService.matches(project, this.currentFilters)
-      );
+    const projects = this.allProjects();
+    const filters = this.currentFilters();
+
+    const visibleProjects = projects.filter(project =>
+      this.portfolioFilterService.isPublished(project) &&
+      this.portfolioFilterService.matches(project, filters)
+    );
 
     const groups = new Map<number, PortfolioCard[]>();
 
@@ -144,7 +149,7 @@ export class PDesign implements OnInit, AfterViewInit, OnDestroy {
 
     this.filtersSubscription = this.portfolioFilterService.filters$
       .subscribe(filters => {
-        this.currentFilters = filters;
+        this.currentFilters.set(filters);
         this.syncActiveYear();
         this.scheduleAnimationRefresh();
       });
@@ -154,16 +159,16 @@ export class PDesign implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: projects => {
           this.hidePortfolioLoader();
-          this.allProjects = projects.filter(project =>
+          this.allProjects.set(projects.filter(project =>
             this.portfolioFilterService.isPublished(project)
-          );
+          ));
           this.syncActiveYear();
           this.scheduleAnimationRefresh();
         },
         error: error => {
           this.hidePortfolioLoader();
           console.error('Unable to load portfolio projects:', error);
-          this.allProjects = [];
+          this.allProjects.set([]);
           this.scheduleAnimationRefresh();
         }
       });
