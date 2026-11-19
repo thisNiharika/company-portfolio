@@ -26,6 +26,23 @@ export class ProjectService {
       );
   }
 
+  reorderProject(
+  id: string,
+  project: Omit<Project, 'id'>
+): Observable<Project> {
+  return this.http
+    .post<any>(
+      `${this.apiUrl}/${id}/reorder`,
+      project
+    )
+    .pipe(
+      map(result => ({
+        ...result,
+        id: result._id
+      }))
+    );
+}
+
   getProjectById(id: string): Observable<Project> {
     return this.http
       .get<any>(`${this.apiUrl}/${id}`)

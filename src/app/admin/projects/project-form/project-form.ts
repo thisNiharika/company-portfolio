@@ -135,25 +135,25 @@ export class ProjectForm implements OnInit {
   // INIT
   // =====================================================
 
-    ngOnInit(): void {
+  ngOnInit(): void {
 
-      this.projectId =
-        this.route.snapshot.paramMap.get('id') || '';
+    this.projectId =
+      this.route.snapshot.paramMap.get('id') || '';
 
-      if (this.projectId) {
+    if (this.projectId) {
 
-        this.isEditMode = true;
+      this.isEditMode = true;
 
-        this.loadProject();
+      this.loadProject();
 
-        return;
-      }
-
-      // ADD MODE
-      this.loadingProjects = true;
-
-      this.loadProjectsForAdd();
+      return;
     }
+
+    // ADD MODE
+    this.loadingProjects = true;
+
+    this.loadProjectsForAdd();
+  }
 
   // =====================================================
   // LOAD PROJECT FOR EDIT
@@ -213,73 +213,73 @@ export class ProjectForm implements OnInit {
   }
 
 
- private loadProjectsForAdd(): void {
+  private loadProjectsForAdd(): void {
 
-  this.loadingProjects = true;
+    this.loadingProjects = true;
 
-  this.projectService
-    .getProjects()
-    .subscribe({
+    this.projectService
+      .getProjects()
+      .subscribe({
 
-      next: (projects) => {
+        next: (projects) => {
 
-        console.log(
-          'PROJECTS FOR ADD:',
-          projects
-        );
+          console.log(
+            'PROJECTS FOR ADD:',
+            projects
+          );
 
-        this.projects = [...projects];
+          this.projects = [...projects];
 
-        console.table(
-          this.projects.map(project => ({
-            title: project.title,
-            serialNo: project.serialNo,
-            year: project.year
-          }))
-        );
+          console.table(
+            this.projects.map(project => ({
+              title: project.title,
+              serialNo: project.serialNo,
+              year: project.year
+            }))
+          );
 
-        const nextSerialNo =
-          this.projects.length > 0
-            ? Math.max(
+          const nextSerialNo =
+            this.projects.length > 0
+              ? Math.max(
                 ...this.projects.map(
                   project =>
                     Number(project.serialNo) || 0
                 )
               ) + 1
-            : 1;
+              : 1;
 
-        console.log(
-          'NEXT S.NO:',
-          nextSerialNo
-        );
+          console.log(
+            'NEXT S.NO:',
+            nextSerialNo
+          );
 
-        this.projectForm.patchValue({
-          serialNo: nextSerialNo
-        });
+          this.projectForm.patchValue({
+            serialNo: nextSerialNo
+          });
 
-        this.loadingProjects = false;
+          this.loadingProjects = false;
 
-        // Force the UI to update
-        this.cdr.detectChanges();
-      },
+          // Force the UI to update
+          this.cdr.detectChanges();
+        },
 
-      error: (error) => {
+        error: (error) => {
 
-        console.error(
-          'Failed to load projects:',
-          error
-        );
+          console.error(
+            'Failed to load projects:',
+            error
+          );
 
-        this.loadingProjects = false;
+          this.loadingProjects = false;
 
-        this.errorMessage =
-          'Failed to load existing projects.';
+          this.errorMessage =
+            'Failed to load existing projects.';
 
-        this.cdr.detectChanges();
-      }
+          this.cdr.detectChanges();
+        }
 
-    });
-}
+      });
+  }
 
   // =====================================================
   // NEXT S.NO.
@@ -1155,426 +1155,426 @@ export class ProjectForm implements OnInit {
   // =====================================================
   // REORDER WHEN EDITING
   // =====================================================
-private getTemporarySerialNo(): number {
+  private getTemporarySerialNo(): number {
 
-  const highest =
-    this.projects.length
-      ? Math.max(
+    const highest =
+      this.projects.length
+        ? Math.max(
           ...this.projects.map(
             project =>
               Number(project.serialNo) || 0
           )
         )
-      : 0;
+        : 0;
 
-  return highest + 100000;
-}
-
-private finaliseMovedProject(
-  existingProject: Project,
-  newSerialNo: number,
-  formValue: any
-): void {
-  this.projectService.updateProject({
-    ...existingProject,
-    year: formValue.year,
-    serialNo: newSerialNo,
-    title: formValue.title,
-    description: formValue.description,
-    coverImage: formValue.coverImage || '',
-    slug: formValue.slug,
-    status: formValue.status
-  }).subscribe({
-    next: (updatedProject) => {
-      this.saving = false;
-      this.successMessage = 'Project order updated successfully.';
-      console.log('FINAL PROJECT UPDATE SUCCESS:', updatedProject);
-    },
-    error: (error) => {
-      console.error('FINAL PROJECT UPDATE FAILED:', error);
-      this.saving = false;
-      this.errorMessage = 'Failed to finalize project order.';
-    }
-  });
-}
-
-private sendNormalUpdate(
-  existingProject: Project
-): void {
-
-  const formValue =
-    this.projectForm.getRawValue();
-
-  const updatedProject: Project = {
-
-    ...existingProject,
-
-    year:
-      Number(formValue.year),
-
-    serialNo:
-      Number(formValue.serialNo),
-
-    title:
-      formValue.title!.trim(),
-
-    description:
-      formValue.description!.trim(),
-
-    coverImage:
-      formValue.coverImage!,
-
-    slug:
-      formValue.slug!.trim(),
-
-    status:
-      formValue.status!
-
-  };
-
-  this.projectService
-    .updateProject(updatedProject)
-    .subscribe({
-
-      next: () => {
-
-        this.saving = false;
-
-        this.successMessage =
-          'Project updated successfully.';
-
-        setTimeout(() => {
-
-          this.router.navigate([
-            '/admin/projects'
-          ]);
-
-        }, 700);
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to update project:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to update project.';
-
-      }
-
-    });
-}
-
-
-
-private moveProjectUp(
-  existingProject: Project,
-  newSerialNo: number,
-  oldSerialNo: number,
-  formValue: any
-): void {
-
-  const affectedProjects =
-    this.projects
-      .filter(
-        project =>
-          project.id !== existingProject.id &&
-          Number(project.serialNo) >= newSerialNo &&
-          Number(project.serialNo) < oldSerialNo
-      )
-      .sort(
-        (a, b) =>
-          Number(b.serialNo) -
-          Number(a.serialNo)
-      );
-
-
-  /*
-   * Example:
-   *
-   * A = 1
-   * B = 2
-   * C = 3
-   *
-   * C moves to 1
-   *
-   * B -> 3
-   * A -> 2
-   *
-   * Update from highest to lowest.
-   */
-  from(affectedProjects)
-    .pipe(
-
-      concatMap(project => {
-
-        return this.projectService
-          .updateProject({
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) + 1
-
-          });
-
-      })
-
-    )
-    .subscribe({
-
-      complete: () => {
-
-        this.finaliseMovedProject(
-          existingProject,
-          newSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to move projects:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-
-    complete: () => {
-  console.log('REORDER SEQUENCE COMPLETED');
-
-  this.finaliseMovedProject(
-    existingProject,
-    newSerialNo,
-    formValue
-  );
-}
-}
-
-private moveProjectDown(
-  existingProject: Project,
-  newSerialNo: number,
-  oldSerialNo: number,
-  formValue: any
-): void {
-
-  const affectedProjects =
-    this.projects
-      .filter(
-        project =>
-          project.id !== existingProject.id &&
-          Number(project.serialNo) > oldSerialNo &&
-          Number(project.serialNo) <= newSerialNo
-      )
-      .sort(
-        (a, b) =>
-          Number(a.serialNo) -
-          Number(b.serialNo)
-      );
-
-
-  /*
-   * Example:
-   *
-   * A = 1
-   * B = 2
-   * C = 3
-   *
-   * A moves to 3
-   *
-   * B -> 1
-   * C -> 2
-   *
-   * Update from lowest to highest.
-   */
-  from(affectedProjects)
-    .pipe(
-
-      concatMap(project => {
-
-        return this.projectService
-          .updateProject({
-
-            ...project,
-
-            serialNo:
-              Number(project.serialNo) - 1
-
-          });
-
-      })
-
-    )
-    .subscribe({
-
-      complete: () => {
-
-        this.finaliseMovedProject(
-          existingProject,
-          newSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to move projects:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-
-    complete: () => {
-  console.log('REORDER SEQUENCE COMPLETED');
-
-  this.finaliseMovedProject(
-    existingProject,
-    newSerialNo,
-    formValue
-  );
-}
-}
-
-
-private reorderForEdit(
-  existingProject: Project,
-  newSerialNo: number
-): void {
-
-  const oldSerialNo =
-    Number(existingProject.serialNo);
-
-  if (oldSerialNo === newSerialNo) {
-    this.sendNormalUpdate(existingProject);
-    return;
+    return highest + 100000;
   }
 
-  const formValue =
-    this.projectForm.getRawValue();
+  private finaliseMovedProject(
+    existingProject: Project,
+    newSerialNo: number,
+    formValue: any
+  ): void {
+    this.projectService.updateProject({
+      ...existingProject,
+      year: formValue.year,
+      serialNo: newSerialNo,
+      title: formValue.title,
+      description: formValue.description,
+      coverImage: formValue.coverImage || '',
+      slug: formValue.slug,
+      status: formValue.status
+    }).subscribe({
+      next: (updatedProject) => {
+        this.saving = false;
+        this.successMessage = 'Project order updated successfully.';
+        console.log('FINAL PROJECT UPDATE SUCCESS:', updatedProject);
+      },
+      error: (error) => {
+        console.error('FINAL PROJECT UPDATE FAILED:', error);
+        this.saving = false;
+        this.errorMessage = 'Failed to finalize project order.';
+      }
+    });
+  }
 
-  this.saving = true;
-  this.clearMessages();
+  private sendNormalUpdate(
+    existingProject: Project
+  ): void {
 
-  /*
-   * Temporarily move the edited project
-   * outside the normal S.No. sequence.
-   *
-   * This is necessary because serialNo is
-   * unique in MongoDB.
-   */
-  const temporarySerialNo =
-    this.getTemporarySerialNo();
+    const formValue =
+      this.projectForm.getRawValue();
 
-
-  this.projectService
-    .updateProject({
+    const updatedProject: Project = {
 
       ...existingProject,
 
-      serialNo: temporarySerialNo
+      year:
+        Number(formValue.year),
 
-    })
-    .subscribe({
+      serialNo:
+        Number(formValue.serialNo),
 
-      next: () => {
+      title:
+        formValue.title!.trim(),
 
-        /*
-         * MOVING UP
-         *
-         * Example:
-         *
-         * 1 A
-         * 2 B
-         * 3 C
-         *
-         * C -> 1
-         *
-         * B: 2 -> 3
-         * A: 1 -> 2
-         *
-         * Because the edited project is already
-         * temporarily removed, there is no
-         * unique-number collision.
-         */
-        if (newSerialNo < oldSerialNo) {
+      description:
+        formValue.description!.trim(),
 
-          this.moveProjectUp(
+      coverImage:
+        formValue.coverImage!,
+
+      slug:
+        formValue.slug!.trim(),
+
+      status:
+        formValue.status!
+
+    };
+
+    this.projectService
+      .updateProject(updatedProject)
+      .subscribe({
+
+        next: () => {
+
+          this.saving = false;
+
+          this.successMessage =
+            'Project updated successfully.';
+
+          setTimeout(() => {
+
+            this.router.navigate([
+              '/admin/projects'
+            ]);
+
+          }, 700);
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to update project:',
+            error
+          );
+
+          this.saving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to update project.';
+
+        }
+
+      });
+  }
+
+
+
+  private moveProjectUp(
+    existingProject: Project,
+    newSerialNo: number,
+    oldSerialNo: number,
+    formValue: any
+  ): void {
+
+    const affectedProjects =
+      this.projects
+        .filter(
+          project =>
+            project.id !== existingProject.id &&
+            Number(project.serialNo) >= newSerialNo &&
+            Number(project.serialNo) < oldSerialNo
+        )
+        .sort(
+          (a, b) =>
+            Number(b.serialNo) -
+            Number(a.serialNo)
+        );
+
+
+    /*
+     * Example:
+     *
+     * A = 1
+     * B = 2
+     * C = 3
+     *
+     * C moves to 1
+     *
+     * B -> 3
+     * A -> 2
+     *
+     * Update from highest to lowest.
+     */
+    from(affectedProjects)
+      .pipe(
+
+        concatMap(project => {
+
+          return this.projectService
+            .updateProject({
+
+              ...project,
+
+              serialNo:
+                Number(project.serialNo) + 1
+
+            });
+
+        })
+
+      )
+      .subscribe({
+
+        complete: () => {
+
+          this.finaliseMovedProject(
+            existingProject,
+            newSerialNo,
+            formValue
+          );
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to move projects:',
+            error
+          );
+
+          this.saving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to change project order.';
+
+        }
+
+      });
+
+    complete: () => {
+      console.log('REORDER SEQUENCE COMPLETED');
+
+      this.finaliseMovedProject(
+        existingProject,
+        newSerialNo,
+        formValue
+      );
+    }
+  }
+
+  private moveProjectDown(
+    existingProject: Project,
+    newSerialNo: number,
+    oldSerialNo: number,
+    formValue: any
+  ): void {
+
+    const affectedProjects =
+      this.projects
+        .filter(
+          project =>
+            project.id !== existingProject.id &&
+            Number(project.serialNo) > oldSerialNo &&
+            Number(project.serialNo) <= newSerialNo
+        )
+        .sort(
+          (a, b) =>
+            Number(a.serialNo) -
+            Number(b.serialNo)
+        );
+
+
+    /*
+     * Example:
+     *
+     * A = 1
+     * B = 2
+     * C = 3
+     *
+     * A moves to 3
+     *
+     * B -> 1
+     * C -> 2
+     *
+     * Update from lowest to highest.
+     */
+    from(affectedProjects)
+      .pipe(
+
+        concatMap(project => {
+
+          return this.projectService
+            .updateProject({
+
+              ...project,
+
+              serialNo:
+                Number(project.serialNo) - 1
+
+            });
+
+        })
+
+      )
+      .subscribe({
+
+        complete: () => {
+
+          this.finaliseMovedProject(
+            existingProject,
+            newSerialNo,
+            formValue
+          );
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to move projects:',
+            error
+          );
+
+          this.saving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to change project order.';
+
+        }
+
+      });
+
+    complete: () => {
+      console.log('REORDER SEQUENCE COMPLETED');
+
+      this.finaliseMovedProject(
+        existingProject,
+        newSerialNo,
+        formValue
+      );
+    }
+  }
+
+
+  private reorderForEdit(
+    existingProject: Project,
+    newSerialNo: number
+  ): void {
+
+    const oldSerialNo =
+      Number(existingProject.serialNo);
+
+    if (oldSerialNo === newSerialNo) {
+      this.sendNormalUpdate(existingProject);
+      return;
+    }
+
+    const formValue =
+      this.projectForm.getRawValue();
+
+    this.saving = true;
+    this.clearMessages();
+
+    /*
+     * Temporarily move the edited project
+     * outside the normal S.No. sequence.
+     *
+     * This is necessary because serialNo is
+     * unique in MongoDB.
+     */
+    const temporarySerialNo =
+      this.getTemporarySerialNo();
+
+
+    this.projectService
+      .updateProject({
+
+        ...existingProject,
+
+        serialNo: temporarySerialNo
+
+      })
+      .subscribe({
+
+        next: () => {
+
+          /*
+           * MOVING UP
+           *
+           * Example:
+           *
+           * 1 A
+           * 2 B
+           * 3 C
+           *
+           * C -> 1
+           *
+           * B: 2 -> 3
+           * A: 1 -> 2
+           *
+           * Because the edited project is already
+           * temporarily removed, there is no
+           * unique-number collision.
+           */
+          if (newSerialNo < oldSerialNo) {
+
+            this.moveProjectUp(
+              existingProject,
+              newSerialNo,
+              oldSerialNo,
+              formValue
+            );
+
+            return;
+          }
+
+
+          /*
+           * MOVING DOWN
+           *
+           * Example:
+           *
+           * 1 A
+           * 2 B
+           * 3 C
+           *
+           * A -> 3
+           *
+           * C: 3 -> 2
+           * B: 2 -> 1
+           */
+          this.moveProjectDown(
             existingProject,
             newSerialNo,
             oldSerialNo,
             formValue
           );
 
-          return;
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to temporarily move project:',
+            error
+          );
+
+          this.saving = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Failed to change project order.';
+
         }
 
-
-        /*
-         * MOVING DOWN
-         *
-         * Example:
-         *
-         * 1 A
-         * 2 B
-         * 3 C
-         *
-         * A -> 3
-         *
-         * C: 3 -> 2
-         * B: 2 -> 1
-         */
-        this.moveProjectDown(
-          existingProject,
-          newSerialNo,
-          oldSerialNo,
-          formValue
-        );
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'Failed to temporarily move project:',
-          error
-        );
-
-        this.saving = false;
-
-        this.errorMessage =
-          error?.error?.message ||
-          'Failed to change project order.';
-
-      }
-
-    });
-}
+      });
+  }
 
   // =====================================================
   // UPDATE MOVED PROJECT
@@ -1688,33 +1688,33 @@ private reorderForEdit(
 
   }
   onSerialNoChange(): void {
-  if (this.isEditMode) {
-    return;
+    if (this.isEditMode) {
+      return;
+    }
+
+    this.clearMessages();
+
+    const serialNo =
+      Number(this.projectForm.controls.serialNo.value);
+
+    if (!serialNo || serialNo < 1) {
+      return;
+    }
+
+    const existingProject =
+      this.projects.find(
+        project =>
+          Number(project.serialNo) === serialNo
+      );
+
+    if (!existingProject) {
+      return;
+    }
+
+    this.requestedSerialNo = serialNo;
+    this.conflictingProject = existingProject;
+    this.showOrderModal = true;
   }
-
-  this.clearMessages();
-
-  const serialNo =
-    Number(this.projectForm.controls.serialNo.value);
-
-  if (!serialNo || serialNo < 1) {
-    return;
-  }
-
-  const existingProject =
-    this.projects.find(
-      project =>
-        Number(project.serialNo) === serialNo
-    );
-
-  if (!existingProject) {
-    return;
-  }
-
-  this.requestedSerialNo = serialNo;
-  this.conflictingProject = existingProject;
-  this.showOrderModal = true;
-}
 
 
 
