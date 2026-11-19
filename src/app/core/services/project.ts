@@ -8,41 +8,71 @@ export class ProjectService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'https://company-portfolio-api.onrender.com/projects';
 
+  private http = inject(HttpClient);
+
+  private apiUrl =
+    'https://company-portfolio-api.onrender.com/projects';
+
   getProjects(): Observable<Project[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(projects => projects.map(project => ({ ...project, id: project._id ?? project.id })))
-    );
+    return this.http
+      .get<any[]>(this.apiUrl)
+      .pipe(
+        map(projects =>
+          projects.map(project => ({
+            ...project,
+            id: project._id
+          }))
+        )
+      );
   }
 
   getProjectById(id: string): Observable<Project> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(project => ({ ...project, id: project._id ?? project.id }))
-    );
+    return this.http
+      .get<any>(`${this.apiUrl}/${id}`)
+      .pipe(
+        map(project => ({
+          ...project,
+          id: project._id
+        }))
+      );
   }
 
   addProject(project: Omit<Project, 'id'>): Observable<Project> {
-    return this.http.post<any>(this.apiUrl, project).pipe(
-      map(created => ({ ...created, id: created._id ?? created.id }))
-    );
+    return this.http
+      .post<any>(this.apiUrl, project)
+      .pipe(
+        map(createdProject => ({
+          ...createdProject,
+          id: createdProject._id
+        }))
+      );
   }
 
   updateProject(project: Project): Observable<Project> {
-    return this.http.patch<any>(`${this.apiUrl}/${project.id}`, {
-      year: Number(project.year),
-      serialNo: Number(project.serialNo),
-      title: project.title,
-      description: project.description,
-      coverImage: project.coverImage,
-      slug: project.slug,
-      status: project.status
-    }).pipe(
-      map(updated => ({ ...updated, id: updated._id ?? updated.id }))
-    );
+    return this.http
+      .patch<any>(
+        `${this.apiUrl}/${project.id}`,
+        {
+          year: project.year,
+          serialNo: project.serialNo,
+          title: project.title,
+          description: project.description,
+          coverImage: project.coverImage,
+          slug: project.slug,
+          status: project.status
+        }
+      )
+      .pipe(
+        map(updatedProject => ({
+          ...updatedProject,
+          id: updatedProject._id
+        }))
+      );
   }
 
-  reorderProject(id: string, project: Omit<Project, 'id'>): Observable<Project> {
-    return this.http.post<any>(`${this.apiUrl}/${id}/reorder`, project).pipe(
-      map(result => ({ ...result, id: result._id ?? result.id }))
+  deleteProject(id: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/${id}`
     );
   }
 

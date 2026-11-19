@@ -241,11 +241,11 @@
 
             <button
               type="button"
-              (click)="editProjectPage(project)"
+              (click)="duplicateProject(project)"
             >
-              Edit Page
+             
+              Duplicate
             </button>
-
 
             <div class="menu-divider"></div>
 
@@ -261,6 +261,21 @@
           </div>
 
         </div>
+
+        <h3>
+          No projects yet
+        </h3>
+
+        <p>
+          Add your first project to start building your portfolio.
+        </p>
+
+        <button
+          type="button"
+          (click)="addProject()"
+        >
+          Add Project
+        </button>
 
       </div>
 
@@ -341,6 +356,29 @@
 
       <div class="delete-options">
 
+        <!-- ARCHIVE -->
+
+        <button
+          type="button"
+          class="delete-option archive"
+          (click)="archiveProject()"
+        >
+
+          <div>
+            <strong>
+              Archive Project
+            </strong>
+
+            <span>
+              Remove it from the active portfolio.
+            </span>
+          </div>
+
+          <span class="option-arrow">
+            →
+          </span>
+
+        </button>
 
 
         <!-- PERMANENT -->
